@@ -41,7 +41,7 @@ export default function ProdutoPage({ onNavigate }: ProdutoPageProps) {
 
       <div className="p-6 space-y-4 bg-white">
         <div>
-          <span className="text-xs font-bold uppercase tracking-widest text-[#4d8063]/70">O Boticário</span>
+          <span className="text-xs font-bold uppercase tracking-widest text-[#4d8063]/70">Flor de Liz</span>
           <h1 className="text-2xl font-bold leading-tight mt-1">Lily Eau de Parfum 75ml</h1>
           <div className="flex items-center gap-1 mt-2">
             <div className="flex text-yellow-500">

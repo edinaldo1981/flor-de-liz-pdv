@@ -29,7 +29,7 @@ export default function HomePage({ onNavigate }: HomePageProps) {
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <span className="material-symbols-outlined text-[#4d8063] text-3xl">menu</span>
-            <h1 className="text-xl font-bold tracking-tight text-[#4d8063]">O Boticário</h1>
+            <h1 className="text-xl font-bold tracking-tight text-[#4d8063]">Flor de Liz</h1>
           </div>
           <div className="flex items-center gap-3">
             <button className="relative p-1">
@@ -96,7 +96,7 @@ export default function HomePage({ onNavigate }: HomePageProps) {
                 <span className="material-symbols-outlined text-[#4d8063]">redeem</span>
               </div>
               <div>
-                <h3 className="font-bold text-slate-800">Viva O Boticário</h3>
+                <h3 className="font-bold text-slate-800">Viva Flor de Liz</h3>
                 <p className="text-xs text-slate-500">Você tem <span className="text-[#4d8063] font-bold">1.250 pontos</span></p>
               </div>
             </div>

@@ -26,7 +26,7 @@ export default function ProfilePage({ onNavigate }: ProfilePageProps) {
         <div className="bg-white/20 rounded-xl px-6 py-3 flex items-center gap-3">
           <span className="material-symbols-outlined text-white">redeem</span>
           <div>
-            <p className="text-xs text-white/70 font-medium">Pontos Viva O Boticário</p>
+            <p className="text-xs text-white/70 font-medium">Pontos Viva Flor de Liz</p>
             <p className="text-xl font-bold">1.250 pts</p>
           </div>
         </div>
