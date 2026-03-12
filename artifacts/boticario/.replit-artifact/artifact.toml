@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "O Boticário - App"
+version = "1.0.0"
+id = "artifacts/boticario"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+localPort = 18272
+name = "web"
+paths = ["/"]
+
+[services.development]
+run = "pnpm --filter @workspace/boticario run dev"
+
+[services.env]
+PORT = "18272"
+BASE_PATH = "/"
+
+[services.production]
+build = ["pnpm", "--filter", "@workspace/boticario", "run", "build"]
+publicDir = "artifacts/boticario/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"

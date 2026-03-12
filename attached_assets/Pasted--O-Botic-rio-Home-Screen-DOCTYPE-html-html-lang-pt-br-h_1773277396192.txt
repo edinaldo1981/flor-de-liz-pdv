@@ -1,0 +1,1810 @@
+<!-- O Boticário - Home Screen -->
+<!DOCTYPE html>
+
+<html lang="pt-br"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#4d8063",
+              "background-light": "#f6f7f7",
+              "background-dark": "#161c19",
+            },
+            fontFamily: {
+              "display": ["Work Sans"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<title>O Boticário - Home</title>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen pb-24">
+<!-- Header Section -->
+<header class="sticky top-0 z-50 bg-white/95 dark:bg-background-dark/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 pt-4 pb-3">
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-3xl">menu</span>
+<h1 class="text-xl font-bold tracking-tight text-primary">O Boticário</h1>
+</div>
+<div class="flex items-center gap-3">
+<button class="relative p-1">
+<span class="material-symbols-outlined text-slate-700 dark:text-slate-300">notifications</span>
+<span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+</button>
+<div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden border border-primary/20">
+<span class="material-symbols-outlined text-primary">person</span>
+</div>
+</div>
+</div>
+<!-- Search Bar -->
+<div class="relative group">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-slate-400">search</span>
+</div>
+<input class="block w-full pl-10 pr-3 py-2.5 bg-slate-100 dark:bg-slate-800 border-none rounded-xl text-sm placeholder-slate-500 focus:ring-2 focus:ring-primary/50 transition-all" placeholder="O que você procura hoje?" type="text"/>
+</div>
+</header>
+<main class="max-w-md mx-auto">
+<!-- Stories Style Carousel -->
+<section class="py-6 overflow-x-auto no-scrollbar">
+<div class="flex px-4 gap-6">
+<!-- Brand Story -->
+<div class="flex flex-col items-center gap-2 shrink-0">
+<div class="p-0.5 rounded-full border-2 border-primary">
+<div class="w-16 h-16 rounded-full bg-white border border-slate-100 bg-center bg-cover" data-alt="Logotipo clássico do perfume Malbec" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuC9_byuTsq9dx9jWOqrb31ESq_YS3SJVcqH7BftBBvw0gnBFFR6KKibC8OqqK_fTWWxuK51d4jwuCLYJKmOxzZfQP-7zR-2DF8TVNBdPW4-1rCHQxBpK8X-JAVSMIfSh5mfC1cebgNBLMYt_NFdTWNm0HGb5MbGs9USnCT5yjqjc0diZXhAgg8QCsBS9pOZE222VUsSK0KxrKrZQbpGH3Y5zR9erkxcvmHsqupFuAaNF50w6VGzP4Ny37Ef760jDcasqo6vKHTN3ZA')"></div>
+</div>
+<span class="text-xs font-medium">Malbec</span>
+</div>
+<div class="flex flex-col items-center gap-2 shrink-0">
+<div class="p-0.5 rounded-full border-2 border-primary">
+<div class="w-16 h-16 rounded-full bg-white border border-slate-100 bg-center bg-cover" data-alt="Logotipo elegante do perfume Lily" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBxNbAjJyzNE2h-0sZFD5SnSmeR8uHPV2TKsyfMdffv39sPjvYl-Q0fxYaNLR-bSvYT6YmzrbAgIKQ1d5S_fYqh4mLVbtwxfilkNIkmqKWpA1n2vyxAyHLl2-ClcLM15mKHQVs4pAxo9lFOO50sVJLyOk2acBFWCKP3t0c_15sBz765-Uu8fFfBwbISrw5ZA3ZKgT1Ka7WG7XdYFfRGDpZbqq4129Q03cnCLcNSK6aKNfA8L-5gv1ge3R6BmrD0CveWVGmrih7yKEE')"></div>
+</div>
+<span class="text-xs font-medium">Lily</span>
+</div>
+<div class="flex flex-col items-center gap-2 shrink-0">
+<div class="p-0.5 rounded-full border-2 border-primary">
+<div class="w-16 h-16 rounded-full bg-white border border-slate-100 bg-center bg-cover" data-alt="Logotipo Nativa SPA natureza" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuC5WrmS822iikiHfO53vApzirj2QS9_hA_4r0b45HFJm97gjqA5kK5s34kTpId03_8d6ojYXH-gNyftFUdoD7uIzTd5_uLlv9Cpc6noaU64K4KhDvj39OTxmqgdIBtiEXs1g6yy8JOvX0XAg5jcPQw3JNWvw0FTtj58LHPhlAjkfcVHLLVwyfRR5uhWtI2CM1A5Qc9xeThRr2HxlvhtYsqfBNjW1jws50IVJW0i6-A8x0Wtf_6KxnyOlt9aqqH2TqRda2el8qmxw7s')"></div>
+</div>
+<span class="text-xs font-medium">Nativa SPA</span>
+</div>
+<div class="flex flex-col items-center gap-2 shrink-0">
+<div class="p-0.5 rounded-full border-2 border-slate-200">
+<div class="w-16 h-16 rounded-full bg-white border border-slate-100 bg-center bg-cover" data-alt="Logotipo maquiagem Make B" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBKwZPse_fKrOTG5jWV3xU-05fD8-ePnLlRgN_KQVpR--DqXSmut7u_sXYP5urCsvgGixz3qDM16cmVRn0IIyprjESkJHhmU1Lna9mbk4fsLDUplfmae6Gt2raflZV09Sy_AubgJbmsXcmX43IWYlV4MtAR6YAE9PKEePRP_GaH8FUKLnpFszxlFS4F4OjrGuNoHhj7Gj1KokFZ4w5OB6MgCSv3he9PUecvMLfr5tfzluL2fCKmvbapBl88k7oJiueW8M4XthxLjBg')"></div>
+</div>
+<span class="text-xs font-medium">Make B.</span>
+</div>
+<div class="flex flex-col items-center gap-2 shrink-0">
+<div class="p-0.5 rounded-full border-2 border-slate-200">
+<div class="w-16 h-16 rounded-full bg-white border border-slate-100 bg-center bg-cover" data-alt="Logotipo linha infantil Dr Botica" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAoxxH3te-Eu1F4SmKB5UQJLcHbITYIh-awR6ohbgV6yo7KdWIVvngNjbklen4xcEDFEAWCrHvnTD3oppkRGFelWMF8vCQsa3fOPGq-IaMAl2CCrwPLdJBLlNpiz9G9IvNCTs6k70JDvBWm9ZHrmvLh0Rvg2HQpH8AXaxlRIGTXw_vjFkzQhS2--nOBBxC17RmEnTfsewOmiI7hWm9Lib6YxdwiFyMzRjs7XDrb8Ad0xRZc_21huf0tPlxk9qzZ7BXQnlAbfFpqpLE')"></div>
+</div>
+<span class="text-xs font-medium">Dr. Botica</span>
+</div>
+</div>
+</section>
+<!-- Main Promotional Banner -->
+<section class="px-4 mb-8">
+<div class="relative w-full aspect-[16/9] rounded-2xl overflow-hidden shadow-lg shadow-primary/10">
+<div class="absolute inset-0 bg-cover bg-center" data-alt="Banner promocional de perfumes florais" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAOOSMydJjlJmMAy0XBfOR7RlY3TLI8QvGcfCFrLk1Eb-IiLrXCgYpOjVxLiexLtLbfe4s5plEmOE6urjaH2IytDuAku1y5pUwLNHX-_z3ugMWbm-GE1YVmp9MCPiA5uaCMqKCNqXE_O-Bz_CzSW8txHXv7QbdpLeXvX4qclm7ZRtLFig6MsN1Q9aEr0rVwMqc9_bKdNMouUZtCbOQ2hSxMzTVjpeHyx7aDsTjmzqRLFER0ngUYoetQq3aE9Z-XDMlyw_4sfo86e3g')"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex flex-col justify-end p-6">
+<span class="text-white/80 text-xs font-bold uppercase tracking-widest mb-1">Oferta Exclusiva</span>
+<h2 class="text-white text-2xl font-bold mb-2">Semana da Perfumaria</h2>
+<p class="text-white/90 text-sm mb-4">Até 40% OFF em fragrâncias selecionadas.</p>
+<button class="bg-primary text-white px-6 py-2 rounded-full text-sm font-bold w-fit">Aproveitar</button>
+</div>
+</div>
+</section>
+<!-- Loyalty Program Section -->
+<section class="px-4 mb-8">
+<div class="bg-white dark:bg-slate-800 rounded-2xl p-5 border border-primary/10 shadow-sm flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="bg-primary/10 p-3 rounded-xl">
+<span class="material-symbols-outlined text-primary">redeem</span>
+</div>
+<div>
+<h3 class="font-bold text-slate-800 dark:text-slate-100">Viva O Boticário</h3>
+<p class="text-xs text-slate-500 dark:text-slate-400">Você tem <span class="text-primary font-bold">1.250 pontos</span></p>
+</div>
+</div>
+<span class="material-symbols-outlined text-slate-400">chevron_right</span>
+</div>
+</section>
+<!-- Categories Grid -->
+<section class="px-4 mb-8">
+<div class="flex items-center justify-between mb-4">
+<h3 class="text-lg font-bold">Categorias</h3>
+<a class="text-primary text-sm font-semibold" href="#">Ver todas</a>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="relative group h-32 rounded-xl overflow-hidden shadow-sm">
+<div class="absolute inset-0 bg-center bg-cover" data-alt="Frasco de perfume elegante" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuD8z3_K5H5X6LCVaNxMi55WrVuc3Kw8IP-TUw57faX4WBnUTsU1qeWmNs7mWjUR2pJ0-vnLOFZqbMN07IGjGV0SWGPEJb3C27YViblcGBLlfBEXzBQbo9pHgC9Yf_TWO4fzTlsMNGh62p7MDdIybGgH4zYcbxK7LzxoaZLyIaG63YEZRk8LaM6v-7z_t-HG5yM4QXFSjo3ws76KIqVTlSjvMDukvcIC-DVOaQM7x6uMWX8x44N6mIgyiyO3jz3819jPBWUGvPcL8_s')"></div>
+<div class="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors"></div>
+<div class="absolute bottom-3 left-3">
+<span class="text-white font-bold text-sm">Perfumaria</span>
+</div>
+</div>
+<div class="relative group h-32 rounded-xl overflow-hidden shadow-sm">
+<div class="absolute inset-0 bg-center bg-cover" data-alt="Produtos de maquiagem variados" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDuPC6Z2AmvET0iCpskQZO5s4rL5qlP6xVEZZiX4en0T25OT89Wi12L3t4XSlZGHgIE6yeIIBhqZvo2-6BwLBiLmt_gSXvqRCvd5MWvkgBvBuzwfRjoicTI9PsAMeMQSfDUIaxH44t58fq408Vf7pD_b6MwaQF1edlBWtMipe0h9kvXA3rt7mobdF8NDanMnevg2ADNPoH19KmWazWcDsTEr0IPVXibXml7SsnTaUf-6dOu0NROgGpnPTBpS9w-yG8oR-D89TsDa_k')"></div>
+<div class="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors"></div>
+<div class="absolute bottom-3 left-3">
+<span class="text-white font-bold text-sm">Maquiagem</span>
+</div>
+</div>
+<div class="relative group h-32 rounded-xl overflow-hidden shadow-sm">
+<div class="absolute inset-0 bg-center bg-cover" data-alt="Cremes corporais e hidratantes" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCCEBo9mtlKNWBUGeLkPsAQZlHkhwEwqAJeXHdLrkxdiNYbTaNfxJ6nW1lc248-CNxs5SpB6BENCXls3z-r_Dy-aT-ZcL9YnkqRZt4jye-hO4ndn0cKjOOLjwFlDy1ICdfZdjIla6GNanBXvTl5XkLmgFeLViE21OLEBFdXwInmQQh2DnLaTt1LX7UH4vb5llaEt-uSBY1NmzoQaFcCoRCyYYme9JdnNypdLKsgGefiQltRoxqVkHXd258DvOvkuAv_FT1brX9j64E')"></div>
+<div class="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors"></div>
+<div class="absolute bottom-3 left-3">
+<span class="text-white font-bold text-sm">Corpo e Banho</span>
+</div>
+</div>
+<div class="relative group h-32 rounded-xl overflow-hidden shadow-sm">
+<div class="absolute inset-0 bg-center bg-cover" data-alt="Produtos para cuidados capilares" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCguQ93jZox412Ll91K-fnRQRmcLDSsepQB4LSjqIL4Oi3T9xRQlVIEzyTK_ehYoTYM_Jofa9AwEgrsypy1sd7Ho8zC1vR2rNFhcOBDInN41eST_Aj1xD9so7CVwq4y3_EmQbkoLRW__4PmR-7eiwJj9k0gbEtsBXA2vHRIiPrYPqRaSqgz8Whl4QbvoMef1TBUoKexNCeQaqS4ll8YHgxxR5iO6ffrvqPpc9ztYBBo5ufXBcpUW-Fiev1oX7wM8cRT-Qzv9WIb4fY')"></div>
+<div class="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors"></div>
+<div class="absolute bottom-3 left-3">
+<span class="text-white font-bold text-sm">Cabelos</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Recommended Section -->
+<section class="px-4 mb-12">
+<h3 class="text-lg font-bold mb-4">Especialmente para você</h3>
+<div class="bg-white dark:bg-slate-800 rounded-2xl overflow-hidden border border-slate-100 dark:border-slate-700 shadow-sm flex">
+<div class="w-1/3 aspect-square bg-center bg-cover" data-alt="Produto de destaque recomendado" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBbqh7Jct2T5-t6X4flwABRhIF5yhWnZPrJZuUqzc2gS4hhMchCd_WnTb09e6eBSQrqHlDtL8fxFOd6fOBhZHMtixtdK0UivI7IrtEwLyvZPpZ8M_UyQb2dDZntBA5KEKaWFZHuM-mFSZmRxny2QlHPMGkyvn3E3wjUYlE1CwFVlQxLDv_8gTl3xpyHMpkbEWBWCxYhivvUterTODoFjq5_SSjDvoii7ze5iJ_HZ1ZLZzpEFexdCXqDZv8UQEsyh3-TURk7e4VO6ss')"></div>
+<div class="w-2/3 p-4 flex flex-col justify-center">
+<span class="text-[10px] font-bold text-primary uppercase mb-1">Novidade</span>
+<h4 class="font-bold text-sm mb-1">Combo Lily: Hidratante + Perfume</h4>
+<p class="text-slate-500 text-xs mb-3">O presente ideal para momentos inesquecíveis.</p>
+<div class="flex items-center justify-between">
+<span class="font-bold text-primary">R$ 289,90</span>
+<button class="bg-primary/10 p-2 rounded-lg">
+<span class="material-symbols-outlined text-primary text-xl">add_shopping_cart</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 right-0 bg-white dark:bg-background-dark border-t border-slate-200 dark:border-slate-800 px-6 py-3 pb-6 safe-area-bottom">
+<div class="flex items-center justify-between max-w-md mx-auto">
+<a class="flex flex-col items-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined fill-1">home</span>
+<span class="text-[10px] font-bold">Início</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400 dark:text-slate-500" href="#">
+<span class="material-symbols-outlined">search</span>
+<span class="text-[10px] font-medium">Busca</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400 dark:text-slate-500 relative" href="#">
+<span class="material-symbols-outlined">shopping_bag</span>
+<span class="text-[10px] font-medium">Sacola</span>
+<span class="absolute -top-1 -right-1 bg-primary text-white text-[8px] w-4 h-4 rounded-full flex items-center justify-center font-bold">2</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400 dark:text-slate-500" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[10px] font-medium">Perfil</span>
+</a>
+</div>
+</nav>
+<style>
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .safe-area-bottom {
+            padding-bottom: env(safe-area-inset-bottom, 1.5rem);
+        }
+        .fill-1 {
+            font-variation-settings: 'FILL' 1;
+        }
+    </style>
+</body></html>
+
+<!-- O Boticário - Perfumaria -->
+<!DOCTYPE html>
+
+<html lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#4d8063",
+                        "background-light": "#f6f7f7",
+                        "background-dark": "#161c19",
+                    },
+                    fontFamily: {
+                        "display": ["Work Sans", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Work Sans', sans-serif; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100">
+<div class="relative flex min-h-screen w-full flex-col max-w-md mx-auto bg-white dark:bg-background-dark shadow-xl overflow-x-hidden">
+<!-- Header -->
+<header class="sticky top-0 z-20 bg-white/90 dark:bg-background-dark/90 backdrop-blur-md border-b border-primary/10">
+<div class="flex items-center p-4 justify-between">
+<div class="flex items-center gap-4">
+<button class="text-slate-900 dark:text-slate-100">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h2 class="text-lg font-bold leading-tight tracking-tight">Perfumaria</h2>
+</div>
+<div class="flex items-center gap-3">
+<button class="flex items-center justify-center">
+<span class="material-symbols-outlined">shopping_bag</span>
+</button>
+</div>
+</div>
+<!-- Search Bar -->
+<div class="px-4 pb-4">
+<label class="flex flex-col w-full h-11">
+<div class="flex w-full flex-1 items-stretch rounded-lg bg-primary/5 dark:bg-primary/10 border border-primary/10">
+<div class="text-primary flex items-center justify-center pl-4">
+<span class="material-symbols-outlined text-[20px]">search</span>
+</div>
+<input class="form-input flex w-full min-w-0 flex-1 border-none bg-transparent focus:ring-0 px-3 text-sm font-normal" placeholder="Buscar perfumes"/>
+</div>
+</label>
+</div>
+</header>
+<main class="flex-1 pb-24">
+<!-- Tabs/Sub-categories -->
+<div class="sticky top-[108px] z-10 bg-white dark:bg-background-dark border-b border-primary/5">
+<div class="flex overflow-x-auto no-scrollbar px-4 gap-6">
+<a class="flex flex-col items-center border-b-2 border-primary text-primary pb-3 pt-4 whitespace-nowrap" href="#">
+<p class="text-sm font-bold">Feminino</p>
+</a>
+<a class="flex flex-col items-center border-b-2 border-transparent text-slate-500 pb-3 pt-4 whitespace-nowrap" href="#">
+<p class="text-sm font-medium">Masculino</p>
+</a>
+<a class="flex flex-col items-center border-b-2 border-transparent text-slate-500 pb-3 pt-4 whitespace-nowrap" href="#">
+<p class="text-sm font-medium">Infantil</p>
+</a>
+<a class="flex flex-col items-center border-b-2 border-transparent text-slate-500 pb-3 pt-4 whitespace-nowrap" href="#">
+<p class="text-sm font-medium">Unissex</p>
+</a>
+</div>
+</div>
+<!-- Filters & Sort -->
+<div class="flex gap-2 p-4">
+<button class="flex h-9 items-center justify-center gap-2 rounded-full bg-primary/10 px-4 text-primary border border-primary/20">
+<span class="material-symbols-outlined text-[18px]">filter_list</span>
+<p class="text-xs font-bold">Filtrar</p>
+</button>
+<button class="flex h-9 items-center justify-center gap-2 rounded-full bg-primary/10 px-4 text-primary border border-primary/20">
+<span class="material-symbols-outlined text-[18px]">swap_vert</span>
+<p class="text-xs font-bold">Ordenar</p>
+</button>
+</div>
+<!-- Featured Banner -->
+<div class="px-4 mb-6">
+<div class="relative w-full aspect-[21/9] rounded-xl overflow-hidden bg-primary/20 group">
+<img alt="Featured Collection" class="absolute inset-0 w-full h-full object-cover" data-alt="Luxurious perfume bottles on an elegant surface" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC1652d7zzACSXQ2kCS6NsOg1ttriM3-a7UZ068DsH0d6nSjn52lvEeu2rGc78USQeTFhPjhL03huiqNV5_jUtg5lMovidOrw7Qxf7BiLG7_xQWmNFZ1jfkaBTG9KV9EWrYDshfiisacMfrZA_ks6yi0u9f4zOqeRo81kMqyFAZvTJ0asEOVhabZhRs_cfESpCu9YhFVYFwGOMpsH_hb0vSr4g0Iaem6wGTn3WyrhiGSp3hkM0r_t2ITlOgeUTpBfUlUz2zZpuwRPM"/>
+<div class="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent flex flex-col justify-center p-6">
+<span class="text-[10px] font-bold tracking-widest text-white uppercase mb-1">Novo Lançamento</span>
+<h3 class="text-2xl font-bold text-white leading-tight mb-2">Lily Lumière</h3>
+<p class="text-white/80 text-xs max-w-[150px] mb-4">A intensidade do lírio com o frescor da mandarina.</p>
+<button class="bg-primary text-white text-[10px] font-bold px-4 py-2 rounded-full w-fit uppercase tracking-wider">Confira</button>
+</div>
+</div>
+</div>
+<!-- Product Grid -->
+<div class="px-4 grid grid-cols-2 gap-4">
+<!-- Product Card 1 -->
+<div class="flex flex-col bg-white dark:bg-primary/5 rounded-xl border border-primary/5 overflow-hidden">
+<div class="relative aspect-[4/5] bg-slate-50 dark:bg-slate-800">
+<img alt="Lily Eau de Parfum" class="w-full h-full object-cover" data-alt="Classic elegant perfume bottle in glass" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD01thmBaw-85fXK4zO2J2FuRdJ4tQF0wtcFwOaxBG2RVGN0f40CNayvwufRTIB_0ALbCjjxzl8d9bQkofM_8BwR9XHsRsNS1yVLv3I1mXYtW7Gfx3kxcg8-MnHS5on2jHeANz7F_zdy44eCoU4DNET-WuTSEQlZXlRnhBVyI4XmKpHXEIX9vMzCjYeKIDqg6kid4TBQaUByuPK5krDCp57KdTLg0XtHw7Ixs_CvJXbUTU8rvvgl9rJnGau-oChr46GEDFmayEczBY"/>
+<button class="absolute top-2 right-2 size-8 flex items-center justify-center bg-white/80 dark:bg-black/40 backdrop-blur-sm rounded-full text-primary">
+<span class="material-symbols-outlined text-[20px]">favorite</span>
+</button>
+</div>
+<div class="p-3 flex flex-col flex-1">
+<p class="text-[10px] font-bold text-primary uppercase tracking-wider mb-0.5">Lily</p>
+<h4 class="text-sm font-medium text-slate-800 dark:text-slate-100 leading-tight mb-2 flex-1">Eau de Parfum 75ml</h4>
+<div class="flex items-center justify-between mt-auto">
+<p class="text-primary font-bold">R$ 279,90</p>
+<button class="size-8 bg-primary rounded-lg flex items-center justify-center text-white">
+<span class="material-symbols-outlined text-[20px]">add_shopping_cart</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Product Card 2 -->
+<div class="flex flex-col bg-white dark:bg-primary/5 rounded-xl border border-primary/5 overflow-hidden">
+<div class="relative aspect-[4/5] bg-slate-50 dark:bg-slate-800">
+<img alt="Malbec Magnetic" class="w-full h-full object-cover" data-alt="Modern geometric dark perfume bottle" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCrd-rSVAJULduK2Y2aNqQmHOcBw6FLSm8ede_yuKbqwYn89IdHPwf_SNfDhYkQodC0xIrFTJehi8RD1jIM5V3Oia9vJZBHg9W0vmLgEdVy90X0W7_Lp6DpJnLRX_bHLlefB5G3sVlydLqECvs8bITVlEzv1y7pV2ynAAMEePWMrJUgklG2vL52AJx3XxC9g3Te_fKzoYwMf3RK6HXtGELO9kga6tOdnm8xT0TwMzKdizDHdK6xYE3wLKB2MZe03nohZaSc4JQtYZg"/>
+<button class="absolute top-2 right-2 size-8 flex items-center justify-center bg-white/80 dark:bg-black/40 backdrop-blur-sm rounded-full text-slate-400">
+<span class="material-symbols-outlined text-[20px]">favorite</span>
+</button>
+</div>
+<div class="p-3 flex flex-col flex-1">
+<p class="text-[10px] font-bold text-primary uppercase tracking-wider mb-0.5">Malbec</p>
+<h4 class="text-sm font-medium text-slate-800 dark:text-slate-100 leading-tight mb-2 flex-1">Magnetic Desodorante Colônia 100ml</h4>
+<div class="flex items-center justify-between mt-auto">
+<p class="text-primary font-bold">R$ 209,90</p>
+<button class="size-8 bg-primary rounded-lg flex items-center justify-center text-white">
+<span class="material-symbols-outlined text-[20px]">add_shopping_cart</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Product Card 3 -->
+<div class="flex flex-col bg-white dark:bg-primary/5 rounded-xl border border-primary/5 overflow-hidden">
+<div class="relative aspect-[4/5] bg-slate-50 dark:bg-slate-800">
+<img alt="Floratta Red" class="w-full h-full object-cover" data-alt="Vibrant red feminine perfume bottle" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDX-kb5GX_lNTugx-wLBCeF1sy3t8JPCVYh104_I8UrtLA1U597JGHkrx2GqTtJYMuLE1YVNlYZ4iAOq46d1963F9XPQdM1-wdPXVUSyOSP83Z9QqDZoTVotQyhjGrwa2vPiQBBbuHxXhOqC1pdDf_fAxJcjon1C_BLgsIE7-FO-UYpjMbybYUDoD8qcJVNBKw_v_dtC2mN1yGBubO7DCNQ2LiqmZTD5PEITZtoZvgkCzGXie2Dt5hHycPJgpG6wpThplob84y_g60"/>
+<button class="absolute top-2 right-2 size-8 flex items-center justify-center bg-white/80 dark:bg-black/40 backdrop-blur-sm rounded-full text-slate-400">
+<span class="material-symbols-outlined text-[20px]">favorite</span>
+</button>
+</div>
+<div class="p-3 flex flex-col flex-1">
+<p class="text-[10px] font-bold text-primary uppercase tracking-wider mb-0.5">Floratta</p>
+<h4 class="text-sm font-medium text-slate-800 dark:text-slate-100 leading-tight mb-2 flex-1">Red Desodorante Colônia 75ml</h4>
+<div class="flex items-center justify-between mt-auto">
+<p class="text-primary font-bold">R$ 139,90</p>
+<button class="size-8 bg-primary rounded-lg flex items-center justify-center text-white">
+<span class="material-symbols-outlined text-[20px]">add_shopping_cart</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Product Card 4 -->
+<div class="flex flex-col bg-white dark:bg-primary/5 rounded-xl border border-primary/5 overflow-hidden">
+<div class="relative aspect-[4/5] bg-slate-50 dark:bg-slate-800">
+<img alt="Coffee Woman Duo" class="w-full h-full object-cover" data-alt="Sophisticated dark glass perfume bottle" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB77iHLMrULhbcr1Bxr2DctSuxL7ABgbCCztBtVsxQC2B83jQEbDcCXT9NSGQogAYCr8icJpjgzTO42dM74P7HNDmOKUBYUqHPZxDKYSszO2OqrdP1v2rWzHCku6u2y7jz6bd8mvldCh5j8a9z8_o3L94iAhAFuPGc7x8JRt31XZOKpbIyp31E31nVN-N8fPkiCgp3jyt88DC76C1BezH7-u5_XnEE4NDwAMZT4VY2R_uJ4KxsF2Woc_6tHSUXzbd6SP8yHZR55vPk"/>
+<button class="absolute top-2 right-2 size-8 flex items-center justify-center bg-white/80 dark:bg-black/40 backdrop-blur-sm rounded-full text-slate-400">
+<span class="material-symbols-outlined text-[20px]">favorite</span>
+</button>
+</div>
+<div class="p-3 flex flex-col flex-1">
+<p class="text-[10px] font-bold text-primary uppercase tracking-wider mb-0.5">Coffee</p>
+<h4 class="text-sm font-medium text-slate-800 dark:text-slate-100 leading-tight mb-2 flex-1">Woman Duo Colônia 100ml</h4>
+<div class="flex items-center justify-between mt-auto">
+<p class="text-primary font-bold">R$ 184,90</p>
+<button class="size-8 bg-primary rounded-lg flex items-center justify-center text-white">
+<span class="material-symbols-outlined text-[20px]">add_shopping_cart</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom NavBar -->
+<nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto z-30 flex gap-2 border-t border-primary/10 bg-white/95 dark:bg-background-dark/95 backdrop-blur-md px-4 pb-4 pt-2">
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-500" href="#">
+<span class="material-symbols-outlined">home</span>
+<p class="text-[10px] font-medium leading-normal tracking-tight">Início</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-500" href="#">
+<span class="material-symbols-outlined">shopping_bag</span>
+<p class="text-[10px] font-medium leading-normal tracking-tight">Loja</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-primary" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">auto_awesome</span>
+<p class="text-[10px] font-bold leading-normal tracking-tight">Perfumaria</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-500" href="#">
+<span class="material-symbols-outlined">sell</span>
+<p class="text-[10px] font-medium leading-normal tracking-tight">Ofertas</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-500" href="#">
+<span class="material-symbols-outlined">person</span>
+<p class="text-[10px] font-medium leading-normal tracking-tight">Perfil</p>
+</a>
+</nav>
+</div>
+</body></html>
+
+<!-- Confirmação de Pagamento -->
+<!DOCTYPE html>
+
+<html lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#4d8063",
+                        "background-light": "#f6f7f7",
+                        "background-dark": "#161c19",
+                    },
+                    fontFamily: {
+                        "display": ["Work Sans"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<title>Confirmação de Pagamento</title>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 transition-colors duration-200">
+<div class="relative flex h-auto min-h-screen w-full flex-col max-w-md mx-auto bg-white dark:bg-background-dark shadow-xl overflow-x-hidden">
+<div class="flex items-center bg-white dark:bg-background-dark p-4 pb-2 justify-between">
+<div class="text-primary flex size-12 shrink-0 items-center justify-center cursor-pointer">
+<span class="material-symbols-outlined">arrow_back</span>
+</div>
+<h2 class="text-slate-900 dark:text-slate-100 text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center pr-12">Confirmação</h2>
+</div>
+<div class="flex flex-col px-6 py-8">
+<div class="flex flex-col items-center gap-6">
+<div class="flex items-center justify-center bg-primary/10 dark:bg-primary/20 size-24 rounded-full">
+<span class="material-symbols-outlined text-primary !text-6xl">check_circle</span>
+</div>
+<div class="flex flex-col items-center gap-2">
+<h1 class="text-slate-900 dark:text-slate-100 text-2xl font-bold leading-tight tracking-tight text-center">Pagamento Realizado com Sucesso!</h1>
+<p class="text-slate-600 dark:text-slate-400 text-sm font-medium text-center">Pedido #823941</p>
+<p class="text-slate-500 dark:text-slate-400 text-sm font-normal leading-normal max-w-[320px] text-center">Seu pagamento foi processado e aprovado. Em breve você receberá as atualizações por e-mail.</p>
+</div>
+</div>
+</div>
+<div class="px-6 py-4">
+<h3 class="text-slate-900 dark:text-slate-100 text-lg font-bold leading-tight tracking-tight pb-2">Resumo do Processamento</h3>
+<p class="text-slate-600 dark:text-slate-400 text-sm font-normal leading-relaxed">Seu pedido está sendo processado individualmente por cada marca para garantir a melhor entrega.</p>
+</div>
+<div class="flex flex-col gap-1 px-4">
+<div class="flex items-center gap-4 bg-slate-50 dark:bg-white/5 rounded-xl px-4 min-h-[72px] py-3 justify-between">
+<div class="flex items-center gap-4">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-lg size-12 bg-white flex items-center justify-center border border-slate-100 dark:border-white/10" data-alt="Logotipo da marca O Boticário verde" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCTLgKgPeh5Muy5SoAiioWysgGivI66NssAH2Fb5hm8PwCBoQsQTyM7kGS_A4T8obg1Jtg97_uMghtdUM-1675SK9x4vAURlZL7flOVPaHbG8qpHC6dBcCKhwdEzLu8Vie4dBJskIIXI7I_t_TTo3C6sPw9pNXJFpyWXzqTzai6rm-Dfqfe6q8AOVwV7Dbt81x5zLubzMwaYEiaVTSsXtTEY77ZMEXt7zwsjmStW-riSJ4pnHOA-4_KPLcpzJbcBxUkJ75g6qy2GWs")'>
+</div>
+<div class="flex flex-col justify-center">
+<p class="text-slate-900 dark:text-slate-100 text-base font-semibold leading-none">O Boticário</p>
+<p class="text-slate-500 dark:text-slate-400 text-xs font-normal mt-1">Processando envio</p>
+</div>
+</div>
+<div class="shrink-0"><p class="text-slate-900 dark:text-slate-100 text-base font-medium">R$ 145,90</p></div>
+</div>
+<div class="flex items-center gap-4 bg-slate-50 dark:bg-white/5 rounded-xl px-4 min-h-[72px] py-3 justify-between">
+<div class="flex items-center gap-4">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-lg size-12 bg-white flex items-center justify-center border border-slate-100 dark:border-white/10" data-alt="Logotipo da marca Natura em verde" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAH9KPymNoqT-i5RhXayqRzgX72w38CViFnD_5VVXYFziTjCpP54RmHhDsWn0mP4N-IJJqWanPNyyoktMI8t8_tX2ssDQn5Y8kiuS9T3RQG3OERqVH9oJ4nDC0DQsUu-9g7Ko4IWH2pVnGcc8tMENgTxKXVvQMbxmlew2hRvEa4G3v6oF7N7uVMhJLGNXpPJDeFKNpx4zcOmKKgv8C76e5c6bJHpZGnZiDYNTBQGXMZA5FpWVn0AiwQZufReBfh2VgeeLWwlLiJGpI")'>
+</div>
+<div class="flex flex-col justify-center">
+<p class="text-slate-900 dark:text-slate-100 text-base font-semibold leading-none">Natura</p>
+<p class="text-slate-500 dark:text-slate-400 text-xs font-normal mt-1">Aguardando separação</p>
+</div>
+</div>
+<div class="shrink-0"><p class="text-slate-900 dark:text-slate-100 text-base font-medium">R$ 89,30</p></div>
+</div>
+<div class="flex items-center gap-4 bg-slate-50 dark:bg-white/5 rounded-xl px-4 min-h-[72px] py-3 justify-between">
+<div class="flex items-center gap-4">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-lg size-12 bg-white flex items-center justify-center border border-slate-100 dark:border-white/10" data-alt="Logotipo da marca Rommanel dourado verde" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAIZzkJ3e9KJs-KmbJva-mcuThacR-5kjTgFlruZ88kXbiR2y0TuhQI5RNz27ebLoIsP1cGTTECLE51OaHWT-gc91wBhlD2mYZUVgjKD5Gjp7W4vY6bDYE2kWrniSw7_R8rqVayzGh3DE6PpZaqSbc7m5GnW69ci6Z8bE9zE39Sqfxoghg70ArtpbLuPLhwkajvCkqmWm7nXqDRPO-AGxKYcbo1TMOFSH4e3dKnrfhS2E3q2GzoCkKFqRDp4yggRt8Dosih0-h1pvw")'>
+</div>
+<div class="flex flex-col justify-center">
+<p class="text-slate-900 dark:text-slate-100 text-base font-semibold leading-none">Rommanel</p>
+<p class="text-slate-500 dark:text-slate-400 text-xs font-normal mt-1">Validando estoque</p>
+</div>
+</div>
+<div class="shrink-0"><p class="text-slate-900 dark:text-slate-100 text-base font-medium">R$ 210,00</p></div>
+</div>
+</div>
+<div class="mt-8 px-6 py-6 border-t border-slate-100 dark:border-white/10">
+<div class="flex justify-between items-center mb-6">
+<p class="text-slate-600 dark:text-slate-400 text-base font-medium">Total Pago</p>
+<p class="text-primary text-2xl font-bold">R$ 445,20</p>
+</div>
+<div class="flex flex-col gap-3">
+<button class="w-full bg-primary text-white font-bold py-4 rounded-xl hover:opacity-90 transition-opacity">
+                    Ver Meus Pedidos
+                </button>
+<button class="w-full bg-primary/10 dark:bg-primary/20 text-primary font-bold py-4 rounded-xl hover:bg-primary/20 transition-colors">
+                    Voltar para o Início
+                </button>
+</div>
+</div>
+<div class="h-8 bg-white dark:bg-background-dark"></div>
+</div>
+</body></html>
+
+<!-- Detalhes do Produto - Lily -->
+<!DOCTYPE html>
+
+<html lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#4d8063",
+                        "background-light": "#f6f7f7",
+                        "background-dark": "#161c19",
+                    },
+                    fontFamily: {
+                        "display": ["Work Sans"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Work Sans', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100">
+<div class="relative flex min-h-screen w-full flex-col bg-background-light dark:bg-background-dark max-w-md mx-auto shadow-2xl">
+<!-- Header -->
+<div class="sticky top-0 z-50 flex items-center bg-white/80 dark:bg-background-dark/80 backdrop-blur-md p-4 justify-between border-b border-primary/10">
+<div class="text-primary flex size-10 shrink-0 items-center justify-center cursor-pointer">
+<span class="material-symbols-outlined">arrow_back</span>
+</div>
+<h2 class="text-slate-900 dark:text-slate-100 text-lg font-bold leading-tight tracking-tight flex-1 text-center">Lily Eau de Parfum</h2>
+<div class="flex size-10 items-center justify-end gap-2">
+<button class="text-primary">
+<span class="material-symbols-outlined">share</span>
+</button>
+</div>
+</div>
+<!-- Product Image Hero -->
+<div class="relative bg-white dark:bg-zinc-900">
+<div class="aspect-[4/5] w-full bg-center bg-no-repeat bg-cover flex flex-col justify-end" data-alt="Elegant glass perfume bottle with floral accents" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuA6qdYKZcIHmlSYjQZhRBeSI0hf3N8taIe2_2HkPrjLOeV_PyofBfgIW13arFB--rN_Dh1NJELrd0vBiQFo1Tg9qOaM3nwzXwrJ8hldoxAX5XPWvXEhAEe0r3TtsHi5Pud3la7lQXUjjCu1c8tjlC6UzhORHID9kF1FOhlJ-TUUwtz-GDup1RJnQzI6J1C0TQgvCqUOBs_x5V8eeMmNZPxK3FNdg58wGvlgWZVTesTadD_PSAR8mGPaZAqFENhPkrc_oQOw3sMr1zo");'>
+</div>
+<div class="absolute bottom-4 right-4 bg-white/90 dark:bg-background-dark/90 p-2 rounded-full shadow-lg">
+<span class="material-symbols-outlined text-primary">favorite</span>
+</div>
+</div>
+<!-- Product Info -->
+<div class="p-6 space-y-4">
+<div>
+<span class="text-xs font-bold uppercase tracking-widest text-primary/70">O Boticário</span>
+<h1 class="text-2xl font-bold leading-tight mt-1">Lily Eau de Parfum 75ml</h1>
+<div class="flex items-center gap-1 mt-2">
+<div class="flex text-yellow-500">
+<span class="material-symbols-outlined text-sm">star</span>
+<span class="material-symbols-outlined text-sm">star</span>
+<span class="material-symbols-outlined text-sm">star</span>
+<span class="material-symbols-outlined text-sm">star</span>
+<span class="material-symbols-outlined text-sm">star_half</span>
+</div>
+<span class="text-xs text-slate-500 font-medium">(4.8 • 1.2k avaliações)</span>
+</div>
+</div>
+<div class="space-y-1">
+<h2 class="text-3xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">R$ 279,90</h2>
+<p class="text-sm text-slate-600 dark:text-slate-400">ou em até <span class="font-bold">10x de R$ 27,99</span></p>
+</div>
+<button class="w-full bg-primary hover:bg-primary/90 text-white font-bold py-4 rounded-xl transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined">shopping_bag</span>
+                COMPRAR
+            </button>
+</div>
+<!-- Description Section -->
+<div class="px-6 py-4 border-t border-primary/10">
+<h3 class="text-lg font-bold mb-3">O Segredo de Lily</h3>
+<p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                Lily Eau de Parfum faz parte de uma das fragrâncias de maior sucesso de O Boticário. Uma fragrância feminina que soma a delicadeza de facetas florais com a força marcante das madeiras, tornando-a sofisticada e uma companhia perfeita para o seu dia a dia.
+            </p>
+</div>
+<!-- Olfactory Pyramid -->
+<div class="px-6 py-6 bg-primary/5 dark:bg-primary/10 mx-4 rounded-xl space-y-6">
+<h3 class="text-sm font-bold uppercase tracking-widest text-primary text-center">Pirâmide Olfativa</h3>
+<div class="flex items-start gap-4">
+<div class="bg-primary/20 p-2 rounded-lg text-primary">
+<span class="material-symbols-outlined">light_mode</span>
+</div>
+<div>
+<p class="text-xs font-bold text-primary uppercase">Topo</p>
+<p class="text-sm">Pêra, Mandarina, Pimenta Rosa.</p>
+</div>
+</div>
+<div class="flex items-start gap-4 border-y border-primary/10 py-4">
+<div class="bg-primary/20 p-2 rounded-lg text-primary">
+<span class="material-symbols-outlined">favorite</span>
+</div>
+<div>
+<p class="text-xs font-bold text-primary uppercase">Coração</p>
+<p class="text-sm">Lírio do Vale, Gardênia, Violeta.</p>
+</div>
+</div>
+<div class="flex items-start gap-4">
+<div class="bg-primary/20 p-2 rounded-lg text-primary">
+<span class="material-symbols-outlined">nature</span>
+</div>
+<div>
+<p class="text-xs font-bold text-primary uppercase">Fundo</p>
+<p class="text-sm">Sândalo, Baunilha, Almíscar.</p>
+</div>
+</div>
+</div>
+<!-- Related Products -->
+<div class="py-8">
+<div class="px-6 flex justify-between items-center mb-4">
+<h3 class="text-lg font-bold">Quem comprou também amou</h3>
+<span class="text-primary text-xs font-bold cursor-pointer">Ver todos</span>
+</div>
+<div class="flex gap-4 overflow-x-auto px-6 pb-4 scrollbar-hide">
+<!-- Card 1 -->
+<div class="min-w-[160px] bg-white dark:bg-zinc-800 p-3 rounded-xl shadow-sm border border-primary/5">
+<div class="h-32 w-full bg-slate-100 rounded-lg mb-2 flex items-center justify-center overflow-hidden">
+<img alt="Creme de Lily" class="object-cover h-full w-full" data-alt="Floral body cream jar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBrJwrX4dIVBYVLfy5butVBcG2eszgjVUzYQ63Vhytw5xkFAva1zbyaF8rgo8aaDT0Pumexq-NU8b6WVGcW-g3D15DYEeF-rOekkHj-G93do14AAKYuxv2G1Gv2ebpxseAojri6BHVZCJAJh65szle73p8lqKAGCrtdinBfCurpRrcUa6CmI62jRUqfx6jki3YDpNCWzDZ3nQelJXih1wN7RrxAoqS6fSaRsixQeFrWFKZXXvwHxDkLFFTsHJsgyyfPXkzGbUrjva4"/>
+</div>
+<p class="text-xs font-medium line-clamp-2">Creme Acetinado Hidratante Lily</p>
+<p class="text-sm font-bold mt-1 text-primary">R$ 109,90</p>
+</div>
+<!-- Card 2 -->
+<div class="min-w-[160px] bg-white dark:bg-zinc-800 p-3 rounded-xl shadow-sm border border-primary/5">
+<div class="h-32 w-full bg-slate-100 rounded-lg mb-2 flex items-center justify-center overflow-hidden">
+<img alt="Lily Absolu" class="object-cover h-full w-full" data-alt="Luxury gold perfume bottle" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAGCexMvk9nr4PfFfjAotDZn0Ijjgx-Y87pZKPhQdlzjyUFaxWBrc8QlkbhgxvKnKLY4_MO5BKqBGWfQznyLXKDdgGSowyLWIZ1mhGwER-l_XXbxdsFeqwL8rYyrDl10odnGhmLLODZOv-YPBAnwkJYXwcFs03VambCGnEZ6jzLuQsQyXb9mfJOWK3QAyTa_Cxos1T2r53cqe16UmbYlnpdQwvqyVu9mxo3sgpfp1yD8tH89yelpqLlJFmzXTkxDkPfY5m_woOYCx0"/>
+</div>
+<p class="text-xs font-medium line-clamp-2">Lily Absolu Eau de Parfum</p>
+<p class="text-sm font-bold mt-1 text-primary">R$ 299,90</p>
+</div>
+<!-- Card 3 -->
+<div class="min-w-[160px] bg-white dark:bg-zinc-800 p-3 rounded-xl shadow-sm border border-primary/5">
+<div class="h-32 w-full bg-slate-100 rounded-lg mb-2 flex items-center justify-center overflow-hidden">
+<img alt="Oleo Lily" class="object-cover h-full w-full" data-alt="Golden body oil bottle" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDjZFgfjCqVdRsHZFYx2bDUDQVWZKiFsJhaR_leaWbiyhFE0Wmr1CihJzcucjiKYyZt7uCQ164PwstKWcunU0VcTiXM3e4lR8CRT1Sx8ccmpbYEfeAjEhYpGfJp5XseKaroHNrMx6oMX2JVDpWvQLkscELuBTKg__H-RI__qUhil_mIamSTzoL5e249kVtRsaBuH-ubGfinHHCdn6mF3MYPlPJd1W6Ata0tEUQtf7I_UX-fCx7l0BWXQoGk_sLEtEVTscIf3deY3Dw"/>
+</div>
+<p class="text-xs font-medium line-clamp-2">Óleo Perfumado Corporal Lily</p>
+<p class="text-sm font-bold mt-1 text-primary">R$ 84,90</p>
+</div>
+</div>
+</div>
+<!-- Reviews Teaser -->
+<div class="px-6 py-6 border-t border-primary/10 mb-20">
+<h3 class="text-lg font-bold mb-4">Avaliações</h3>
+<div class="space-y-4">
+<div class="flex gap-4">
+<div class="size-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold">M</div>
+<div class="flex-1">
+<div class="flex justify-between items-start">
+<p class="text-sm font-bold">Mariana S.</p>
+<span class="text-[10px] text-slate-500">2 dias atrás</span>
+</div>
+<div class="flex text-yellow-500 mb-1">
+<span class="material-symbols-outlined text-xs">star</span>
+<span class="material-symbols-outlined text-xs">star</span>
+<span class="material-symbols-outlined text-xs">star</span>
+<span class="material-symbols-outlined text-xs">star</span>
+<span class="material-symbols-outlined text-xs">star</span>
+</div>
+<p class="text-xs text-slate-600 dark:text-slate-400">Minha fragrância favorita da vida! Chique e atemporal.</p>
+</div>
+</div>
+</div>
+<button class="w-full mt-6 py-3 border border-primary text-primary font-bold rounded-lg text-sm">LER TODAS AS AVALIAÇÕES</button>
+</div>
+<!-- Bottom Navigation -->
+<div class="fixed bottom-0 left-0 right-0 z-50 max-w-md mx-auto bg-white dark:bg-background-dark border-t border-primary/10">
+<div class="flex gap-2 px-4 pb-3 pt-2">
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined">home</span>
+<p class="text-[10px] font-medium leading-normal">Início</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-slate-400 dark:text-slate-500" href="#">
+<span class="material-symbols-outlined">search</span>
+<p class="text-[10px] font-medium leading-normal">Busca</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-slate-400 dark:text-slate-500" href="#">
+<span class="material-symbols-outlined">local_mall</span>
+<p class="text-[10px] font-medium leading-normal">Sacola</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-slate-400 dark:text-slate-500" href="#">
+<span class="material-symbols-outlined">favorite</span>
+<p class="text-[10px] font-medium leading-normal">Favoritos</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-slate-400 dark:text-slate-500" href="#">
+<span class="material-symbols-outlined">person</span>
+<p class="text-[10px] font-medium leading-normal">Perfil</p>
+</a>
+</div>
+</div>
+</div>
+</body></html>
+
+<!-- Financeiro Multi-Marcas -->
+<!DOCTYPE html>
+
+<html lang="pt-br"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Financeiro por Marca</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#4d8063",
+                        "background-light": "#f6f7f7",
+                        "background-dark": "#161c19",
+                    },
+                    fontFamily: {
+                        "display": ["Work Sans"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen flex flex-col">
+<!-- Header -->
+<header class="flex items-center bg-white dark:bg-slate-900 p-4 border-b border-primary/10 sticky top-0 z-10">
+<div class="text-primary flex size-10 items-center justify-center rounded-lg bg-primary/10">
+<span class="material-symbols-outlined">menu</span>
+</div>
+<h2 class="text-slate-900 dark:text-slate-100 text-lg font-bold leading-tight flex-1 text-center">Financeiro por Marca</h2>
+<div class="size-10 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">notifications</span>
+</div>
+</header>
+<!-- Main Content -->
+<main class="flex-1 pb-24 overflow-y-auto">
+<!-- Balance Overview -->
+<section class="p-4">
+<div class="flex flex-col gap-2 rounded-xl p-6 bg-primary text-white shadow-lg shadow-primary/20">
+<div class="flex justify-between items-start">
+<p class="text-white/80 text-sm font-medium">Saldo Total Acumulado</p>
+<span class="material-symbols-outlined text-white/60">account_balance_wallet</span>
+</div>
+<p class="text-white tracking-tight text-3xl font-bold">R$ 12.450,00</p>
+<div class="flex items-center gap-1 mt-2">
+<span class="material-symbols-outlined text-sm">trending_up</span>
+<p class="text-white/90 text-sm font-medium">+15.4% este mês</p>
+</div>
+</div>
+</section>
+<!-- Brands Revenue Section -->
+<section class="px-4 py-2">
+<h3 class="text-slate-900 dark:text-slate-100 text-lg font-bold mb-4">Receita por Marca</h3>
+<div class="grid grid-cols-1 gap-4">
+<!-- O Boticário -->
+<div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-primary/10 flex items-center gap-4">
+<div class="size-12 rounded-lg bg-[#4d8063]/10 flex items-center justify-center overflow-hidden">
+<img class="object-contain size-10" data-alt="Logotipo minimalista verde esmeralda" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB5qBhOkgwpSRvBwhAxvCEtNMCzv6eEIHqL3wL7-Y1BuhwDgHvlIYZuOBfaiv-xH78g1E1KIbXUQ7s6y3HK4yHswYmbSJFd8EiJ0xN7KrzgVNX38xBa-nzDP0Bivej1_ocMsKhxzSrh_RWnk8llLhwvQRjoi4je98m9-4RiYPlw3FP2wtNbhcTDm0PqWWgU6PrFpk8x7xKDjjW4dgR49EwpbvDFVu5RaURPAV-FM2xwZeRjN5KvFN6MTrd3pZVHLwcMp4wpz9lRUt0"/>
+</div>
+<div class="flex-1">
+<p class="text-slate-500 dark:text-slate-400 text-xs font-medium uppercase tracking-wider">O Boticário</p>
+<p class="text-slate-900 dark:text-slate-100 text-lg font-bold">R$ 5.280,00</p>
+</div>
+<div class="text-right">
+<p class="text-primary text-sm font-bold">42%</p>
+<div class="w-16 h-1 bg-slate-100 dark:bg-slate-800 rounded-full mt-1">
+<div class="bg-primary h-1 rounded-full" style="width: 42%;"></div>
+</div>
+</div>
+</div>
+<!-- Natura -->
+<div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-primary/10 flex items-center gap-4">
+<div class="size-12 rounded-lg bg-orange-50 dark:bg-orange-900/20 flex items-center justify-center overflow-hidden">
+<img class="object-contain size-10" data-alt="Logo em tons laranja e terra" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAqUtIikvfhDgy8biT7tBegIMAKxiwKGAyk0DQ6k5caY66-ImUVG8D50y1SWe5lbOAyV3YJxI5aUWGqfHqYzRt-269o2yXEAFYgfdsw8uFAAtLMlWaT4jUdft2WA8nCM0ahmVgWFAPvOPR193NuVsbicKKjNnzUXpOXmydo-S6PoubnZd83u75suedgu6-rTYqHJSfosLXM6mfo5Z9iqSbyPo8AUh23-vPokfL7PnoUNpTVupd_qzqwjNQdzAzBolU85iPCjO7HaeY"/>
+</div>
+<div class="flex-1">
+<p class="text-slate-500 dark:text-slate-400 text-xs font-medium uppercase tracking-wider">Natura</p>
+<p class="text-slate-900 dark:text-slate-100 text-lg font-bold">R$ 4.120,00</p>
+</div>
+<div class="text-right">
+<p class="text-primary text-sm font-bold">33%</p>
+<div class="w-16 h-1 bg-slate-100 dark:bg-slate-800 rounded-full mt-1">
+<div class="bg-primary h-1 rounded-full" style="width: 33%;"></div>
+</div>
+</div>
+</div>
+<!-- Rommanel -->
+<div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-primary/10 flex items-center gap-4">
+<div class="size-12 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 flex items-center justify-center overflow-hidden">
+<img class="object-contain size-10" data-alt="Borboleta dourada estilizada" src="https://lh3.googleusercontent.com/aida-public/AB6AXuApLFLLVMhxtt2P3xr01OlxVCDM69jMjLRIhxRqBC6NSeFCHqNKONHa_FbvdhdB-izqlUEbOSeGaP-d4dABtHtpXvPEQCiqqF3e3CeAhqGmzfiCL0dH5MrvYbMrDPK_I6eP2zmNJw3FXe8XeGLaJCcrJgLqURzcpQxwAK3UYPI5DAVcmd_3gZ1Kdp0aQa6tQGdLZseRsnRlqylXqD_qgWAAgaLg91CnVDFzMW02P5H6Upea3zKe5I_wGz7t9Dmg9o6VJo8nrM174vU"/>
+</div>
+<div class="flex-1">
+<p class="text-slate-500 dark:text-slate-400 text-xs font-medium uppercase tracking-wider">Rommanel</p>
+<p class="text-slate-900 dark:text-slate-100 text-lg font-bold">R$ 3.050,00</p>
+</div>
+<div class="text-right">
+<p class="text-primary text-sm font-bold">25%</p>
+<div class="w-16 h-1 bg-slate-100 dark:bg-slate-800 rounded-full mt-1">
+<div class="bg-primary h-1 rounded-full" style="width: 25%;"></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Financial Health -->
+<section class="p-4 mt-2">
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-primary/10">
+<div class="flex items-center justify-between mb-4">
+<h3 class="text-slate-900 dark:text-slate-100 text-lg font-bold">Saúde Financeira</h3>
+<span class="px-2 py-1 bg-primary/10 text-primary text-xs font-bold rounded">EXCELENTE</span>
+</div>
+<div class="space-y-4">
+<div>
+<div class="flex justify-between mb-1">
+<p class="text-slate-600 dark:text-slate-400 text-sm">Índice de Lucratividade</p>
+<p class="text-slate-900 dark:text-slate-100 text-sm font-bold">85/100</p>
+</div>
+<div class="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full">
+<div class="bg-primary h-2 rounded-full" style="width: 85%;"></div>
+</div>
+</div>
+<div class="flex items-start gap-3 p-3 bg-background-light dark:bg-background-dark rounded-lg border border-primary/5">
+<span class="material-symbols-outlined text-primary">info</span>
+<p class="text-slate-600 dark:text-slate-400 text-sm leading-snug">
+                            Seu desempenho financeiro está <span class="font-bold text-primary">22% acima</span> da média de revendedores na sua região.
+                        </p>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-900 border-t border-primary/10 px-4 pb-6 pt-2 z-20">
+<div class="flex justify-between items-center max-w-md mx-auto">
+<a class="flex flex-col items-center gap-1 text-slate-400 dark:text-slate-500 transition-colors" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="text-[10px] font-medium uppercase">Início</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400 dark:text-slate-500 transition-colors" href="#">
+<span class="material-symbols-outlined">receipt_long</span>
+<span class="text-[10px] font-medium uppercase">Vendas</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-primary transition-colors" href="#">
+<div class="relative">
+<span class="material-symbols-outlined fill-1">payments</span>
+<div class="absolute -top-1 -right-1 size-2 bg-primary rounded-full border-2 border-white dark:border-slate-900"></div>
+</div>
+<span class="text-[10px] font-bold uppercase">Financeiro</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400 dark:text-slate-500 transition-colors" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="text-[10px] font-medium uppercase">Clientes</span>
+</a>
+</div>
+</nav>
+</body></html>
+
+<!-- Cadastro de Cliente -->
+<!DOCTYPE html>
+
+<html lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#4d8063",
+                        "background-light": "#f6f7f7",
+                        "background-dark": "#161c19",
+                    },
+                    fontFamily: {
+                        "display": ["Work Sans"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: "Work Sans", sans-serif;
+        }
+        .form-input:focus {
+            border-color: #4d8063 !important;
+            box-shadow: 0 0 0 1px #4d8063 !important;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark min-h-screen font-display">
+<div class="relative flex h-auto min-h-screen w-full flex-col bg-background-light dark:bg-background-dark overflow-x-hidden max-w-[480px] mx-auto shadow-xl">
+<!-- TopAppBar -->
+<div class="flex items-center bg-white dark:bg-slate-900 p-4 pb-2 justify-between sticky top-0 z-10 border-b border-primary/10">
+<div class="text-slate-900 dark:text-slate-100 flex size-12 shrink-0 items-center cursor-pointer">
+<span class="material-symbols-outlined">arrow_back</span>
+</div>
+<h2 class="text-slate-900 dark:text-slate-100 text-lg font-bold leading-tight tracking-tight flex-1 text-center pr-12">Novo Cliente</h2>
+</div>
+<div class="flex flex-col gap-6 p-4 pb-24">
+<!-- Section: Informações Pessoais -->
+<section class="flex flex-col gap-4">
+<h3 class="text-primary text-sm font-bold uppercase tracking-wider">Informações Pessoais</h3>
+<div class="flex flex-col gap-4 bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-primary/5">
+<label class="flex flex-col w-full">
+<p class="text-slate-700 dark:text-slate-300 text-sm font-medium pb-1.5">Nome Completo</p>
+<input class="form-input flex w-full rounded-lg text-slate-900 dark:text-slate-100 border border-slate-200 dark:border-slate-700 bg-transparent h-12 placeholder:text-slate-400 p-3 text-base font-normal" placeholder="Digite o nome completo" type="text"/>
+</label>
+<div class="flex gap-4">
+<label class="flex flex-col flex-1">
+<p class="text-slate-700 dark:text-slate-300 text-sm font-medium pb-1.5">CPF</p>
+<input class="form-input flex w-full rounded-lg text-slate-900 dark:text-slate-100 border border-slate-200 dark:border-slate-700 bg-transparent h-12 placeholder:text-slate-400 p-3 text-base font-normal" placeholder="000.000.000-00" type="text"/>
+</label>
+<label class="flex flex-col flex-1">
+<p class="text-slate-700 dark:text-slate-300 text-sm font-medium pb-1.5">Nascimento</p>
+<div class="relative flex items-center">
+<input class="form-input flex w-full rounded-lg text-slate-900 dark:text-slate-100 border border-slate-200 dark:border-slate-700 bg-transparent h-12 placeholder:text-slate-400 p-3 pr-10 text-base font-normal" placeholder="DD/MM/AAAA" type="text"/>
+<span class="material-symbols-outlined absolute right-3 text-slate-400 text-xl">calendar_today</span>
+</div>
+</label>
+</div>
+<label class="flex flex-col w-full">
+<p class="text-slate-700 dark:text-slate-300 text-sm font-medium pb-1.5">WhatsApp</p>
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-3 text-primary text-xl">chat</span>
+<input class="form-input flex w-full rounded-lg text-slate-900 dark:text-slate-100 border border-slate-200 dark:border-slate-700 bg-transparent h-12 placeholder:text-slate-400 pl-10 pr-3 text-base font-normal" placeholder="(00) 00000-0000" type="tel"/>
+</div>
+</label>
+</div>
+</section>
+<!-- Section: Endereço -->
+<section class="flex flex-col gap-4">
+<h3 class="text-primary text-sm font-bold uppercase tracking-wider">Endereço</h3>
+<div class="flex flex-col gap-4 bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-primary/5">
+<label class="flex flex-col w-full">
+<p class="text-slate-700 dark:text-slate-300 text-sm font-medium pb-1.5">Rua e Número</p>
+<input class="form-input flex w-full rounded-lg text-slate-900 dark:text-slate-100 border border-slate-200 dark:border-slate-700 bg-transparent h-12 placeholder:text-slate-400 p-3 text-base font-normal" placeholder="Ex: Av. Brasil, 123" type="text"/>
+</label>
+<div class="flex gap-4">
+<label class="flex flex-col flex-1">
+<p class="text-slate-700 dark:text-slate-300 text-sm font-medium pb-1.5">Bairro</p>
+<input class="form-input flex w-full rounded-lg text-slate-900 dark:text-slate-100 border border-slate-200 dark:border-slate-700 bg-transparent h-12 placeholder:text-slate-400 p-3 text-base font-normal" placeholder="Ex: Centro" type="text"/>
+</label>
+<label class="flex flex-col flex-1">
+<p class="text-slate-700 dark:text-slate-300 text-sm font-medium pb-1.5">Cidade</p>
+<input class="form-input flex w-full rounded-lg text-slate-900 dark:text-slate-100 border border-slate-200 dark:border-slate-700 bg-transparent h-12 placeholder:text-slate-400 p-3 text-base font-normal" placeholder="Ex: São Paulo" type="text"/>
+</label>
+</div>
+</div>
+</section>
+<!-- Section: Notas -->
+<section class="flex flex-col gap-4">
+<h3 class="text-primary text-sm font-bold uppercase tracking-wider">Notas / Observações</h3>
+<div class="flex flex-col gap-4 bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-primary/5">
+<label class="flex flex-col w-full">
+<textarea class="form-input flex w-full rounded-lg text-slate-900 dark:text-slate-100 border border-slate-200 dark:border-slate-700 bg-transparent min-h-[100px] placeholder:text-slate-400 p-3 text-base font-normal resize-none" placeholder="Adicione preferências de marcas, melhores horários para contato ou restrições..."></textarea>
+</label>
+</div>
+</section>
+</div>
+<!-- Sticky Footer Button -->
+<div class="fixed bottom-0 left-0 right-0 p-4 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-t border-primary/10 max-w-[480px] mx-auto z-20">
+<button class="w-full bg-primary hover:bg-primary/90 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-2 transition-colors shadow-lg">
+<span class="material-symbols-outlined">save</span>
+<span>Salvar Cadastro</span>
+</button>
+</div>
+</div>
+</body></html>
+
+<!-- Controle de Fiados -->
+<!DOCTYPE html>
+
+<html lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Controle de Fiados</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#4d8063",
+                        "background-light": "#f6f7f7",
+                        "background-dark": "#161c19",
+                    },
+                    fontFamily: {
+                        "display": ["Work Sans"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen">
+<div class="relative flex min-h-screen w-full flex-col max-w-md mx-auto bg-white dark:bg-background-dark shadow-xl overflow-x-hidden">
+<header class="flex items-center bg-white dark:bg-background-dark p-4 pb-2 justify-between sticky top-0 z-10 border-b border-primary/10">
+<div class="text-primary flex size-12 shrink-0 items-center">
+<span class="material-symbols-outlined text-3xl">menu</span>
+</div>
+<h2 class="text-slate-900 dark:text-slate-100 text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">Controle de Fiados</h2>
+<div class="flex w-12 items-center justify-end">
+<button class="flex cursor-pointer items-center justify-center rounded-lg h-12 bg-transparent text-primary p-0">
+<span class="material-symbols-outlined text-2xl">search</span>
+</button>
+</div>
+</header>
+<main class="flex-1 overflow-y-auto">
+<div class="flex flex-wrap gap-4 p-4">
+<div class="flex min-w-[158px] flex-1 flex-col gap-2 rounded-xl p-6 border border-primary/20 bg-primary/5">
+<p class="text-slate-600 dark:text-slate-400 text-sm font-medium leading-normal">Total a Receber</p>
+<p class="text-primary tracking-light text-2xl font-bold leading-tight">R$ 4.820,50</p>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-emerald-600 text-sm">trending_up</span>
+<p class="text-emerald-600 text-xs font-medium">+8.2% este mês</p>
+</div>
+</div>
+<div class="flex min-w-[158px] flex-1 flex-col gap-2 rounded-xl p-6 border border-primary/20 bg-primary/5">
+<p class="text-slate-600 dark:text-slate-400 text-sm font-medium leading-normal">Devedores Ativos</p>
+<p class="text-slate-900 dark:text-slate-100 tracking-light text-2xl font-bold leading-tight">18</p>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-rose-600 text-sm">trending_up</span>
+<p class="text-rose-600 text-xs font-medium">+3 novos</p>
+</div>
+</div>
+</div>
+<div class="px-4 py-2">
+<button class="w-full flex items-center justify-center gap-2 bg-primary text-white py-3 px-4 rounded-xl font-bold shadow-sm hover:bg-primary/90 transition-colors">
+<span class="material-symbols-outlined">person_add</span>
+                    Cadastrar Novo Devedor
+                </button>
+</div>
+<div class="flex items-center justify-between px-4 pb-2 pt-6">
+<h3 class="text-slate-900 dark:text-slate-100 text-lg font-bold leading-tight tracking-[-0.015em]">Lista de Devedores</h3>
+<button class="text-primary text-sm font-semibold">Ver todos</button>
+</div>
+<div class="flex flex-col gap-1 px-2">
+<div class="flex items-center gap-4 bg-white dark:bg-background-dark hover:bg-primary/5 p-3 rounded-xl transition-colors border-b border-primary/5">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-14 w-14 shrink-0 border-2 border-primary/20" data-alt="Profile photo of a middle aged man smiling" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCiDk4z8PPna4Q1iLyMT-GRbPAGxqv-143AOF8k-mhCAdQ8TFx31T6Q1NCsW6ddRD911CMjlb16M7vhs4jArm6GSdwpBqwpOcbwAqDscXvPvm-bLPiCG4q-lQt2MVg4a2IV6hP8WEMjcsE6nzgTWhxyjd0U7bvb7eBoWH_N7uu3JEMtcoWLpipdLslshbBsMK-fnUmktNZO3botV_Zdk1Kn9_Lk9J6a7eHsiYTMOazeTL0mmS1H2CHsNp5rBXmzExX6ynF7dtjoLfI");'></div>
+<div class="flex flex-1 flex-col justify-center">
+<p class="text-slate-900 dark:text-slate-100 text-base font-bold leading-normal">João Silva</p>
+<p class="text-slate-500 dark:text-slate-400 text-xs font-normal">Última compra: 12/10/2023</p>
+<p class="text-primary text-sm font-bold mt-0.5">Dívida: R$ 150,00</p>
+</div>
+<div class="shrink-0 flex gap-2">
+<button class="text-emerald-500 bg-emerald-50 dark:bg-emerald-900/20 p-2 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1">chat</span>
+</button>
+</div>
+</div>
+<div class="flex items-center gap-4 bg-white dark:bg-background-dark hover:bg-primary/5 p-3 rounded-xl transition-colors border-b border-primary/5">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-14 w-14 shrink-0 border-2 border-primary/20" data-alt="Profile photo of a young woman with glasses" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAd41_aGHHKYZaM_YfjZ3WJejt-4u47DFC3o_PdMrk53mYsc0FdMYsLPIPt4nBAhTBe41T1uhH18_MPQNsAHEcq6t868Ybpcwnx4CuTvnN7kXbd7Wu88KaYtLtSt72GX7iUZjA4bZOgYT5eS1CjkMWTfXX5vZNN8PIvrt6Wt5xBDRKgw879rka8fG9g6ORZ7yHaJTgRQqJTh9tjslizj4DXSuwLxuTA33kmssXI9nNCeZfbYuANBKNYAMuh_f33Jfkvgm41sU5RV7I");'></div>
+<div class="flex flex-1 flex-col justify-center">
+<p class="text-slate-900 dark:text-slate-100 text-base font-bold leading-normal">Maria Oliveira</p>
+<p class="text-slate-500 dark:text-slate-400 text-xs font-normal">Última compra: 05/11/2023</p>
+<p class="text-primary text-sm font-bold mt-0.5">Dívida: R$ 342,80</p>
+</div>
+<div class="shrink-0 flex gap-2">
+<button class="text-emerald-500 bg-emerald-50 dark:bg-emerald-900/20 p-2 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1">chat</span>
+</button>
+</div>
+</div>
+<div class="flex items-center gap-4 bg-white dark:bg-background-dark hover:bg-primary/5 p-3 rounded-xl transition-colors border-b border-primary/5">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-14 w-14 shrink-0 border-2 border-primary/20" data-alt="Profile photo of a man with a beard" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBleSxIjn6LwrLyrSDlGY1SPiiNodAUp2sf1RFhUFNNhZvuqDOLFlwHTB3UQcUqGxutYakEE4d4sYNMBg7gtWzNPAeWIOORaNk40w2Ajo17oEUdQG_RIyuf33nyqMyF_Dbo1b4F7tXXcj57jFojrD_5uwMDV3cCYXCLJP3-BYFeqJsvS813uPw8p8StIbOxBVujJK8PqjMK3eYisGShR03D7cIDUQdaoGKJkdh-0HNItMklHOfSvzI-6yEeIbaNqjTt3vW4CGpjOfs");'></div>
+<div class="flex flex-1 flex-col justify-center">
+<p class="text-slate-900 dark:text-slate-100 text-base font-bold leading-normal">Ricardo Santos</p>
+<p class="text-slate-500 dark:text-slate-400 text-xs font-normal">Última compra: 28/10/2023</p>
+<p class="text-rose-600 text-sm font-bold mt-0.5">Dívida: R$ 890,00</p>
+</div>
+<div class="shrink-0 flex gap-2">
+<button class="text-emerald-500 bg-emerald-50 dark:bg-emerald-900/20 p-2 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1">chat</span>
+</button>
+</div>
+</div>
+<div class="flex items-center gap-4 bg-white dark:bg-background-dark hover:bg-primary/5 p-3 rounded-xl transition-colors border-b border-primary/5">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-14 w-14 shrink-0 border-2 border-primary/20" data-alt="Profile photo of a woman in a casual setting" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBFU0DMT4vcnyRgwpeWIXveKUR-EDB9as7xdrywjsBN5bwOOBgD6FcP18lgC5JMpEB9eAaCcYmM1Mw0E-vyCJMV90lTVaOymQGW8EoI3uApEc6c9WpYh32-dB_wFy7nvr_mB1ZdQ0W10e6NJGyOKFig0ZbpgG_j9Jn_C9j_BBRDyTDROZfnwDH_GPKD2E2Y59TiM4t9S7yLHPMAGARIV92jWkpKoOHwYgySupwax9v8JoIVdqo6ygOf5hmgNmVqzCyy9R2zOgqCJAw");'></div>
+<div class="flex flex-1 flex-col justify-center">
+<p class="text-slate-900 dark:text-slate-100 text-base font-bold leading-normal">Ana Costa</p>
+<p class="text-slate-500 dark:text-slate-400 text-xs font-normal">Última compra: 02/11/2023</p>
+<p class="text-primary text-sm font-bold mt-0.5">Dívida: R$ 45,20</p>
+</div>
+<div class="shrink-0 flex gap-2">
+<button class="text-emerald-500 bg-emerald-50 dark:bg-emerald-900/20 p-2 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1">chat</span>
+</button>
+</div>
+</div>
+</div>
+<div class="h-24"></div>
+</main>
+<nav class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md border-t border-primary/10 bg-white dark:bg-background-dark px-4 pb-4 pt-2 flex justify-between items-end z-20">
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined text-2xl">home</span>
+<p class="text-[10px] font-medium uppercase tracking-wider">Início</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1">receipt_long</span>
+<p class="text-[10px] font-bold uppercase tracking-wider">Fiados</p>
+</a>
+<div class="flex-1 flex justify-center -translate-y-4">
+<button class="bg-primary text-white p-3 rounded-full shadow-lg shadow-primary/40 flex items-center justify-center">
+<span class="material-symbols-outlined text-3xl">add</span>
+</button>
+</div>
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined text-2xl">sell</span>
+<p class="text-[10px] font-medium uppercase tracking-wider">Vendas</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined text-2xl">more_horiz</span>
+<p class="text-[10px] font-medium uppercase tracking-wider">Mais</p>
+</a>
+</nav>
+</div>
+</body></html>
+
+<!-- Cobrança via WhatsApp -->
+<!DOCTYPE html>
+
+<html lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#4d8063",
+                        "background-light": "#f6f7f7",
+                        "background-dark": "#161c19",
+                    },
+                    fontFamily: {
+                        "display": ["Work Sans"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<title>Cobrança WhatsApp</title>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-display bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex flex-col">
+<!-- Header Section -->
+<header class="sticky top-0 z-10 bg-white/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-primary/10">
+<div class="flex items-center p-4 gap-4">
+<button class="flex items-center justify-center size-10 rounded-full hover:bg-primary/10 text-primary transition-colors">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h1 class="text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100">Cobrança WhatsApp</h1>
+</div>
+</header>
+<main class="flex-1 overflow-y-auto pb-24">
+<!-- Client Summary Card -->
+<div class="p-4">
+<div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-primary/5 overflow-hidden">
+<div class="p-5 flex flex-col gap-4">
+<div class="flex items-center gap-4">
+<div class="size-16 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-3xl">account_circle</span>
+</div>
+<div class="flex-1">
+<p class="text-sm font-medium text-primary/70 uppercase tracking-wider">Resumo do Cliente</p>
+<h2 class="text-2xl font-bold text-slate-900 dark:text-white">João Silva</h2>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-4 pt-2 border-t border-slate-100 dark:border-slate-700">
+<div class="flex flex-col">
+<span class="text-xs text-slate-500 dark:text-slate-400">Total em Aberto</span>
+<span class="text-lg font-bold text-primary">R$ 150,00</span>
+</div>
+<div class="flex flex-col">
+<span class="text-xs text-slate-500 dark:text-slate-400">Status</span>
+<span class="text-lg font-bold text-orange-600 dark:text-orange-400">15 dias de atraso</span>
+</div>
+</div>
+</div>
+<div class="h-2 bg-gradient-to-r from-primary/20 to-primary/60"></div>
+</div>
+</div>
+<!-- Section Title -->
+<div class="px-4 py-2">
+<h3 class="text-lg font-bold text-slate-800 dark:text-slate-200">Modelos de Mensagem</h3>
+<p class="text-sm text-slate-500 dark:text-slate-400">Selecione um modelo para enviar</p>
+</div>
+<!-- Message Templates List -->
+<div class="p-4 space-y-4">
+<!-- Template 1 -->
+<div class="bg-white dark:bg-slate-800 p-5 rounded-xl border border-primary/10 flex flex-col gap-4 shadow-sm">
+<div class="flex justify-between items-start">
+<div class="flex flex-col gap-1">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 w-fit">Suave</span>
+<h4 class="text-base font-bold text-slate-900 dark:text-white">Lembrete Amigável</h4>
+</div>
+<span class="material-symbols-outlined text-primary/40">chat_bubble</span>
+</div>
+<p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed italic bg-background-light dark:bg-slate-900/50 p-3 rounded-lg border-l-4 border-primary/30">
+                    "Olá, João! Passando para lembrar do seu pagamento que vence em breve. Podemos contar com você? Qualquer dúvida, estou à disposição!"
+                </p>
+<button class="flex w-full items-center justify-center gap-2 bg-primary text-white py-3 rounded-lg font-bold hover:bg-primary/90 active:scale-[0.98] transition-all">
+<span class="material-symbols-outlined text-lg">send</span>
+<span>Enviar via WhatsApp</span>
+</button>
+</div>
+<!-- Template 2 -->
+<div class="bg-white dark:bg-slate-800 p-5 rounded-xl border border-primary/10 flex flex-col gap-4 shadow-sm">
+<div class="flex justify-between items-start">
+<div class="flex flex-col gap-1">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300 w-fit">Moderado</span>
+<h4 class="text-base font-bold text-slate-900 dark:text-white">Aviso de Atraso</h4>
+</div>
+<span class="material-symbols-outlined text-orange-500/40">warning</span>
+</div>
+<p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed italic bg-background-light dark:bg-slate-900/50 p-3 rounded-lg border-l-4 border-orange-500/30">
+                    "Oi João, notamos que o seu pagamento de R$ 150,00 está com alguns dias de atraso. Aconteceu algo? Se precisar do boleto novamente, me avise."
+                </p>
+<button class="flex w-full items-center justify-center gap-2 bg-primary text-white py-3 rounded-lg font-bold hover:bg-primary/90 active:scale-[0.98] transition-all">
+<span class="material-symbols-outlined text-lg">send</span>
+<span>Enviar via WhatsApp</span>
+</button>
+</div>
+<!-- Template 3 -->
+<div class="bg-white dark:bg-slate-800 p-5 rounded-xl border border-primary/10 flex flex-col gap-4 shadow-sm">
+<div class="flex justify-between items-start">
+<div class="flex flex-col gap-1">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300 w-fit">Urgente</span>
+<h4 class="text-base font-bold text-slate-900 dark:text-white">Cobrança Urgente</h4>
+</div>
+<span class="material-symbols-outlined text-red-500/40">error</span>
+</div>
+<p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed italic bg-background-light dark:bg-slate-900/50 p-3 rounded-lg border-l-4 border-red-500/30">
+                    "Prezado João, consta em nosso sistema um débito pendente há 15 dias. Solicitamos a regularização imediata para evitar suspensão de novos pedidos."
+                </p>
+<button class="flex w-full items-center justify-center gap-2 bg-primary text-white py-3 rounded-lg font-bold hover:bg-primary/90 active:scale-[0.98] transition-all">
+<span class="material-symbols-outlined text-lg">send</span>
+<span>Enviar via WhatsApp</span>
+</button>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 right-0 bg-white dark:bg-background-dark border-t border-primary/10 px-4 pb-6 pt-2 flex justify-around items-center">
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="text-[10px] font-medium">Início</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">group</span>
+<span class="text-[10px] font-medium">Clientes</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">receipt_long</span>
+<span class="text-[10px] font-medium">Vendas</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-[10px] font-medium">Ajustes</span>
+</a>
+</nav>
+</body></html>
+
+<!-- Carrinho Multi-Marca -->
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Shopping Cart - Multi-Brand Reseller</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#4d8063",
+                        "background-light": "#f6f7f7",
+                        "background-dark": "#161c19",
+                    },
+                    fontFamily: {
+                        "display": ["Work Sans"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Work Sans', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen">
+<!-- Header -->
+<header class="sticky top-0 z-10 bg-white dark:bg-background-dark border-b border-primary/10 px-4 py-4 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<button class="flex items-center justify-center p-1 rounded-full hover:bg-primary/10">
+<span class="material-symbols-outlined text-slate-900 dark:text-slate-100">arrow_back</span>
+</button>
+<h1 class="text-xl font-bold tracking-tight">Your Cart</h1>
+</div>
+<button class="flex items-center justify-center p-2 rounded-full text-slate-600 dark:text-slate-400">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</header>
+<main class="pb-32">
+<!-- Split Payment Info -->
+<div class="m-4 p-4 rounded-xl bg-primary/10 border border-primary/20 flex gap-3 items-start">
+<span class="material-symbols-outlined text-primary">info</span>
+<p class="text-sm font-medium leading-tight">Your order will be processed per brand. Each brand handles its own shipping and payment.</p>
+</div>
+<!-- Brand Group: O Boticário -->
+<section class="mb-6">
+<div class="flex items-center justify-between px-4 py-3 bg-white dark:bg-slate-800/50 border-y border-primary/5">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">verified</span>
+<h2 class="font-bold text-lg">O Boticário</h2>
+</div>
+<span class="text-xs font-semibold px-2 py-1 rounded bg-primary/20 text-primary">Reseller Direct</span>
+</div>
+<!-- Product 1 -->
+<div class="flex items-center gap-4 bg-white dark:bg-slate-900 px-4 py-4 border-b border-slate-100 dark:border-slate-800">
+<div class="h-20 w-20 rounded-lg bg-cover bg-center shrink-0 border border-slate-100 dark:border-slate-800" data-alt="Luxury dark cologne bottle on a minimalist background" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDVfIE6Rk5pKPaRKd-XKP89BVaqQsw4OtUNXbwFVC20i5qvPmPQlcj__OE5t4qD88lvmMueVhLEMeBeHeQ8SpgBpnr7Qe_rNdb8DiXacgbpjj-8Cu-OGNIXM7sdF5IeyD2w9KvkbgD7osQmL3Zbv24_90WTyOd3k5koHsicsJIUCjUQOENdIdb68LB6I7dE-wOuYSlgtLePh1RQzF1dHd0fg7OrYrZKGyI2FngHaqT0irYynsHHZz5Vg958X6x-8SxrThjKuEvSSxE');"></div>
+<div class="flex flex-col flex-1 gap-1">
+<p class="text-base font-semibold line-clamp-1">Malbec Magnetic Cologne</p>
+<p class="text-primary font-bold">$45.90</p>
+<div class="flex items-center gap-3 mt-1">
+<button class="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">-</button>
+<span class="font-medium">1</span>
+<button class="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">+</button>
+</div>
+</div>
+</div>
+<div class="px-4 py-3 bg-white dark:bg-slate-900/80 flex justify-between items-center text-sm">
+<span class="text-slate-500">Subtotal O Boticário</span>
+<span class="font-bold text-slate-900 dark:text-slate-100">$45.90</span>
+</div>
+</section>
+<!-- Brand Group: Natura -->
+<section class="mb-6">
+<div class="flex items-center justify-between px-4 py-3 bg-white dark:bg-slate-800/50 border-y border-primary/5">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">eco</span>
+<h2 class="font-bold text-lg">Natura</h2>
+</div>
+<span class="text-xs font-semibold px-2 py-1 rounded bg-primary/20 text-primary">Eco-Friendly</span>
+</div>
+<!-- Product 2 -->
+<div class="flex items-center gap-4 bg-white dark:bg-slate-900 px-4 py-4 border-b border-slate-100 dark:border-slate-800">
+<div class="h-20 w-20 rounded-lg bg-cover bg-center shrink-0 border border-slate-100 dark:border-slate-800" data-alt="Natura Ekos body lotion tube with botanical elements" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDeQI9l5fePZ3NOfRCnz9t2WA0cevKj6giUmkLGAcxGP7R7LKC8Acwnf6xa9Xem97jbVTzSy6yoEZlm-M-A5KE6mHVocvOtzGcfs07UoppWTtMg-9x_U_LaQS1xBXd0HrHsKT2ojewP4tUTLeJ1_6ijMDHSrGFuIzOHKXePQG-a9gfKror8D1sWCcipOdKZT-6L5-14-9gmNq3ESa7C4peSPgIo2ARnwX11FGsUxuzAaiZ4_ps_TnwVVIA88pKJFakim1UKxf7zBMY');"></div>
+<div class="flex flex-col flex-1 gap-1">
+<p class="text-base font-semibold line-clamp-1">Ekos Castanha Body Lotion</p>
+<p class="text-primary font-bold">$22.00</p>
+<div class="flex items-center gap-3 mt-1">
+<button class="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">-</button>
+<span class="font-medium">2</span>
+<button class="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">+</button>
+</div>
+</div>
+</div>
+<div class="px-4 py-3 bg-white dark:bg-slate-900/80 flex justify-between items-center text-sm">
+<span class="text-slate-500">Subtotal Natura</span>
+<span class="font-bold text-slate-900 dark:text-slate-100">$44.00</span>
+</div>
+</section>
+<!-- Brand Group: Rommanel -->
+<section class="mb-6">
+<div class="flex items-center justify-between px-4 py-3 bg-white dark:bg-slate-800/50 border-y border-primary/5">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">diamond</span>
+<h2 class="font-bold text-lg">Rommanel</h2>
+</div>
+<span class="text-xs font-semibold px-2 py-1 rounded bg-primary/20 text-primary">Jewelry</span>
+</div>
+<!-- Product 3 -->
+<div class="flex items-center gap-4 bg-white dark:bg-slate-900 px-4 py-4 border-b border-slate-100 dark:border-slate-800">
+<div class="h-20 w-20 rounded-lg bg-cover bg-center shrink-0 border border-slate-100 dark:border-slate-800" data-alt="Elegant gold plated earrings on white background" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCOzMkoC1X3s9pnzUCDk3nBS7pM1aiUGGeuNMhFPi81-yascNLZBs3NtpfCgkbGsArTQ2iRQOGgPmyWSo8mCkNI9PbcEWOs0aAeWhQAwFqrAdx2N5HfWTRq8zmz0TuwG7B78_T8fFzfYfZkvVhQHlqCNlbjpb-obSJjHsMTLyDnlh9dEYbmxmDceuR3WAT81zAxEBrnt2eIGGdNQOtBZZPiiJm2h6EuuaYJQe6Sab6Yvzmd4d4prlif9Pe60mYmPzb1FB3kAWzMbsk');"></div>
+<div class="flex flex-col flex-1 gap-1">
+<p class="text-base font-semibold line-clamp-1">Gold Plated Drop Earrings</p>
+<p class="text-primary font-bold">$89.00</p>
+<div class="flex items-center gap-3 mt-1">
+<button class="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">-</button>
+<span class="font-medium">1</span>
+<button class="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">+</button>
+</div>
+</div>
+</div>
+<div class="px-4 py-3 bg-white dark:bg-slate-900/80 flex justify-between items-center text-sm">
+<span class="text-slate-500">Subtotal Rommanel</span>
+<span class="font-bold text-slate-900 dark:text-slate-100">$89.00</span>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation & Summary -->
+<div class="fixed bottom-0 left-0 right-0 z-20">
+<div class="bg-white dark:bg-background-dark border-t border-slate-100 dark:border-slate-800 p-4 shadow-2xl">
+<div class="flex justify-between items-end mb-4">
+<div>
+<p class="text-xs text-slate-500 uppercase tracking-widest font-bold">Total Amount</p>
+<p class="text-2xl font-bold text-primary">$178.90</p>
+</div>
+<p class="text-xs text-slate-400 text-right">3 Brand Shipments Included</p>
+</div>
+<button class="w-full bg-primary hover:bg-primary/90 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-2 transition-colors">
+<span>Finish Payment</span>
+<span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+<!-- Custom Bottom Nav Bar -->
+<nav class="flex gap-2 border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-background-dark px-4 pb-4 pt-2">
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">home</span>
+<p class="text-[10px] font-bold uppercase">Home</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined">shopping_cart</span>
+<p class="text-[10px] font-bold uppercase">Cart</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">receipt_long</span>
+<p class="text-[10px] font-bold uppercase">Orders</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">person</span>
+<p class="text-[10px] font-bold uppercase">Profile</p>
+</a>
+</nav>
+</div>
+</body></html>
+
+<!-- Dashboard Central Renovado -->
+<!DOCTYPE html>
+
+<html lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Revendedora Dashboard - Vendas e Controle</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#4d8063",
+                        "background-light": "#f8faf9",
+                        "background-dark": "#161c19",
+                    },
+                    fontFamily: {
+                        "display": ["Work Sans"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "0.75rem",
+                        "xl": "1rem",
+                        "2xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            min-height: max(884px, 100dvh);
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .font-fill {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(8px);
+        }
+        .dark .glass-card {
+            background: rgba(30, 41, 59, 0.7);
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen">
+<!-- Top Header -->
+<header class="sticky top-0 z-50 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-primary/5 px-6 py-4 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="bg-primary/10 p-2 rounded-xl">
+<span class="material-symbols-outlined text-primary text-2xl font-fill">storefront</span>
+</div>
+<h1 class="text-xl font-bold tracking-tight text-slate-800 dark:text-white">Revenda <span class="text-primary">Pro</span></h1>
+</div>
+<div class="flex gap-2">
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors relative">
+<span class="material-symbols-outlined text-slate-600 dark:text-slate-300">notifications</span>
+<span class="absolute top-2.5 right-2.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-slate-900"></span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+<span class="material-symbols-outlined text-slate-600 dark:text-slate-300">account_circle</span>
+</button>
+</div>
+</header>
+<main class="pb-28">
+<!-- Summary Cards Section -->
+<section class="p-4 grid grid-cols-2 gap-4">
+<div class="bg-gradient-to-br from-primary/5 to-primary/20 dark:from-primary/10 dark:to-primary/30 p-5 rounded-2xl border border-primary/10 shadow-sm relative overflow-hidden group">
+<div class="flex items-center justify-between mb-4 relative z-10">
+<p class="text-[11px] font-bold text-primary uppercase tracking-wider">Vendas à Vista</p>
+<div class="w-8 h-8 rounded-lg bg-white/60 dark:bg-slate-800/60 flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-primary text-lg font-fill">payments</span>
+</div>
+</div>
+<div class="relative z-10">
+<p class="text-2xl font-bold text-slate-900 dark:text-white leading-tight">R$ 2.450,00</p>
+<div class="flex items-center gap-1 mt-1">
+<span class="material-symbols-outlined text-emerald-600 text-sm font-bold">trending_up</span>
+<p class="text-xs font-bold text-emerald-600">+12%</p>
+</div>
+</div>
+<div class="absolute -right-2 -bottom-2 opacity-5">
+<span class="material-symbols-outlined text-7xl font-fill">payments</span>
+</div>
+</div>
+<div class="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900/10 dark:to-orange-900/30 p-5 rounded-2xl border border-orange-200/50 dark:border-orange-500/10 shadow-sm relative overflow-hidden">
+<div class="flex items-center justify-between mb-4 relative z-10">
+<p class="text-[11px] font-bold text-orange-600 dark:text-orange-400 uppercase tracking-wider">Vendas Fiado</p>
+<div class="w-8 h-8 rounded-lg bg-white/60 dark:bg-slate-800/60 flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-orange-500 text-lg font-fill">history_edu</span>
+</div>
+</div>
+<div class="relative z-10">
+<p class="text-2xl font-bold text-slate-900 dark:text-white leading-tight">R$ 1.120,00</p>
+<div class="flex items-center gap-1 mt-1">
+<span class="material-symbols-outlined text-orange-500 text-sm font-bold">trending_up</span>
+<p class="text-xs font-bold text-orange-500">+5%</p>
+</div>
+</div>
+<div class="absolute -right-2 -bottom-2 opacity-5">
+<span class="material-symbols-outlined text-7xl font-fill">history_edu</span>
+</div>
+</div>
+</section>
+<!-- Chart Section -->
+<section class="px-4 py-2">
+<div class="bg-white dark:bg-slate-800/50 p-6 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-sm">
+<div class="flex items-start justify-between mb-8">
+<div>
+<p class="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Total do Mês (Faturamento)</p>
+<h3 class="text-3xl font-bold text-slate-900 dark:text-white tracking-tight">R$ 3.570,00</h3>
+</div>
+<div class="bg-primary/10 px-3 py-1 rounded-full">
+<span class="text-[10px] font-bold text-primary uppercase tracking-widest">Desempenho</span>
+</div>
+</div>
+<div class="relative h-44 flex items-end justify-around gap-8 px-4">
+<!-- Grid Lines Background -->
+<div class="absolute inset-x-0 top-0 h-full flex flex-col justify-between pointer-events-none opacity-30">
+<div class="border-t border-dashed border-slate-300 dark:border-slate-600 w-full h-px"></div>
+<div class="border-t border-dashed border-slate-300 dark:border-slate-600 w-full h-px"></div>
+<div class="border-t border-dashed border-slate-300 dark:border-slate-600 w-full h-px"></div>
+</div>
+<div class="flex-1 flex flex-col items-center gap-3 group relative z-10">
+<div class="w-full max-w-[64px] bg-slate-100 dark:bg-slate-700 rounded-t-xl relative h-40 overflow-hidden">
+<div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-primary to-primary/80 transition-all duration-700" style="height: 68%;">
+<div class="absolute top-2 inset-x-0 flex justify-center">
+<div class="w-4 h-1 bg-white/30 rounded-full"></div>
+</div>
+</div>
+</div>
+<span class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Vista</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-3 group relative z-10">
+<div class="w-full max-w-[64px] bg-slate-100 dark:bg-slate-700 rounded-t-xl relative h-40 overflow-hidden">
+<div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-orange-500 to-orange-400 transition-all duration-700" style="height: 32%;">
+<div class="absolute top-2 inset-x-0 flex justify-center">
+<div class="w-4 h-1 bg-white/30 rounded-full"></div>
+</div>
+</div>
+</div>
+<span class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Fiado</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Quick Actions -->
+<section class="p-4">
+<h2 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-lg">bolt</span> Ações Rápidas
+            </h2>
+<div class="grid grid-cols-2 gap-4">
+<button class="group bg-primary text-white p-6 rounded-2xl flex flex-col items-center justify-center gap-3 shadow-xl shadow-primary/20 hover:shadow-primary/30 active:scale-[0.98] transition-all relative overflow-hidden">
+<div class="absolute top-0 right-0 w-16 h-16 bg-white/10 rounded-bl-full translate-x-4 -translate-y-4"></div>
+<span class="material-symbols-outlined text-3xl transition-transform group-hover:scale-110">add_shopping_cart</span>
+<span class="text-sm font-bold tracking-tight">Registrar Venda</span>
+</button>
+<button class="group bg-white dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 p-6 rounded-2xl flex flex-col items-center justify-center gap-3 hover:border-primary/50 hover:bg-primary/5 active:scale-[0.98] transition-all">
+<span class="material-symbols-outlined text-3xl text-primary transition-transform group-hover:scale-110">person_add</span>
+<span class="text-sm font-bold text-slate-700 dark:text-slate-200 tracking-tight">Novo Cliente</span>
+</button>
+</div>
+</section>
+<!-- Debtors List -->
+<section class="p-4">
+<div class="flex items-center justify-between mb-5">
+<h2 class="text-sm font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+<span class="material-symbols-outlined text-red-500 text-lg">error</span> Clientes com Débito
+                </h2>
+<a class="text-primary text-xs font-bold uppercase tracking-wider hover:underline" href="#">Ver todos</a>
+</div>
+<div class="space-y-3">
+<!-- Debtor 1 -->
+<div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-100 dark:border-slate-700/50 flex items-center justify-between shadow-sm hover:shadow-md transition-shadow">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-900/30 flex items-center justify-center text-red-600 dark:text-red-400 font-bold text-sm">
+                            MA
+                        </div>
+<div>
+<p class="font-bold text-slate-900 dark:text-slate-50 leading-none mb-1.5">Maria Almeida</p>
+<div class="flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>
+<p class="text-[11px] text-red-500 font-bold uppercase tracking-tight">Atrasado há 12 dias</p>
+</div>
+</div>
+</div>
+<div class="flex flex-col items-end gap-2">
+<p class="font-bold text-slate-900 dark:text-slate-50">R$ 184,90</p>
+<button class="text-[10px] font-bold text-white bg-primary px-3 py-1.5 rounded-lg uppercase tracking-wider hover:brightness-110 active:scale-95 transition-all shadow-sm">Cobrar</button>
+</div>
+</div>
+<!-- Debtor 2 -->
+<div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-100 dark:border-slate-700/50 flex items-center justify-between shadow-sm">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-500 dark:text-slate-400 font-bold text-sm">
+                            JS
+                        </div>
+<div>
+<p class="font-bold text-slate-900 dark:text-slate-50 leading-none mb-1.5">João Santos</p>
+<div class="flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+<p class="text-[11px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-tight">Vence em 2 dias</p>
+</div>
+</div>
+</div>
+<div class="flex flex-col items-end gap-2">
+<p class="font-bold text-slate-900 dark:text-slate-50">R$ 312,00</p>
+<button class="text-[10px] font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 px-3 py-1.5 rounded-lg uppercase tracking-wider hover:bg-slate-200 dark:hover:bg-slate-600 active:scale-95 transition-all">Lembrar</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Brand Filter (Contextual) -->
+<section class="p-4">
+<div class="flex gap-3 overflow-x-auto pb-4 no-scrollbar">
+<button class="shrink-0 flex items-center gap-2.5 bg-white dark:bg-slate-800 px-5 py-3 rounded-2xl border-2 border-slate-100 dark:border-slate-700 shadow-sm active:scale-95 hover:border-primary/30 transition-all">
+<span class="w-2.5 h-2.5 rounded-full bg-[#00a35e] ring-4 ring-[#00a35e]/10"></span>
+<span class="text-[13px] font-bold text-slate-700 dark:text-slate-300">O Boticário</span>
+</button>
+<button class="shrink-0 flex items-center gap-2.5 bg-white dark:bg-slate-800 px-5 py-3 rounded-2xl border-2 border-slate-100 dark:border-slate-700 shadow-sm active:scale-95 hover:border-primary/30 transition-all">
+<span class="w-2.5 h-2.5 rounded-full bg-[#f48120] ring-4 ring-[#f48120]/10"></span>
+<span class="text-[13px] font-bold text-slate-700 dark:text-slate-300">Natura</span>
+</button>
+<button class="shrink-0 flex items-center gap-2.5 bg-white dark:bg-slate-800 px-5 py-3 rounded-2xl border-2 border-slate-100 dark:border-slate-700 shadow-sm active:scale-95 hover:border-primary/30 transition-all">
+<span class="w-2.5 h-2.5 rounded-full bg-[#c2a15e] ring-4 ring-[#c2a15e]/10"></span>
+<span class="text-[13px] font-bold text-slate-700 dark:text-slate-300">Rommanel</span>
+</button>
+</div>
+</section>
+</main>
+<!-- Navigation Bar -->
+<nav class="fixed bottom-0 left-0 right-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-lg border-t border-slate-100 dark:border-slate-800 px-6 pb-8 pt-4 z-50">
+<div class="max-w-md mx-auto flex justify-between items-center">
+<a class="flex flex-col items-center gap-1.5 text-primary group" href="#">
+<div class="relative">
+<span class="material-symbols-outlined font-fill text-2xl transition-transform group-active:scale-90" style="font-variation-settings: 'FILL' 1">home</span>
+<span class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-primary rounded-full"></span>
+</div>
+<p class="text-[9px] font-black uppercase tracking-[0.15em]">Dashboard</p>
+</a>
+<a class="flex flex-col items-center gap-1.5 text-slate-400 dark:text-slate-500 hover:text-primary transition-colors group" href="#">
+<span class="material-symbols-outlined text-2xl transition-transform group-active:scale-90">receipt_long</span>
+<p class="text-[9px] font-black uppercase tracking-[0.15em]">Vendas</p>
+</a>
+<a class="flex flex-col items-center gap-1.5 text-slate-400 dark:text-slate-500 hover:text-primary transition-colors group" href="#">
+<span class="material-symbols-outlined text-2xl transition-transform group-active:scale-90">group</span>
+<p class="text-[9px] font-black uppercase tracking-[0.15em]">Clientes</p>
+</a>
+<a class="flex flex-col items-center gap-1.5 text-slate-400 dark:text-slate-500 hover:text-primary transition-colors group" href="#">
+<span class="material-symbols-outlined text-2xl transition-transform group-active:scale-90">account_balance_wallet</span>
+<p class="text-[9px] font-black uppercase tracking-[0.15em]">Finanças</p>
+</a>
+</div>
+</nav>
+</body></html>
