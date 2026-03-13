@@ -48,13 +48,19 @@ export default function ProdutoPage({ onNavigate }: ProdutoPageProps) {
     onNavigate("carrinho");
   };
 
+  const [deleteError, setDeleteError] = useState("");
+
   const handleDelete = async () => {
     if (!produto) return;
     if (!window.confirm(`Excluir "${produto.marca} — ${produto.nome}"?`)) return;
+    setDeleteError("");
     try {
-      await fetch(`${API_BASE}/produtos/${produto.id}`, { method: "DELETE" });
+      const resp = await fetch(`${API_BASE}/produtos/${produto.id}`, { method: "DELETE" });
+      if (!resp.ok) throw new Error();
       onNavigate("perfumaria");
-    } catch { /* silently fail */ }
+    } catch {
+      setDeleteError("Erro ao excluir produto. Tente novamente.");
+    }
   };
 
   if (!produto) {
@@ -150,6 +156,12 @@ export default function ProdutoPage({ onNavigate }: ProdutoPageProps) {
               Excluir
             </button>
           </div>
+
+          {deleteError && (
+            <div className="mt-3 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
+              <p className="text-xs text-red-700 font-medium">{deleteError}</p>
+            </div>
+          )}
         </div>
       </main>
     </div>
