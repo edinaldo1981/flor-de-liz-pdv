@@ -1,4 +1,4 @@
-import { ArrowLeft, Trash2, Plus, Minus, Search, AlertCircle } from "lucide-react";
+import { ArrowLeft, Trash2, Plus, Minus, Search, AlertCircle, Package } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 
 interface CarrinhoPageProps {
@@ -21,11 +21,6 @@ interface CartItem {
   img: string;
 }
 
-const initialItems: CartItem[] = [
-  { id: 1, brand: "Lily", name: "Eau de Parfum 75ml", price: 279.90, qty: 1, img: "https://lh3.googleusercontent.com/aida-public/AB6AXuD01thmBaw-85fXK4zO2J2FuRdJ4tQF0wtcFwOaxBG2RVGN0f40CNayvwufRTIB_0ALbCjjxzl8d9bQkofM_8BwR9XHsRsNS1yVLv3I1mXYtW7Gfx3kxcg8-MnHS5on2jHeANz7F_zdy44eCoU4DNET-WuTSEQlZXlRnhBVyI4XmKpHXEIX9vMzCjYeKIDqg6kid4TBQaUByuPK5krDCp57KdTLg0XtHw7Ixs_CvJXbUTU8rvvgl9rJnGau-oChr46GEDFmayEczBY" },
-  { id: 2, brand: "Malbec", name: "Magnetic 100ml", price: 209.90, qty: 1, img: "https://lh3.googleusercontent.com/aida-public/AB6AXuCrd-rSVAJULduK2Y2aNqQmHOcBw6FLSm8ede_yuKbqwYn89IdHPwf_SNfDhYkQodC0xIrFTJehi8RD1jIM5V3Oia9vJZBHg9W0vmLgEdVy90X0W7_Lp6DpJnLRX_bHLlefB5G3sVlydLqECvs8bITVlEzv1y7pV2ynAAMEePWMrJUgklG2vL52AJx3XxC9g3Te_fKzoYwMf3RK6HXtGELO9kga6tOdnm8xT0TwMzKdizDHdK6xYE3wLKB2MZe03nohZaSc4JQtYZg" },
-];
-
 const formasPagamento = [
   { key: "dinheiro", icon: "payments", label: "Dinheiro" },
   { key: "cartao", icon: "credit_card", label: "Cartão" },
@@ -35,8 +30,19 @@ const formasPagamento = [
 
 const API_BASE = "/api-server/api";
 
+function loadCartFromStorage(): CartItem[] {
+  try {
+    const raw = localStorage.getItem("carrinho_items");
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
+  } catch { /* ignore */ }
+  return [];
+}
+
 export default function CarrinhoPage({ onNavigate }: CarrinhoPageProps) {
-  const [items, setItems] = useState<CartItem[]>(initialItems);
+  const [items, setItems] = useState<CartItem[]>(loadCartFromStorage);
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const [clienteSelecionado, setClienteSelecionado] = useState<Cliente | null>(null);
   const [busca, setBusca] = useState("");
@@ -64,6 +70,10 @@ export default function CarrinhoPage({ onNavigate }: CarrinhoPageProps) {
     fetchClientes("");
   }, []);
 
+  useEffect(() => {
+    localStorage.setItem("carrinho_items", JSON.stringify(items));
+  }, [items]);
+
   const fetchClientes = async (q: string) => {
     setLoadingClientes(true);
     try {
@@ -71,7 +81,6 @@ export default function CarrinhoPage({ onNavigate }: CarrinhoPageProps) {
       const resp = await fetch(url);
       if (resp.ok) setClientes(await resp.json());
     } catch {
-      // Network error - silently fail
     } finally {
       setLoadingClientes(false);
     }
@@ -108,6 +117,7 @@ export default function CarrinhoPage({ onNavigate }: CarrinhoPageProps) {
         total: totalFinal,
         pagamento,
       }));
+      localStorage.removeItem("carrinho_items");
       onNavigate("confirmacao");
     } catch {
       setErro("Não foi possível registrar a venda. Tente novamente.");
@@ -211,15 +221,19 @@ export default function CarrinhoPage({ onNavigate }: CarrinhoPageProps) {
           <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Itens da Venda</h3>
           {items.length === 0 ? (
             <button onClick={() => onNavigate("perfumaria")} className="bg-white w-full rounded-xl border-2 border-dashed border-[#4d8063]/30 py-6 flex flex-col items-center gap-2 text-[#4d8063]">
-              <span className="material-symbols-outlined text-3xl">add_shopping_cart</span>
-              <p className="text-sm font-medium">Adicionar produtos ao catálogo</p>
+              <Package className="w-8 h-8 opacity-50" />
+              <p className="text-sm font-medium">Adicionar produtos do catálogo</p>
             </button>
           ) : (
             <div className="flex flex-col gap-2">
               {items.map(item => (
                 <div key={item.id} className="bg-white rounded-xl border border-[#4d8063]/5 p-3 flex gap-3 shadow-sm">
-                  <div className="w-14 h-14 rounded-xl overflow-hidden shrink-0 bg-slate-100">
-                    <img src={item.img} alt={item.name} className="w-full h-full object-cover" />
+                  <div className="w-14 h-14 rounded-xl overflow-hidden shrink-0 bg-slate-100 flex items-center justify-center">
+                    {item.img ? (
+                      <img src={item.img} alt={item.name} className="w-full h-full object-cover" />
+                    ) : (
+                      <Package className="w-6 h-6 text-slate-300" />
+                    )}
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-[10px] font-bold text-[#4d8063] uppercase">{item.brand}</p>

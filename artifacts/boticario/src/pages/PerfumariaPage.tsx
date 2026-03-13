@@ -1,33 +1,150 @@
-import { useState } from "react";
-import { ArrowLeft, Search, Plus } from "lucide-react";
-
-const products = [
-  { id: 1, brand: "Lily", name: "Eau de Parfum 75ml", price: 279.90, stock: 5, img: "https://lh3.googleusercontent.com/aida-public/AB6AXuD01thmBaw-85fXK4zO2J2FuRdJ4tQF0wtcFwOaxBG2RVGN0f40CNayvwufRTIB_0ALbCjjxzl8d9bQkofM_8BwR9XHsRsNS1yVLv3I1mXYtW7Gfx3kxcg8-MnHS5on2jHeANz7F_zdy44eCoU4DNET-WuTSEQlZXlRnhBVyI4XmKpHXEIX9vMzCjYeKIDqg6kid4TBQaUByuPK5krDCp57KdTLg0XtHw7Ixs_CvJXbUTU8rvvgl9rJnGau-oChr46GEDFmayEczBY" },
-  { id: 2, brand: "Malbec", name: "Magnetic Desodorante Colônia 100ml", price: 209.90, stock: 8, img: "https://lh3.googleusercontent.com/aida-public/AB6AXuCrd-rSVAJULduK2Y2aNqQmHOcBw6FLSm8ede_yuKbqwYn89IdHPwf_SNfDhYkQodC0xIrFTJehi8RD1jIM5V3Oia9vJZBHg9W0vmLgEdVy90X0W7_Lp6DpJnLRX_bHLlefB5G3sVlydLqECvs8bITVlEzv1y7pV2ynAAMEePWMrJUgklG2vL52AJx3XxC9g3Te_fKzoYwMf3RK6HXtGELO9kga6tOdnm8xT0TwMzKdizDHdK6xYE3wLKB2MZe03nohZaSc4JQtYZg" },
-  { id: 3, brand: "Floratta", name: "Red Desodorante Colônia 75ml", price: 139.90, stock: 12, img: "https://lh3.googleusercontent.com/aida-public/AB6AXuDX-kb5GX_lNTugx-wLBCeF1sy3t8JPCVYh104_I8UrtLA1U597JGHkrx2GqqTtJYMuLE1YVNlYZ4iAOq46d1963F9XPQdM1-wdPXVUSyOSP83Z9QqDZoTVotQyhjGrwa2vPiQBBbuHxXhOqC1pdDf_fAxJcjon1C_BLgsIE7-FO-UYpjMbybYUDoD8qcJVNBKw_v_dtC2mN1yGBubO7DCNQ2LiqmZTD5PEITZtoZvgkCzGXie2Dt5hHycPJgpG6wpThplob84y_g60" },
-  { id: 4, brand: "Coffee Woman", name: "Duo Colônia 100ml", price: 184.90, stock: 3, img: "https://lh3.googleusercontent.com/aida-public/AB6AXuB77iHLMrULhbcr1Bxr2DctSuxL7ABgbCCztBtVsxQC2B83jQEbDcCXT9NSGQogAYCr8icJpjgzTO42dM74P7HNDmOKUBYUqHPZxDKYSszO2OqrdP1v2rWzHCku6u2y7jz6bd8mvldCh5j8a9z8_o3L94iAhAFuPGc7x8JRt31XZOKpbIyp31E31nVN-N8fPkiCgp3jyt88DC76C1BezH7-u5_XnEE4NDwAMZT4VY2R_uJ4KxsF2Woc_6tHSUXzbd6SP8yHZR55vPk" },
-  { id: 5, brand: "Lily", name: "Creme Acetinado Hidratante 200ml", price: 109.90, stock: 7, img: "https://lh3.googleusercontent.com/aida-public/AB6AXuBrJwrX4dIVBYVLfy5butVBcG2eszgjVUzYQ63Vhytw5xkFAva1zbyaF8rgo8aaDT0Pumexq-NU8b6WVGcW-g3D15DYEeF-rOekkHj-G93do14AAKYuxv2G1Gv2ebpxseAojri6BHVZCJAJh65szle73p8lqKAGCrtdinBfCurpRrcUa6CmI62jRUqfx6jki3YDpNCWzDZ3nQelJXih1wN7RrxAoqS6fSaRsixQeFrWFKZXXvwHxDkLFFTsHJsgyyfPXkzGbUrjva4" },
-  { id: 6, brand: "Lily", name: "Absolu Eau de Parfum 75ml", price: 299.90, stock: 2, img: "https://lh3.googleusercontent.com/aida-public/AB6AXuAGCexMvk9nr4PfFfjAotDZn0Ijjgx-Y87pZKPhQdlzjyUFaxWBrc8QlkbhgxvKnKLY4_MO5BKqBGWfQznyLXKDdgGSowyLWIZ1mhGwER-l_XXbxdsFeqwL8rYyrDl10odnGhmLLODZOv-YPBAnwkJYXwcFs03VambCGnEZ6jzLuQsQyXb9mfJOWK3QAyTa_Cxos1T2r53cqe16UmbYlnpdQwvqyVu9mxo3sgpfp1yD8tH89yelpqLlJFmzXTkxDkPfY5m_woOYCx0" },
-];
-
-const categorias = ["Todos", "Perfume", "Hidratante", "Colônia", "Óleo"];
+import { useState, useEffect } from "react";
+import { ArrowLeft, Search, Plus, Pencil, Trash2, X, Save, Package } from "lucide-react";
 
 interface PerfumariaPageProps {
   onNavigate: (page: string) => void;
 }
 
+interface Produto {
+  id: number;
+  marca: string;
+  nome: string;
+  preco: number;
+  estoque: number;
+  img_url?: string;
+}
+
+const API_BASE = "/api-server/api";
+
 export default function PerfumariaPage({ onNavigate }: PerfumariaPageProps) {
   const [search, setSearch] = useState("");
-  const [catAtiva, setCatAtiva] = useState(0);
-  const [adicionados, setAdicionados] = useState<number[]>([]);
+  const [produtos, setProdutos] = useState<Produto[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selecionados, setSelecionados] = useState<number[]>([]);
+  const [showForm, setShowForm] = useState(false);
+  const [editando, setEditando] = useState<Produto | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<Produto | null>(null);
+  const [form, setForm] = useState({ marca: "", nome: "", preco: "", estoque: "", img_url: "" });
+  const [saving, setSaving] = useState(false);
+  const [erro, setErro] = useState("");
 
-  const filtered = products.filter(p =>
-    p.name.toLowerCase().includes(search.toLowerCase()) ||
-    p.brand.toLowerCase().includes(search.toLowerCase())
+  useEffect(() => {
+    fetchProdutos();
+    try {
+      const raw = localStorage.getItem("produto_editar");
+      if (raw) {
+        localStorage.removeItem("produto_editar");
+        const p = JSON.parse(raw) as Produto;
+        openForm(p);
+      }
+    } catch { /* ignore */ }
+  }, []);
+
+  const fetchProdutos = async () => {
+    setLoading(true);
+    try {
+      const resp = await fetch(`${API_BASE}/produtos`);
+      if (resp.ok) setProdutos(await resp.json());
+    } catch { /* silently fail */ } finally { setLoading(false); }
+  };
+
+  const filtered = produtos.filter(p =>
+    p.nome.toLowerCase().includes(search.toLowerCase()) ||
+    p.marca.toLowerCase().includes(search.toLowerCase())
   );
 
-  const toggleAdd = (id: number) => {
-    setAdicionados(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
+  const toggleSelecionado = (id: number) => {
+    setSelecionados(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
+  };
+
+  const irParaVenda = () => {
+    const novos = produtos
+      .filter(p => selecionados.includes(p.id))
+      .map(p => ({
+        id: p.id,
+        brand: p.marca,
+        name: p.nome,
+        price: p.preco,
+        qty: 1,
+        img: p.img_url || "",
+      }));
+    let cart: typeof novos = [];
+    try {
+      const raw = localStorage.getItem("carrinho_items");
+      if (raw) cart = JSON.parse(raw);
+    } catch { /* ignore */ }
+    for (const novo of novos) {
+      const idx = cart.findIndex(c => c.id === novo.id);
+      if (idx >= 0) {
+        cart[idx].qty += 1;
+      } else {
+        cart.push(novo);
+      }
+    }
+    localStorage.setItem("carrinho_items", JSON.stringify(cart));
+    onNavigate("carrinho");
+  };
+
+  const openForm = (produto?: Produto) => {
+    if (produto) {
+      setEditando(produto);
+      setForm({
+        marca: produto.marca,
+        nome: produto.nome,
+        preco: produto.preco.toString(),
+        estoque: produto.estoque.toString(),
+        img_url: produto.img_url || "",
+      });
+    } else {
+      setEditando(null);
+      setForm({ marca: "", nome: "", preco: "", estoque: "", img_url: "" });
+    }
+    setErro("");
+    setShowForm(true);
+  };
+
+  const handleSave = async () => {
+    if (!form.marca.trim() || !form.nome.trim() || !form.preco.trim()) {
+      setErro("Marca, nome e preço são obrigatórios.");
+      return;
+    }
+    setSaving(true);
+    setErro("");
+    try {
+      const body = {
+        marca: form.marca,
+        nome: form.nome,
+        preco: parseFloat(form.preco),
+        estoque: parseInt(form.estoque) || 0,
+        img_url: form.img_url || null,
+      };
+      const url = editando ? `${API_BASE}/produtos/${editando.id}` : `${API_BASE}/produtos`;
+      const method = editando ? "PUT" : "POST";
+      const resp = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      if (!resp.ok) throw new Error();
+      setShowForm(false);
+      fetchProdutos();
+    } catch {
+      setErro("Erro ao salvar. Tente novamente.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDelete = async (produto: Produto) => {
+    try {
+      const resp = await fetch(`${API_BASE}/produtos/${produto.id}`, { method: "DELETE" });
+      if (!resp.ok) throw new Error();
+      setConfirmDelete(null);
+      setSelecionados(prev => prev.filter(id => id !== produto.id));
+      fetchProdutos();
+    } catch {
+      setErro("Erro ao excluir produto.");
+    }
   };
 
   return (
@@ -38,13 +155,8 @@ export default function PerfumariaPage({ onNavigate }: PerfumariaPageProps) {
             <ArrowLeft className="w-5 h-5" />
           </button>
           <h1 className="text-lg font-bold flex-1">Catálogo de Produtos</h1>
-          <button onClick={() => onNavigate("carrinho")} className="relative p-1">
-            <span className="material-symbols-outlined text-[#4d8063]">shopping_cart</span>
-            {adicionados.length > 0 && (
-              <span className="absolute -top-1 -right-1 bg-[#4d8063] text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-bold">
-                {adicionados.length}
-              </span>
-            )}
+          <button onClick={() => openForm()} className="flex items-center gap-1 bg-[#4d8063] text-white px-3 py-2 rounded-xl text-xs font-bold">
+            <Plus className="w-3.5 h-3.5" /> Novo
           </button>
         </div>
         <div className="px-4 pb-3">
@@ -58,60 +170,164 @@ export default function PerfumariaPage({ onNavigate }: PerfumariaPageProps) {
             />
           </div>
         </div>
-        <div className="flex overflow-x-auto no-scrollbar px-4 pb-3 gap-2">
-          {categorias.map((c, i) => (
-            <button
-              key={c}
-              onClick={() => setCatAtiva(i)}
-              className={`shrink-0 px-4 py-1.5 rounded-full text-xs font-bold ${catAtiva === i ? "bg-[#4d8063] text-white" : "bg-white text-slate-600 border border-slate-200"}`}
-            >
-              {c}
-            </button>
-          ))}
-        </div>
       </header>
 
       <main className="flex-1 px-4 py-3 pb-24">
-        <p className="text-xs text-slate-500 mb-3 font-medium">{filtered.length} produtos encontrados</p>
+        <p className="text-xs text-slate-500 mb-3 font-medium">
+          {loading ? "Carregando..." : `${filtered.length} produto${filtered.length !== 1 ? "s" : ""} encontrado${filtered.length !== 1 ? "s" : ""}`}
+        </p>
+
+        {!loading && filtered.length === 0 && (
+          <div className="bg-white rounded-xl border-2 border-dashed border-[#4d8063]/20 py-10 flex flex-col items-center gap-3 text-[#4d8063]">
+            <Package className="w-10 h-10 opacity-40" />
+            <p className="text-sm font-medium text-slate-500">Nenhum produto cadastrado</p>
+            <button onClick={() => openForm()} className="bg-[#4d8063] text-white px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-1">
+              <Plus className="w-4 h-4" /> Cadastrar Produto
+            </button>
+          </div>
+        )}
+
         <div className="flex flex-col gap-3">
-          {filtered.map(p => (
-            <div key={p.id} className="bg-white rounded-xl border border-[#4d8063]/5 flex items-center gap-3 p-3 shadow-sm">
-              <div className="w-16 h-16 rounded-xl overflow-hidden shrink-0 bg-slate-100">
-                <img src={p.img} alt={p.name} className="w-full h-full object-cover" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-[10px] font-bold text-[#4d8063] uppercase tracking-wider">{p.brand}</p>
-                <p className="text-sm font-semibold leading-tight mt-0.5 truncate">{p.name}</p>
-                <div className="flex items-center gap-2 mt-1">
-                  <p className="text-[#4d8063] font-bold text-sm">R$ {p.price.toFixed(2).replace(".", ",")}</p>
-                  <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded ${p.stock <= 3 ? "bg-orange-100 text-orange-600" : "bg-emerald-100 text-emerald-700"}`}>
-                    {p.stock} un. em estoque
-                  </span>
+          {filtered.map(p => {
+            const selected = selecionados.includes(p.id);
+            return (
+              <div key={p.id} className={`bg-white rounded-xl border ${selected ? "border-[#4d8063] ring-1 ring-[#4d8063]/30" : "border-[#4d8063]/5"} p-3 shadow-sm`}>
+                <button
+                  onClick={() => {
+                    localStorage.setItem("produto_detalhe", JSON.stringify(p));
+                    onNavigate("produto");
+                  }}
+                  className="flex items-center gap-3 w-full text-left"
+                >
+                  <div className="w-14 h-14 rounded-xl overflow-hidden shrink-0 bg-slate-100 flex items-center justify-center">
+                    {p.img_url ? (
+                      <img src={p.img_url} alt={p.nome} className="w-full h-full object-cover" />
+                    ) : (
+                      <Package className="w-6 h-6 text-slate-300" />
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[10px] font-bold text-[#4d8063] uppercase tracking-wider">{p.marca}</p>
+                    <p className="text-sm font-semibold leading-tight mt-0.5 truncate">{p.nome}</p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <p className="text-[#4d8063] font-bold text-sm">R$ {Number(p.preco).toFixed(2).replace(".", ",")}</p>
+                      <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded ${p.estoque <= 3 ? "bg-orange-100 text-orange-600" : "bg-emerald-100 text-emerald-700"}`}>
+                        {p.estoque} un.
+                      </span>
+                    </div>
+                  </div>
+                </button>
+                <div className="flex items-center gap-2 mt-3 pt-2 border-t border-slate-100">
+                  <button
+                    onClick={() => toggleSelecionado(p.id)}
+                    className={`flex-1 py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition-colors ${
+                      selected ? "bg-[#4d8063] text-white" : "bg-[#4d8063]/10 text-[#4d8063]"
+                    }`}
+                  >
+                    {selected ? (
+                      <><span className="material-symbols-outlined text-sm">check</span> Selecionado</>
+                    ) : (
+                      <><Plus className="w-3.5 h-3.5" /> Adicionar à Venda</>
+                    )}
+                  </button>
+                  <button
+                    onClick={() => openForm(p)}
+                    className="p-2 rounded-lg bg-slate-100 text-slate-500 hover:bg-slate-200"
+                  >
+                    <Pencil className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => setConfirmDelete(p)}
+                    className="p-2 rounded-lg bg-red-50 text-red-400 hover:bg-red-100"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
                 </div>
               </div>
-              <button
-                onClick={() => toggleAdd(p.id)}
-                className={`shrink-0 w-9 h-9 rounded-xl flex items-center justify-center transition-colors ${adicionados.includes(p.id) ? "bg-[#4d8063] text-white" : "bg-[#4d8063]/10 text-[#4d8063]"}`}
-              >
-                {adicionados.includes(p.id)
-                  ? <span className="material-symbols-outlined text-lg">check</span>
-                  : <Plus className="w-5 h-5" />
-                }
-              </button>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </main>
 
-      {adicionados.length > 0 && (
-        <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto p-4 bg-white border-t border-[#4d8063]/10">
+      {selecionados.length > 0 && (
+        <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto p-4 bg-white border-t border-[#4d8063]/10 z-10">
           <button
-            onClick={() => onNavigate("carrinho")}
+            onClick={irParaVenda}
             className="w-full bg-[#4d8063] text-white font-bold py-4 rounded-xl flex items-center justify-center gap-2"
           >
             <span className="material-symbols-outlined">shopping_cart</span>
-            Ir para Venda ({adicionados.length} {adicionados.length === 1 ? "item" : "itens"})
+            Ir para Venda ({selecionados.length} {selecionados.length === 1 ? "item" : "itens"})
           </button>
+        </div>
+      )}
+
+      {/* ── Modal Criar/Editar ── */}
+      {showForm && (
+        <div className="fixed inset-0 z-50 bg-black/40 flex items-end justify-center">
+          <div className="bg-white w-full max-w-md rounded-t-2xl p-5 pb-8 space-y-4 animate-slide-up">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-bold">{editando ? "Editar Produto" : "Novo Produto"}</h2>
+              <button onClick={() => setShowForm(false)} className="p-1 text-slate-400"><X className="w-5 h-5" /></button>
+            </div>
+
+            {[
+              { label: "Marca", key: "marca", placeholder: "Ex: O Boticário", type: "text" },
+              { label: "Nome do Produto", key: "nome", placeholder: "Ex: Lily Eau de Parfum 75ml", type: "text" },
+              { label: "Preço (R$)", key: "preco", placeholder: "0.00", type: "number" },
+              { label: "Estoque (unidades)", key: "estoque", placeholder: "0", type: "number" },
+              { label: "URL da Imagem (opcional)", key: "img_url", placeholder: "https://...", type: "url" },
+            ].map(f => (
+              <label key={f.key} className="flex flex-col gap-1">
+                <span className="text-sm font-medium text-slate-700">{f.label}</span>
+                <input
+                  type={f.type}
+                  placeholder={f.placeholder}
+                  className="border border-slate-200 rounded-lg h-11 px-3 text-sm outline-none focus:ring-2 focus:ring-[#4d8063]/30"
+                  value={form[f.key as keyof typeof form]}
+                  onChange={e => setForm(prev => ({ ...prev, [f.key]: e.target.value }))}
+                />
+              </label>
+            ))}
+
+            {erro && <p className="text-red-600 text-xs font-medium">{erro}</p>}
+
+            <button
+              onClick={handleSave}
+              disabled={saving}
+              className="w-full bg-[#4d8063] text-white font-bold py-3.5 rounded-xl flex items-center justify-center gap-2 disabled:opacity-60"
+            >
+              {saving ? (
+                <><span className="material-symbols-outlined animate-spin text-lg">refresh</span> Salvando...</>
+              ) : (
+                <><Save className="w-5 h-5" /> {editando ? "Salvar Alterações" : "Cadastrar Produto"}</>
+              )}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ── Modal Confirmar Exclusão ── */}
+      {confirmDelete && (
+        <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center px-6">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-sm space-y-4">
+            <div className="flex flex-col items-center gap-3 text-center">
+              <div className="w-14 h-14 rounded-full bg-red-100 flex items-center justify-center">
+                <Trash2 className="w-7 h-7 text-red-500" />
+              </div>
+              <h3 className="font-bold text-lg">Excluir produto?</h3>
+              <p className="text-sm text-slate-500">
+                <span className="font-semibold text-slate-700">{confirmDelete.marca} — {confirmDelete.nome}</span> será removido permanentemente.
+              </p>
+            </div>
+            <div className="flex gap-3">
+              <button onClick={() => setConfirmDelete(null)} className="flex-1 py-3 rounded-xl border border-slate-200 font-bold text-sm">
+                Cancelar
+              </button>
+              <button onClick={() => handleDelete(confirmDelete)} className="flex-1 py-3 rounded-xl bg-red-500 text-white font-bold text-sm">
+                Excluir
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

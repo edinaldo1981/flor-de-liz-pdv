@@ -91,6 +91,25 @@ Generated Zod schemas from the OpenAPI spec (e.g. `HealthCheckResponse`). Used b
 
 Generated React Query hooks and fetch client from the OpenAPI spec (e.g. `useHealthCheck`, `healthCheck`).
 
+### `artifacts/boticario` (`@workspace/boticario`)
+
+Mobile-style PDV (Point of Sale) web app "Flor de Liz" built with React + Vite + Tailwind CSS. Internal system for beauty product resellers.
+
+- Brand color: `#4d8063`, font: Work Sans
+- Navigation: single-page with `onNavigate(page)` pattern in `App.tsx`
+- Pages: `home`, `perfumaria` (catalog CRUD), `produto` (product detail), `carrinho` (cart/sale), `confirmacao`, `profile`, `cadastro` (client registration), `fiados`, `cobranca`, `financeiro`
+- API calls use `const API_BASE = "/api-server/api"` (Vite proxies to port 8080)
+- Cart data flows via `localStorage` key `carrinho_items` (PerfumariaPage → CarrinhoPage)
+- Product detail flows via `localStorage` key `produto_detalhe` (PerfumariaPage → ProdutoPage)
+- Product edit handoff via `localStorage` key `produto_editar` (ProdutoPage → PerfumariaPage auto-opens edit modal)
+
+**API Routes** (`artifacts/api-server/src/routes/`):
+- `clientes.ts`: GET/POST `/api/clientes` (search via `?q=`)
+- `vendas.ts`: GET/POST `/api/vendas`
+- `produtos.ts`: GET/POST `/api/produtos`, PUT/DELETE `/api/produtos/:id`
+
+**DB Tables**: `clientes`, `vendas`, `vendas_itens`, `produtos` (id, marca, nome, preco, estoque, img_url, created_at)
+
 ### `scripts` (`@workspace/scripts`)
 
 Utility scripts package. Each script is a `.ts` file in `src/` with a corresponding npm script in `package.json`. Run scripts via `pnpm --filter @workspace/scripts run <script>`. Scripts can import any workspace package (e.g., `@workspace/db`) by adding it as a dependency in `scripts/package.json`.
