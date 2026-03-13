@@ -131,7 +131,10 @@ export default function ConfirmacaoPage({ onNavigate }: ConfirmacaoPageProps) {
 
       <div className="mx-4 mt-3 flex flex-col gap-3 pb-10">
         <button
-          onClick={() => onNavigate("carrinho")}
+          onClick={() => {
+            localStorage.removeItem("carrinho_items");
+            onNavigate("carrinho");
+          }}
           className="w-full bg-[#4d8063] text-white font-bold py-4 rounded-xl flex items-center justify-center gap-2"
         >
           <span className="material-symbols-outlined">add_shopping_cart</span>

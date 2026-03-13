@@ -12,7 +12,7 @@ import FinanceiroPage from "@/pages/FinanceiroPage";
 
 type Page = "home" | "perfumaria" | "produto" | "carrinho" | "confirmacao" | "profile" | "cadastro" | "fiados" | "cobranca" | "financeiro";
 
-const mainNavPages: Page[] = ["home", "carrinho", "fiados", "financeiro", "profile"];
+const mainNavPages: Page[] = ["home", "fiados", "financeiro", "profile"];
 
 function BottomNav({ current, onNavigate }: { current: Page; onNavigate: (p: Page) => void }) {
   if (!mainNavPages.includes(current)) return null;
