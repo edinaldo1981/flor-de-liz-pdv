@@ -32,7 +32,8 @@ export default function ConfirmacaoPage({ onNavigate }: ConfirmacaoPageProps) {
 
   const handlePrint = () => {
     if (!dados) return;
-    const lines = [
+
+    const linhas = [
       "============================",
       "       FLOR DE LIZ          ",
       "============================",
@@ -42,7 +43,7 @@ export default function ConfirmacaoPage({ onNavigate }: ConfirmacaoPageProps) {
       `Cliente: ${dados.cliente.nome}`,
       "----------------------------",
       "ITENS:",
-      ...dados.items.map(i => `${i.qty}x ${i.brand} ${i.name}  R$${(i.price * i.qty).toFixed(2).replace(".", ",")}`),
+      ...dados.items.map(i => `${i.qty}x ${i.brand} ${i.name}  R$ ${(i.price * i.qty).toFixed(2).replace(".", ",")}`),
       "----------------------------",
       `TOTAL: R$ ${dados.total.toFixed(2).replace(".", ",")}`,
       `Pagamento: ${pagamentoLabel[dados.pagamento] || dados.pagamento}`,
@@ -51,14 +52,27 @@ export default function ConfirmacaoPage({ onNavigate }: ConfirmacaoPageProps) {
       "============================",
     ].join("\n");
 
-    const win = window.open("", "_blank");
-    if (win) {
-      win.document.write(`<pre style="font-family:monospace;font-size:14px;padding:20px">${lines}</pre>`);
-      win.document.close();
-      win.focus();
-      win.print();
-      win.close();
-    }
+    const styleEl = document.createElement("style");
+    styleEl.id = "flor-print-style";
+    styleEl.textContent = `
+      @media print {
+        body > *:not(#flor-print-area) { display: none !important; }
+        #flor-print-area { display: block !important; }
+      }
+    `;
+
+    const printEl = document.createElement("div");
+    printEl.id = "flor-print-area";
+    printEl.style.cssText = "display:none; font-family:monospace; font-size:14px; white-space:pre; padding:20px;";
+    printEl.textContent = linhas;
+
+    document.head.appendChild(styleEl);
+    document.body.appendChild(printEl);
+
+    window.print();
+
+    document.head.removeChild(styleEl);
+    document.body.removeChild(printEl);
   };
 
   return (
