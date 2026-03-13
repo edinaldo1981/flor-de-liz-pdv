@@ -27,3 +27,8 @@ timeoutMs = 20000
 
 [nix]
 channel = "stable-25_05"
+
+[userenv]
+
+[userenv.shared]
+ASAAS_API_KEY = "$aact_hmlg_000MzkwODA2MWY2OGM3MWRlMDU2NWM3MzJlNzZmNGZhZGY6OjZkYTg3Mzc0LWQwYzQtNGYwMC05M2U1LWI5NDI2YzFmODViODo6JGFhY2hfYzliNGQxYzUtYjRiYS00ZjBiLWJjM2ItNmZlNDQwYTkyYTk3"

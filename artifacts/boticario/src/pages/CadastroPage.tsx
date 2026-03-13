@@ -74,7 +74,7 @@ export default function CadastroPage({ onNavigate }: CadastroPageProps) {
           <div className="flex flex-col gap-4 bg-white p-4 rounded-xl shadow-sm border border-[#4d8063]/5">
             {[
               { label: "Nome completo", key: "nome", placeholder: "Ex: João da Silva", type: "text", icon: "person", required: true },
-              { label: "CPF", key: "cpf", placeholder: "000.000.000-00", type: "text", icon: "badge" },
+              { label: "CPF (necessário para cobrança digital)", key: "cpf", placeholder: "000.000.000-00", type: "text", icon: "badge" },
               { label: "Data de nascimento", key: "nascimento", placeholder: "DD/MM/AAAA", type: "text", icon: "cake" },
             ].map((field) => (
               <label key={field.key} className="flex flex-col w-full">
