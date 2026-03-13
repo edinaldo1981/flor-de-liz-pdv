@@ -64,6 +64,12 @@ router.get("/portal/cliente", async (req, res) => {
     const abertas = vendasResult.rows.filter(v => v.status === "fiado" || v.status === "fiado_atrasado");
     const historico = vendasResult.rows.filter(v => v.status === "confirmada" || v.status === "estornada");
 
+    const haveresResult = await pool.query(
+      "SELECT COALESCE(SUM(saldo_restante), 0) as total FROM haveres WHERE cliente_id = $1 AND saldo_restante > 0",
+      [cliente.id]
+    );
+    const saldoHaver = parseFloat(haveresResult.rows[0].total);
+
     res.json({
       cliente: {
         nome: cliente.nome,
@@ -74,6 +80,7 @@ router.get("/portal/cliente", async (req, res) => {
       fiados: abertas,
       historico: historico.slice(0, 10),
       totalEmAberto: abertas.reduce((acc, v) => acc + Math.max(0, parseFloat(v.total) - parseFloat(v.valor_pago || 0)), 0),
+      saldoHaver,
     });
   } catch (err) {
     console.error("[Portal] Erro:", err);

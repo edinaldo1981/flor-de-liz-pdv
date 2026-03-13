@@ -7,6 +7,7 @@ interface ClienteData {
   fiados: Fiado[];
   historico: Venda[];
   totalEmAberto: number;
+  saldoHaver: number;
 }
 
 interface Fiado {
@@ -183,11 +184,20 @@ function PortalScreen({ data, onSair }: { data: ClienteData; onSair: () => void 
           </button>
         </div>
 
-        {/* Total card */}
-        <div className="bg-white/15 rounded-2xl p-4 border border-white/20">
-          <p className="text-white/80 text-xs font-medium mb-1">Total em aberto</p>
-          <p className="text-white text-3xl font-bold">{formatBRL(data.totalEmAberto)}</p>
-          <p className="text-white/70 text-xs mt-1">{data.fiados.length} pedido{data.fiados.length !== 1 ? "s" : ""} pendente{data.fiados.length !== 1 ? "s" : ""}</p>
+        {/* Stats cards */}
+        <div className="flex gap-3">
+          <div className="flex-1 bg-white/15 rounded-2xl p-4 border border-white/20">
+            <p className="text-white/80 text-xs font-medium mb-1">Total em aberto</p>
+            <p className="text-white text-2xl font-bold">{formatBRL(data.totalEmAberto)}</p>
+            <p className="text-white/70 text-xs mt-1">{data.fiados.length} pedido{data.fiados.length !== 1 ? "s" : ""} pendente{data.fiados.length !== 1 ? "s" : ""}</p>
+          </div>
+          {data.saldoHaver > 0 && (
+            <div className="flex-1 bg-amber-400/30 rounded-2xl p-4 border border-amber-300/30">
+              <p className="text-white/80 text-xs font-medium mb-1">Seu Haver</p>
+              <p className="text-white text-2xl font-bold">{formatBRL(data.saldoHaver)}</p>
+              <p className="text-white/70 text-xs mt-1">crédito disponível</p>
+            </div>
+          )}
         </div>
       </div>
 
