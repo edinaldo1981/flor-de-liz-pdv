@@ -1,4 +1,4 @@
-import { CheckCircle, Printer, MessageCircle } from "lucide-react";
+import { CheckCircle, Printer } from "lucide-react";
 import { useEffect, useState } from "react";
 
 interface ConfirmacaoPageProps {
@@ -7,7 +7,7 @@ interface ConfirmacaoPageProps {
 
 interface VendaData {
   venda: { id: number; status: string };
-  cliente: { nome: string; whatsapp?: string; telefone?: string };
+  cliente: { nome: string; telefone?: string };
   items: Array<{ brand: string; name: string; price: number; qty: number }>;
   total: number;
   pagamento: string;
@@ -59,30 +59,6 @@ export default function ConfirmacaoPage({ onNavigate }: ConfirmacaoPageProps) {
       win.print();
       win.close();
     }
-  };
-
-  const handleWhatsApp = () => {
-    if (!dados) return;
-    const numero = dados.cliente.whatsapp || dados.cliente.telefone || "";
-    const limpo = numero.replace(/\D/g, "");
-    const texto = [
-      `Olá, *${dados.cliente.nome}*! 👋`,
-      "",
-      `✅ Sua compra na *Flor de Liz* foi confirmada!`,
-      "",
-      `📦 *Itens:*`,
-      ...dados.items.map(i => `• ${i.qty}x ${i.brand} ${i.name} — R$ ${(i.price * i.qty).toFixed(2).replace(".", ",")}`),
-      "",
-      `💰 *Total: R$ ${dados.total.toFixed(2).replace(".", ",")}*`,
-      `💳 Pagamento: ${pagamentoLabel[dados.pagamento] || dados.pagamento}`,
-      "",
-      dados.pagamento === "a_prazo" ? "⚠️ Registrado como *fiado*. Combine o prazo de pagamento! 😊" : "Obrigada pela compra! 🌸",
-    ].join("\n");
-
-    const url = limpo
-      ? `https://wa.me/${limpo.startsWith("55") ? limpo : "55" + limpo}?text=${encodeURIComponent(texto)}`
-      : `https://wa.me/?text=${encodeURIComponent(texto)}`;
-    window.open(url, "_blank");
   };
 
   return (
@@ -143,21 +119,13 @@ export default function ConfirmacaoPage({ onNavigate }: ConfirmacaoPageProps) {
         </div>
       )}
 
-      {/* Ações */}
-      <div className="mx-4 mt-4 grid grid-cols-2 gap-3">
+      <div className="mx-4 mt-4">
         <button
           onClick={handlePrint}
-          className="flex flex-col items-center gap-2 bg-white border border-[#4d8063]/20 rounded-xl py-4 text-[#4d8063] font-bold text-sm shadow-sm"
+          className="w-full flex items-center justify-center gap-2 bg-white border border-[#4d8063]/30 rounded-xl py-4 text-[#4d8063] font-bold text-sm shadow-sm"
         >
-          <Printer className="w-6 h-6" />
+          <Printer className="w-5 h-5" />
           Imprimir Recibo
-        </button>
-        <button
-          onClick={handleWhatsApp}
-          className="flex flex-col items-center gap-2 bg-green-500 rounded-xl py-4 text-white font-bold text-sm shadow-sm"
-        >
-          <MessageCircle className="w-6 h-6" />
-          Enviar WhatsApp
         </button>
       </div>
 

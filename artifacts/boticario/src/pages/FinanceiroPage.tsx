@@ -1,4 +1,5 @@
 import { ArrowLeft, TrendingUp } from "lucide-react";
+import { useState } from "react";
 
 interface FinanceiroPageProps {
   onNavigate: (page: string) => void;
@@ -7,8 +8,8 @@ interface FinanceiroPageProps {
 const brands = [
   {
     name: "O Boticário",
-    total: "R$ 5.840,00",
-    qty: 24,
+    totals: { mes: "R$ 5.840,00", tri: "R$ 15.200,00", sem: "R$ 28.400,00", ano: "R$ 52.000,00" },
+    qtys: { mes: 24, tri: 62, sem: 118, ano: 210 },
     percent: 47,
     change: "+12.5%",
     positive: true,
@@ -17,8 +18,8 @@ const brands = [
   },
   {
     name: "Natura",
-    total: "R$ 3.210,00",
-    qty: 18,
+    totals: { mes: "R$ 3.210,00", tri: "R$ 8.400,00", sem: "R$ 16.800,00", ano: "R$ 30.000,00" },
+    qtys: { mes: 18, tri: 48, sem: 96, ano: 175 },
     percent: 26,
     change: "+8.1%",
     positive: true,
@@ -27,8 +28,8 @@ const brands = [
   },
   {
     name: "Rommanel",
-    total: "R$ 2.100,00",
-    qty: 9,
+    totals: { mes: "R$ 2.100,00", tri: "R$ 5.800,00", sem: "R$ 10.200,00", ano: "R$ 19.000,00" },
+    qtys: { mes: 9, tri: 25, sem: 46, ano: 88 },
     percent: 17,
     change: "-2.3%",
     positive: false,
@@ -37,8 +38,8 @@ const brands = [
   },
   {
     name: "Avon",
-    total: "R$ 1.300,00",
-    qty: 7,
+    totals: { mes: "R$ 1.300,00", tri: "R$ 3.200,00", sem: "R$ 6.100,00", ano: "R$ 11.500,00" },
+    qtys: { mes: 7, tri: 18, sem: 34, ano: 65 },
     percent: 10,
     change: "+5.0%",
     positive: true,
@@ -47,15 +48,41 @@ const brands = [
   },
 ];
 
+const periodos = [
+  { key: "mes", label: "Este mês" },
+  { key: "tri", label: "3 meses" },
+  { key: "sem", label: "6 meses" },
+  { key: "ano", label: "1 ano" },
+] as const;
+
+type Periodo = typeof periodos[number]["key"];
+
+const totaisGerais: Record<Periodo, string> = {
+  mes: "R$ 12.450,00",
+  tri: "R$ 32.600,00",
+  sem: "R$ 61.500,00",
+  ano: "R$ 112.500,00",
+};
+
+const transacoes = [
+  { brand: "O Boticário", product: "Lily Eau de Parfum", date: "Hoje 14:30", value: "+ R$ 279,90" },
+  { brand: "Natura", product: "Creme Ekos", date: "Hoje 11:15", value: "+ R$ 89,30" },
+  { brand: "Rommanel", product: "Anel Ouro Rose", date: "Ontem 16:20", value: "+ R$ 210,00" },
+  { brand: "Avon", product: "Batom Matte", date: "Ontem 09:00", value: "+ R$ 45,00" },
+  { brand: "O Boticário", product: "Malbec 100ml", date: "13/03 13:10", value: "+ R$ 209,90" },
+];
+
 export default function FinanceiroPage({ onNavigate }: FinanceiroPageProps) {
+  const [periodo, setPeriodo] = useState<Periodo>("mes");
+
   return (
     <div className="bg-[#f6f7f7] min-h-screen flex flex-col pb-24 max-w-md mx-auto">
       <header className="flex items-center bg-white p-4 border-b border-[#4d8063]/10 sticky top-0 z-10">
-        <div className="text-[#4d8063] flex size-10 items-center justify-center rounded-lg bg-[#4d8063]/10">
-          <span className="material-symbols-outlined">menu</span>
-        </div>
+        <button onClick={() => onNavigate("home")} className="text-[#4d8063] flex size-10 items-center justify-center rounded-lg bg-[#4d8063]/10">
+          <ArrowLeft className="w-5 h-5" />
+        </button>
         <h2 className="text-lg font-bold flex-1 text-center">Financeiro por Marca</h2>
-        <span className="material-symbols-outlined text-[#4d8063] size-10 flex items-center justify-center">notifications</span>
+        <div className="size-10" />
       </header>
 
       <main className="flex-1">
@@ -66,22 +93,25 @@ export default function FinanceiroPage({ onNavigate }: FinanceiroPageProps) {
               <p className="text-white/80 text-sm font-medium">Saldo Total Acumulado</p>
               <span className="material-symbols-outlined text-white/60">account_balance_wallet</span>
             </div>
-            <p className="text-white text-3xl font-bold">R$ 12.450,00</p>
+            <p className="text-white text-3xl font-bold">{totaisGerais[periodo]}</p>
             <div className="flex items-center gap-1 mt-2">
               <TrendingUp className="w-4 h-4" />
-              <p className="text-white/90 text-sm font-medium">+15.4% este mês</p>
+              <p className="text-white/90 text-sm font-medium">+15.4% vs período anterior</p>
             </div>
           </div>
         </section>
 
         {/* Period Selector */}
         <div className="flex gap-2 px-4 mb-4">
-          {["Este mês", "3 meses", "6 meses", "1 ano"].map((p, i) => (
+          {periodos.map((p) => (
             <button
-              key={p}
-              className={`flex-1 py-2 rounded-full text-xs font-bold ${i === 0 ? "bg-[#4d8063] text-white" : "bg-white text-slate-600 border border-slate-200"}`}
+              key={p.key}
+              onClick={() => setPeriodo(p.key)}
+              className={`flex-1 py-2 rounded-full text-xs font-bold transition-colors ${
+                periodo === p.key ? "bg-[#4d8063] text-white" : "bg-white text-slate-600 border border-slate-200"
+              }`}
             >
-              {p}
+              {p.label}
             </button>
           ))}
         </div>
@@ -97,19 +127,15 @@ export default function FinanceiroPage({ onNavigate }: FinanceiroPageProps) {
                 />
                 <div className="flex-1">
                   <p className="font-bold">{b.name}</p>
-                  <p className="text-xs text-slate-500">{b.qty} vendas</p>
+                  <p className="text-xs text-slate-500">{b.qtys[periodo]} vendas</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-[#4d8063] font-bold">{b.total}</p>
+                  <p className="text-[#4d8063] font-bold">{b.totals[periodo]}</p>
                   <p className={`text-xs font-medium ${b.positive ? "text-emerald-600" : "text-rose-600"}`}>{b.change}</p>
                 </div>
               </div>
-              {/* Progress bar */}
               <div className="h-2 bg-slate-100 rounded-full">
-                <div
-                  className={`h-2 rounded-full ${b.color}`}
-                  style={{ width: `${b.percent}%` }}
-                />
+                <div className={`h-2 rounded-full ${b.color}`} style={{ width: `${b.percent}%` }} />
               </div>
               <p className="text-xs text-slate-500 mt-1">{b.percent}% do total</p>
             </div>
@@ -120,15 +146,11 @@ export default function FinanceiroPage({ onNavigate }: FinanceiroPageProps) {
         <div className="mt-6 px-4">
           <div className="flex justify-between items-center mb-3">
             <h3 className="font-bold">Transações Recentes</h3>
-            <button className="text-[#4d8063] text-sm font-semibold">Ver todas</button>
+            <span className="text-[#4d8063] text-sm font-semibold">{transacoes.length} registros</span>
           </div>
           <div className="bg-white rounded-xl overflow-hidden border border-[#4d8063]/5 shadow-sm">
-            {[
-              { brand: "O Boticário", product: "Lily Eau de Parfum", date: "Hoje 14:30", value: "+ R$ 279,90" },
-              { brand: "Natura", product: "Creme Ekos", date: "Hoje 11:15", value: "+ R$ 89,30" },
-              { brand: "Rommanel", product: "Anel Ouro Rose", date: "Ontem 16:20", value: "+ R$ 210,00" },
-            ].map((t, i) => (
-              <div key={i} className={`flex items-center gap-4 px-4 py-3 ${i < 2 ? "border-b border-slate-100" : ""}`}>
+            {transacoes.map((t, i) => (
+              <div key={i} className={`flex items-center gap-4 px-4 py-3 ${i < transacoes.length - 1 ? "border-b border-slate-100" : ""}`}>
                 <div className="size-10 rounded-full bg-[#4d8063]/10 flex items-center justify-center">
                   <span className="material-symbols-outlined text-[#4d8063] text-sm">sell</span>
                 </div>
@@ -147,7 +169,7 @@ export default function FinanceiroPage({ onNavigate }: FinanceiroPageProps) {
         {[
           { icon: "home", label: "Início", page: "home" },
           { icon: "receipt_long", label: "Fiados", page: "fiados" },
-          { icon: "sell", label: "Vendas", page: "financeiro", active: true },
+          { icon: "account_balance_wallet", label: "Financeiro", page: "financeiro", active: true },
           { icon: "person", label: "Perfil", page: "profile" },
         ].map((item) => (
           <button

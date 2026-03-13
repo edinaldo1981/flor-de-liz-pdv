@@ -1,4 +1,5 @@
-import { ArrowLeft, Send } from "lucide-react";
+import { ArrowLeft, Check, Copy } from "lucide-react";
+import { useState } from "react";
 
 interface CobrancaPageProps {
   onNavigate: (page: string) => void;
@@ -21,7 +22,7 @@ const templates = [
     icon: "warning",
     iconColor: "text-orange-500/40",
     borderColor: "border-l-orange-500/30",
-    msg: "Oi João, notamos que o seu pagamento de R$ 150,00 está com alguns dias de atraso. Aconteceu algo? Se precisar do boleto novamente, me avise.",
+    msg: "Oi João, notamos que o seu pagamento de R$ 150,00 está com alguns dias de atraso. Aconteceu algo? Me avise para combinarmos.",
   },
   {
     tone: "Urgente",
@@ -30,11 +31,28 @@ const templates = [
     icon: "error",
     iconColor: "text-red-500/40",
     borderColor: "border-l-red-500/30",
-    msg: "Prezado João, consta em nosso sistema um débito pendente há 15 dias. Solicitamos a regularização imediata para evitar suspensão de novos pedidos.",
+    msg: "João, consta em nosso sistema um débito pendente há 15 dias. Solicito a regularização para não bloquear novos pedidos.",
   },
 ];
 
 export default function CobrancaPage({ onNavigate }: CobrancaPageProps) {
+  const [copied, setCopied] = useState<string | null>(null);
+  const [registrado, setRegistrado] = useState(false);
+
+  const handleCopiar = (msg: string, title: string) => {
+    navigator.clipboard.writeText(msg).then(() => {
+      setCopied(title);
+      setTimeout(() => setCopied(null), 2000);
+    });
+  };
+
+  const handleRegistrar = () => {
+    setRegistrado(true);
+    setTimeout(() => {
+      onNavigate("fiados");
+    }, 1500);
+  };
+
   return (
     <div className="font-sans bg-[#f6f7f7] min-h-screen flex flex-col max-w-md mx-auto">
       <header className="sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-[#4d8063]/10">
@@ -42,7 +60,7 @@ export default function CobrancaPage({ onNavigate }: CobrancaPageProps) {
           <button onClick={() => onNavigate("fiados")} className="size-10 rounded-full hover:bg-[#4d8063]/10 text-[#4d8063] flex items-center justify-center">
             <ArrowLeft className="w-5 h-5" />
           </button>
-          <h1 className="text-xl font-bold">Cobrança WhatsApp</h1>
+          <h1 className="text-xl font-bold">Detalhes do Fiado</h1>
         </div>
       </header>
 
@@ -67,7 +85,7 @@ export default function CobrancaPage({ onNavigate }: CobrancaPageProps) {
                 </div>
                 <div className="flex flex-col">
                   <span className="text-xs text-slate-500">Status</span>
-                  <span className="text-lg font-bold text-orange-600">15 dias de atraso</span>
+                  <span className="text-lg font-bold text-orange-600">15 dias em atraso</span>
                 </div>
               </div>
             </div>
@@ -75,9 +93,27 @@ export default function CobrancaPage({ onNavigate }: CobrancaPageProps) {
           </div>
         </div>
 
+        {/* Ação principal */}
+        <div className="px-4 pb-4">
+          {registrado ? (
+            <div className="flex items-center justify-center gap-2 bg-emerald-50 border border-emerald-200 rounded-xl py-4 text-emerald-700 font-bold">
+              <Check className="w-5 h-5" />
+              Cobrança registrada com sucesso!
+            </div>
+          ) : (
+            <button
+              onClick={handleRegistrar}
+              className="w-full flex items-center justify-center gap-2 bg-[#4d8063] text-white py-4 rounded-xl font-bold shadow-sm"
+            >
+              <span className="material-symbols-outlined">task_alt</span>
+              Registrar Cobrança Realizada
+            </button>
+          )}
+        </div>
+
         <div className="px-4 py-2">
           <h3 className="text-lg font-bold text-slate-800">Modelos de Mensagem</h3>
-          <p className="text-sm text-slate-500">Selecione um modelo para enviar</p>
+          <p className="text-sm text-slate-500">Copie e envie pelo canal que preferir</p>
         </div>
 
         {/* Templates */}
@@ -94,9 +130,19 @@ export default function CobrancaPage({ onNavigate }: CobrancaPageProps) {
               <p className={`text-sm text-slate-600 leading-relaxed italic bg-[#f6f7f7] p-3 rounded-lg border-l-4 ${t.borderColor}`}>
                 "{t.msg}"
               </p>
-              <button className="flex w-full items-center justify-center gap-2 bg-[#4d8063] text-white py-3 rounded-lg font-bold">
-                <Send className="w-4 h-4" />
-                Enviar via WhatsApp
+              <button
+                onClick={() => handleCopiar(t.msg, t.title)}
+                className={`flex w-full items-center justify-center gap-2 py-3 rounded-lg font-bold transition-colors ${
+                  copied === t.title
+                    ? "bg-emerald-100 text-emerald-700"
+                    : "bg-[#4d8063]/10 text-[#4d8063]"
+                }`}
+              >
+                {copied === t.title ? (
+                  <><Check className="w-4 h-4" /> Copiado!</>
+                ) : (
+                  <><Copy className="w-4 h-4" /> Copiar Mensagem</>
+                )}
               </button>
             </div>
           ))}
@@ -106,9 +152,9 @@ export default function CobrancaPage({ onNavigate }: CobrancaPageProps) {
       <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-[#4d8063]/10 px-4 pb-6 pt-2 flex justify-around items-center max-w-md mx-auto">
         {[
           { icon: "home", label: "Início", page: "home" },
-          { icon: "group", label: "Clientes", page: "fiados", active: true },
-          { icon: "receipt_long", label: "Vendas", page: "financeiro" },
-          { icon: "settings", label: "Ajustes", page: "profile" },
+          { icon: "receipt_long", label: "Fiados", page: "fiados", active: true },
+          { icon: "account_balance_wallet", label: "Financeiro", page: "financeiro" },
+          { icon: "person", label: "Perfil", page: "profile" },
         ].map((item) => (
           <button
             key={item.label}

@@ -1,4 +1,4 @@
-import { ArrowLeft, Trash2, Plus, Minus, Search, AlertCircle, Printer, MessageCircle } from "lucide-react";
+import { ArrowLeft, Trash2, Plus, Minus, Search, AlertCircle } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 
 interface CarrinhoPageProps {
@@ -9,7 +9,6 @@ interface Cliente {
   id: number;
   nome: string;
   telefone?: string;
-  whatsapp?: string;
   email?: string;
 }
 
