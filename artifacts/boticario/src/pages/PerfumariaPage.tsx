@@ -145,6 +145,14 @@ export default function PerfumariaPage({ onNavigate }: PerfumariaPageProps) {
     onNavigate("carrinho");
   };
 
+  const closeForm = () => {
+    setShowForm(false);
+    setSaving(false);
+    setComprimindo(false);
+    setErro("");
+    setImgPreview("");
+  };
+
   const openForm = (produto?: Produto) => {
     if (produto) {
       setEditando(produto);
@@ -187,11 +195,14 @@ export default function PerfumariaPage({ onNavigate }: PerfumariaPageProps) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
-      if (!resp.ok) throw new Error();
-      setShowForm(false);
+      if (!resp.ok) {
+        const data = await resp.json().catch(() => ({}));
+        throw new Error(data.error || "Erro ao salvar produto.");
+      }
+      closeForm();
       fetchProdutos();
-    } catch {
-      setErro("Erro ao salvar. Tente novamente.");
+    } catch (err: unknown) {
+      setErro(err instanceof Error ? err.message : "Erro ao salvar. Tente novamente.");
     } finally {
       setSaving(false);
     }
@@ -325,11 +336,14 @@ export default function PerfumariaPage({ onNavigate }: PerfumariaPageProps) {
 
       {/* ── Modal Criar/Editar ── */}
       {showForm && (
-        <div className="fixed inset-0 z-50 bg-black/40 flex items-end justify-center">
+        <div
+          className="fixed inset-0 z-50 bg-black/40 flex items-end justify-center"
+          onClick={e => { if (e.target === e.currentTarget) closeForm(); }}
+        >
           <div className="bg-white w-full max-w-md rounded-t-2xl p-5 pb-8 space-y-4 animate-slide-up">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-bold">{editando ? "Editar Produto" : "Novo Produto"}</h2>
-              <button onClick={() => setShowForm(false)} className="p-1 text-slate-400"><X className="w-5 h-5" /></button>
+              <button onClick={closeForm} className="p-2 rounded-full hover:bg-slate-100 text-slate-400"><X className="w-5 h-5" /></button>
             </div>
 
             {[
