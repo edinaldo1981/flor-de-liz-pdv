@@ -64,13 +64,18 @@ export default defineConfig({
       workbox: {
         globPatterns: ["**/*.{js,css,html,ico,png,svg,woff2}"],
         navigateFallback: null,
+        skipWaiting: true,
+        clientsClaim: true,
+        cleanupOutdatedCaches: true,
         runtimeCaching: [
           {
-            urlPattern: /^\/api-server\//,
+            urlPattern: /^\/api\//,
             handler: "NetworkFirst",
             options: {
-              cacheName: "api-cache",
-              expiration: { maxEntries: 50, maxAgeSeconds: 300 },
+              cacheName: "api-cache-v2",
+              networkTimeoutSeconds: 10,
+              expiration: { maxEntries: 100, maxAgeSeconds: 60 },
+              cacheableResponse: { statuses: [0, 200] },
             },
           },
         ],
