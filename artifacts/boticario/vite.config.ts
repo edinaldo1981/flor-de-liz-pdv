@@ -72,7 +72,7 @@ export default defineConfig({
             urlPattern: /^\/api\//,
             handler: "NetworkFirst",
             options: {
-              cacheName: "api-cache-v2",
+              cacheName: "api-cache-v3",
               networkTimeoutSeconds: 10,
               expiration: { maxEntries: 100, maxAgeSeconds: 60 },
               cacheableResponse: { statuses: [0, 200] },
