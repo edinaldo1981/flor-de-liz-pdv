@@ -165,6 +165,7 @@ export default function ProfilePage({ onNavigate }: ProfilePageProps) {
       <div className="px-4 space-y-2">
         {[
           { icon: "add_shopping_cart", label: "Nova Venda", sub: "Registrar uma venda", page: "carrinho" },
+          { icon: "menu_book", label: "Importar do Caderno", sub: "Registrar vendas passadas em lote", page: "importar_vendas" },
           { icon: "person_add", label: "Cadastrar Cliente", sub: "Novo cliente ou devedor", page: "cadastro" },
           { icon: "receipt_long", label: "Controle de Fiados", sub: "Ver e registrar fiados em aberto", page: "fiados" },
           { icon: "account_balance_wallet", label: "Financeiro", sub: "Resumo por marca e período", page: "financeiro" },

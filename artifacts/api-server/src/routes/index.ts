@@ -8,6 +8,7 @@ import portalRouter from "./portal";
 import haveresRouter from "./haveres";
 import dashboardRouter from "./dashboard";
 import financeiroRouter from "./financeiro";
+import importarRouter from "./importar";
 
 const router: IRouter = Router();
 
@@ -20,5 +21,6 @@ router.use(webhookRouter);
 router.use(portalRouter);
 router.use(haveresRouter);
 router.use(financeiroRouter);
+router.use(importarRouter);
 
 export default router;

@@ -11,8 +11,9 @@ import CobrancaPage from "@/pages/CobrancaPage";
 import FinanceiroPage from "@/pages/FinanceiroPage";
 import ClientesPage from "@/pages/ClientesPage";
 import ClienteDetalhePage from "@/pages/ClienteDetalhePage";
+import ImportarVendasPage from "@/pages/ImportarVendasPage";
 
-type Page = "home" | "perfumaria" | "produto" | "carrinho" | "confirmacao" | "profile" | "cadastro" | "fiados" | "cobranca" | "financeiro" | "clientes" | "cliente_detalhe";
+type Page = "home" | "perfumaria" | "produto" | "carrinho" | "confirmacao" | "profile" | "cadastro" | "fiados" | "cobranca" | "financeiro" | "clientes" | "cliente_detalhe" | "importar_vendas";
 
 const mainNavPages: Page[] = ["home", "carrinho", "fiados", "clientes", "financeiro", "profile"];
 
@@ -154,6 +155,7 @@ export default function App() {
         {page === "financeiro" && <FinanceiroPage onNavigate={onNavigate} />}
         {page === "clientes" && <ClientesPage onNavigate={onNavigate} />}
         {page === "cliente_detalhe" && <ClienteDetalhePage onNavigate={onNavigate} />}
+        {page === "importar_vendas" && <ImportarVendasPage onNavigate={onNavigate} />}
         <BottomNav current={page} onNavigate={setPage} />
       </div>
     </div>
