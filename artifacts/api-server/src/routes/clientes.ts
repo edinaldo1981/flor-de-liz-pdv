@@ -100,6 +100,20 @@ router.post("/clientes", async (req, res) => {
   }
 });
 
+router.delete("/clientes/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    await pool.query("DELETE FROM venda_itens WHERE venda_id IN (SELECT id FROM vendas WHERE cliente_id = $1)", [id]);
+    await pool.query("DELETE FROM vendas WHERE cliente_id = $1", [id]);
+    await pool.query("DELETE FROM haveres WHERE cliente_id = $1", [id]);
+    await pool.query("DELETE FROM clientes WHERE id = $1", [id]);
+    res.json({ ok: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Erro ao excluir cliente" });
+  }
+});
+
 router.put("/clientes/:id", async (req, res) => {
   const { id } = req.params;
   const { nome, telefone, whatsapp, email, cpf, endereco, notas } = req.body;
