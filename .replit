@@ -9,12 +9,7 @@ id = "artifacts/mockup-sandbox"
 [deployment]
 router = "application"
 deploymentTarget = "autoscale"
-build = ["bash", "scripts/build-production.sh"]
 run = ["node", "artifacts/api-server/dist/index.cjs"]
-
-[deployment.postBuild]
-args = ["pnpm", "store", "prune"]
-env = { "CI" = "true" }
 
 [workflows]
 runButton = "Project"
