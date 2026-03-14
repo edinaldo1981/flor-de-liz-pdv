@@ -40,7 +40,7 @@ interface Stats {
   totalEmAberto: number;
 }
 
-const API_BASE = "/api-server/api";
+const API_BASE = "/api";
 
 const fmtBRL = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 const fmtDate = (d: string) => new Date(d).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" });

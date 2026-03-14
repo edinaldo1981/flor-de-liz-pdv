@@ -36,7 +36,7 @@ const formasPagamento = [
   { key: "a_prazo", icon: "receipt_long", label: "A Prazo" },
 ];
 
-const API_BASE = "/api-server/api";
+const API_BASE = "/api";
 
 function loadCartFromStorage(): CartItem[] {
   try {

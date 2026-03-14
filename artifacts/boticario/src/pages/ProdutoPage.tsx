@@ -14,7 +14,7 @@ interface Produto {
   img_url?: string;
 }
 
-const API_BASE = "/api-server/api";
+const API_BASE = "/api";
 
 export default function ProdutoPage({ onNavigate }: ProdutoPageProps) {
   const [produto, setProduto] = useState<Produto | null>(null);

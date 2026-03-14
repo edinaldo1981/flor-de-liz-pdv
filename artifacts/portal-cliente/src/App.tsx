@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-const API_BASE = "/api-server/api";
+const API_BASE = "/api";
 
 interface ClienteData {
   cliente: { nome: string; cpf: string | null; telefone: string | null; email: string | null };

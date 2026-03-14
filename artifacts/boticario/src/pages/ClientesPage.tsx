@@ -15,7 +15,7 @@ interface Cliente {
   fiados_abertos: number;
 }
 
-const API_BASE = "/api-server/api";
+const API_BASE = "/api";
 
 export default function ClientesPage({ onNavigate }: ClientesPageProps) {
   const [clientes, setClientes] = useState<Cliente[]>([]);

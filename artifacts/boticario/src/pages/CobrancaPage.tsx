@@ -5,7 +5,7 @@ interface CobrancaPageProps {
   onNavigate: (page: string) => void;
 }
 
-const API_BASE = "/api-server/api";
+const API_BASE = "/api";
 
 interface Venda {
   id: number;

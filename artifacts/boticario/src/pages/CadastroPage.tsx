@@ -5,7 +5,7 @@ interface CadastroPageProps {
   onNavigate: (page: string) => void;
 }
 
-const API_BASE = "/api-server/api";
+const API_BASE = "/api";
 
 export default function CadastroPage({ onNavigate }: CadastroPageProps) {
   const [form, setForm] = useState({

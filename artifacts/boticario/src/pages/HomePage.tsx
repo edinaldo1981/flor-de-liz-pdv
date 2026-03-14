@@ -5,7 +5,7 @@ interface HomePageProps {
   onNavigate: (page: string) => void;
 }
 
-const API_BASE = "/api-server/api";
+const API_BASE = "/api";
 const fmtBRL = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 const statusLabel: Record<string, { label: string; cls: string }> = {
