@@ -27,6 +27,32 @@ export default function PerfumariaPage({ onNavigate }: PerfumariaPageProps) {
   const [form, setForm] = useState({ marca: "", nome: "", preco: "", estoque: "", img_url: "" });
   const [saving, setSaving] = useState(false);
   const [erro, setErro] = useState("");
+  const [imgPreview, setImgPreview] = useState<string>("");
+
+  const compressImage = (file: File): Promise<string> =>
+    new Promise((resolve) => {
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+      img.onload = () => {
+        const MAX = 400;
+        const ratio = Math.min(MAX / img.width, MAX / img.height, 1);
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.round(img.width * ratio);
+        canvas.height = Math.round(img.height * ratio);
+        canvas.getContext("2d")!.drawImage(img, 0, 0, canvas.width, canvas.height);
+        URL.revokeObjectURL(url);
+        resolve(canvas.toDataURL("image/jpeg", 0.75));
+      };
+      img.src = url;
+    });
+
+  const handleImgChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const compressed = await compressImage(file);
+    setImgPreview(compressed);
+    setForm(prev => ({ ...prev, img_url: compressed }));
+  };
 
   useEffect(() => {
     fetchProdutos();
@@ -95,9 +121,11 @@ export default function PerfumariaPage({ onNavigate }: PerfumariaPageProps) {
         estoque: produto.estoque.toString(),
         img_url: produto.img_url || "",
       });
+      setImgPreview(produto.img_url || "");
     } else {
       setEditando(null);
       setForm({ marca: "", nome: "", preco: "", estoque: "", img_url: "" });
+      setImgPreview("");
     }
     setErro("");
     setShowForm(true);
@@ -275,7 +303,6 @@ export default function PerfumariaPage({ onNavigate }: PerfumariaPageProps) {
               { label: "Nome do Produto", key: "nome", placeholder: "Ex: Lily Eau de Parfum 75ml", type: "text" },
               { label: "Preço (R$)", key: "preco", placeholder: "0.00", type: "number" },
               { label: "Estoque (unidades)", key: "estoque", placeholder: "0", type: "number" },
-              { label: "URL da Imagem (opcional)", key: "img_url", placeholder: "https://...", type: "url" },
             ].map(f => (
               <label key={f.key} className="flex flex-col gap-1">
                 <span className="text-sm font-medium text-slate-700">{f.label}</span>
@@ -288,6 +315,41 @@ export default function PerfumariaPage({ onNavigate }: PerfumariaPageProps) {
                 />
               </label>
             ))}
+
+            {/* Foto — galeria do dispositivo */}
+            <div className="flex flex-col gap-1">
+              <span className="text-sm font-medium text-slate-700">Foto do Produto (opcional)</span>
+              <label className="cursor-pointer">
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleImgChange}
+                />
+                {imgPreview ? (
+                  <div className="relative w-full h-36 rounded-xl overflow-hidden bg-slate-100 border border-[#4d8063]/20">
+                    <img src={imgPreview} alt="preview" className="w-full h-full object-cover" />
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 hover:opacity-100 transition-opacity">
+                      <span className="text-white text-xs font-bold bg-black/50 px-3 py-1.5 rounded-full">Trocar foto</span>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="w-full h-24 rounded-xl border-2 border-dashed border-[#4d8063]/30 flex flex-col items-center justify-center gap-2 text-[#4d8063]/60 bg-[#4d8063]/5">
+                    <Package className="w-7 h-7" />
+                    <span className="text-xs font-medium">Toque para escolher da galeria</span>
+                  </div>
+                )}
+              </label>
+              {imgPreview && (
+                <button
+                  type="button"
+                  onClick={() => { setImgPreview(""); setForm(prev => ({ ...prev, img_url: "" })); }}
+                  className="text-xs text-red-400 text-center mt-1"
+                >
+                  Remover foto
+                </button>
+              )}
+            </div>
 
             {erro && <p className="text-red-600 text-xs font-medium">{erro}</p>}
 
