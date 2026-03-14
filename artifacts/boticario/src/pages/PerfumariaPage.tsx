@@ -29,29 +29,63 @@ export default function PerfumariaPage({ onNavigate }: PerfumariaPageProps) {
   const [erro, setErro] = useState("");
   const [imgPreview, setImgPreview] = useState<string>("");
 
+  const [comprimindo, setComprimindo] = useState(false);
+
   const compressImage = (file: File): Promise<string> =>
-    new Promise((resolve) => {
+    new Promise((resolve, reject) => {
       const img = new Image();
       const url = URL.createObjectURL(file);
+
+      const cleanup = () => URL.revokeObjectURL(url);
+
       img.onload = () => {
-        const MAX = 400;
-        const ratio = Math.min(MAX / img.width, MAX / img.height, 1);
-        const canvas = document.createElement("canvas");
-        canvas.width = Math.round(img.width * ratio);
-        canvas.height = Math.round(img.height * ratio);
-        canvas.getContext("2d")!.drawImage(img, 0, 0, canvas.width, canvas.height);
-        URL.revokeObjectURL(url);
-        resolve(canvas.toDataURL("image/jpeg", 0.75));
+        try {
+          const MAX = 1200;
+          const ratio = Math.min(MAX / img.width, MAX / img.height, 1);
+          const w = Math.round(img.width * ratio);
+          const h = Math.round(img.height * ratio);
+          const canvas = document.createElement("canvas");
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext("2d");
+          if (!ctx) { cleanup(); reject(new Error("Canvas não disponível")); return; }
+          ctx.drawImage(img, 0, 0, w, h);
+          cleanup();
+
+          const supportsWebP = canvas.toDataURL("image/webp").startsWith("data:image/webp");
+          const result = supportsWebP
+            ? canvas.toDataURL("image/webp", 0.88)
+            : canvas.toDataURL("image/jpeg", 0.88);
+          resolve(result);
+        } catch (e) {
+          cleanup();
+          reject(e);
+        }
       };
+
+      img.onerror = () => {
+        cleanup();
+        reject(new Error("Não foi possível carregar a imagem. Tente converter para JPG ou PNG."));
+      };
+
       img.src = url;
     });
 
   const handleImgChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const compressed = await compressImage(file);
-    setImgPreview(compressed);
-    setForm(prev => ({ ...prev, img_url: compressed }));
+    setComprimindo(true);
+    setErro("");
+    try {
+      const compressed = await compressImage(file);
+      setImgPreview(compressed);
+      setForm(prev => ({ ...prev, img_url: compressed }));
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Erro ao processar imagem.";
+      setErro(msg);
+    } finally {
+      setComprimindo(false);
+    }
   };
 
   useEffect(() => {
@@ -326,7 +360,12 @@ export default function PerfumariaPage({ onNavigate }: PerfumariaPageProps) {
                   className="hidden"
                   onChange={handleImgChange}
                 />
-                {imgPreview ? (
+                {comprimindo ? (
+                  <div className="w-full h-24 rounded-xl border border-[#4d8063]/20 bg-[#4d8063]/5 flex flex-col items-center justify-center gap-2">
+                    <span className="material-symbols-outlined animate-spin text-[#4d8063]">refresh</span>
+                    <span className="text-xs font-medium text-[#4d8063]">Processando imagem...</span>
+                  </div>
+                ) : imgPreview ? (
                   <div className="relative w-full h-36 rounded-xl overflow-hidden bg-slate-100 border border-[#4d8063]/20">
                     <img src={imgPreview} alt="preview" className="w-full h-full object-cover" />
                     <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 hover:opacity-100 transition-opacity">
@@ -337,6 +376,7 @@ export default function PerfumariaPage({ onNavigate }: PerfumariaPageProps) {
                   <div className="w-full h-24 rounded-xl border-2 border-dashed border-[#4d8063]/30 flex flex-col items-center justify-center gap-2 text-[#4d8063]/60 bg-[#4d8063]/5">
                     <Package className="w-7 h-7" />
                     <span className="text-xs font-medium">Toque para escolher da galeria</span>
+                    <span className="text-[10px] text-slate-400">JPG, PNG, WebP — alta qualidade aceita</span>
                   </div>
                 )}
               </label>
