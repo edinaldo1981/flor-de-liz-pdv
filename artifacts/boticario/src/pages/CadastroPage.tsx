@@ -41,7 +41,7 @@ export default function CadastroPage({ onNavigate }: CadastroPageProps) {
       });
       if (!resp.ok) throw new Error();
       setSucesso(true);
-      setTimeout(() => onNavigate("fiados"), 1500);
+      setTimeout(() => onNavigate("clientes"), 1500);
     } catch {
       setErro("Erro ao salvar. Verifique a conexão e tente novamente.");
     } finally {

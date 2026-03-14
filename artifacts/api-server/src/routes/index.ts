@@ -6,10 +6,12 @@ import produtosRouter from "./produtos";
 import webhookRouter from "./webhook";
 import portalRouter from "./portal";
 import haveresRouter from "./haveres";
+import dashboardRouter from "./dashboard";
 
 const router: IRouter = Router();
 
 router.use(healthRouter);
+router.use(dashboardRouter);
 router.use(clientesRouter);
 router.use(vendasRouter);
 router.use(produtosRouter);

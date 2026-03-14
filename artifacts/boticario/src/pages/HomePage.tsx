@@ -1,23 +1,46 @@
+import { useEffect, useState } from "react";
 import { ShoppingBag, TrendingUp, AlertCircle, Users } from "lucide-react";
 
 interface HomePageProps {
   onNavigate: (page: string) => void;
 }
 
-const recentes = [
-  { client: "Maria Oliveira", produto: "Lily EDP 75ml", valor: "R$ 279,90", hora: "14:32", pago: true },
-  { client: "João Silva", produto: "Malbec 100ml", valor: "R$ 209,90", hora: "13:10", pago: false },
-  { client: "Ana Costa", produto: "Creme Nativa 400ml", valor: "R$ 89,90", hora: "11:45", pago: true },
-  { client: "Ricardo Santos", produto: "Coffee Woman 100ml", valor: "R$ 184,90", hora: "10:20", pago: false },
-];
+const API_BASE = "/api-server/api";
+const fmtBRL = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
-const fiados = [
-  { name: "Ricardo Santos", valor: "R$ 890,00", dias: "15 dias", urgente: true },
-  { name: "João Silva", valor: "R$ 150,00", dias: "3 dias", urgente: false },
-  { name: "Maria Oliveira", valor: "R$ 342,80", dias: "7 dias", urgente: false },
-];
+const statusLabel: Record<string, { label: string; cls: string }> = {
+  confirmada: { label: "Pago", cls: "bg-emerald-100 text-emerald-700" },
+  fiado: { label: "Fiado", cls: "bg-orange-100 text-orange-700" },
+  fiado_atrasado: { label: "Atrasado", cls: "bg-red-100 text-red-600" },
+  estornada: { label: "Estornado", cls: "bg-slate-100 text-slate-500" },
+};
+
+interface DashboardData {
+  vendasHoje: { qtd: number; soma: number };
+  fiadosAbertos: { clientes: number; soma: number };
+  recebidoMes: number;
+  totalClientes: number;
+  ultimasVendas: {
+    id: number; total: string; status: string; forma_pagamento: string;
+    created_at: string; cliente_nome: string; primeiro_item?: string;
+  }[];
+  topFiados: { nome: string; em_aberto: number; dias: number }[];
+}
 
 export default function HomePage({ onNavigate }: HomePageProps) {
+  const [data, setData] = useState<DashboardData | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch(`${API_BASE}/dashboard`)
+      .then(r => r.json())
+      .then(setData)
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  const skeletonCls = "animate-pulse bg-slate-200 rounded";
+
   return (
     <div className="bg-[#f6f7f7] min-h-screen pb-24">
       <header className="sticky top-0 z-50 bg-[#4d8063] px-4 pt-5 pb-5">
@@ -43,32 +66,63 @@ export default function HomePage({ onNavigate }: HomePageProps) {
               <p className="text-xs font-medium text-slate-500">Vendas Hoje</p>
               <TrendingUp className="w-4 h-4 text-[#4d8063]" />
             </div>
-            <p className="text-2xl font-bold text-slate-800">R$ 764,60</p>
-            <p className="text-xs text-emerald-600 font-medium mt-1">4 vendas realizadas</p>
+            {loading ? (
+              <><div className={`h-7 w-24 mb-1 ${skeletonCls}`} /><div className={`h-3 w-20 ${skeletonCls}`} /></>
+            ) : (
+              <>
+                <p className="text-2xl font-bold text-slate-800">{fmtBRL(data?.vendasHoje.soma ?? 0)}</p>
+                <p className="text-xs text-emerald-600 font-medium mt-1">
+                  {data?.vendasHoje.qtd ?? 0} {data?.vendasHoje.qtd === 1 ? "venda realizada" : "vendas realizadas"}
+                </p>
+              </>
+            )}
           </button>
+
           <button onClick={() => onNavigate("fiados")} className="bg-white rounded-xl p-4 border border-[#4d8063]/10 shadow-sm text-left">
             <div className="flex items-center justify-between mb-2">
               <p className="text-xs font-medium text-slate-500">Fiados Abertos</p>
               <AlertCircle className="w-4 h-4 text-orange-500" />
             </div>
-            <p className="text-2xl font-bold text-slate-800">R$ 4.820,50</p>
-            <p className="text-xs text-orange-500 font-medium mt-1">18 clientes devendo</p>
+            {loading ? (
+              <><div className={`h-7 w-24 mb-1 ${skeletonCls}`} /><div className={`h-3 w-20 ${skeletonCls}`} /></>
+            ) : (
+              <>
+                <p className="text-2xl font-bold text-slate-800">{fmtBRL(data?.fiadosAbertos.soma ?? 0)}</p>
+                <p className={`text-xs font-medium mt-1 ${(data?.fiadosAbertos.clientes ?? 0) > 0 ? "text-orange-500" : "text-slate-400"}`}>
+                  {data?.fiadosAbertos.clientes ?? 0} {data?.fiadosAbertos.clientes === 1 ? "cliente devendo" : "clientes devendo"}
+                </p>
+              </>
+            )}
           </button>
+
           <button onClick={() => onNavigate("financeiro")} className="bg-white rounded-xl p-4 border border-[#4d8063]/10 shadow-sm text-left">
             <div className="flex items-center justify-between mb-2">
               <p className="text-xs font-medium text-slate-500">Recebido no Mês</p>
               <ShoppingBag className="w-4 h-4 text-[#4d8063]" />
             </div>
-            <p className="text-2xl font-bold text-slate-800">R$ 12.450,00</p>
-            <p className="text-xs text-emerald-600 font-medium mt-1">+15.4% vs mês anterior</p>
+            {loading ? (
+              <><div className={`h-7 w-24 mb-1 ${skeletonCls}`} /><div className={`h-3 w-16 ${skeletonCls}`} /></>
+            ) : (
+              <>
+                <p className="text-2xl font-bold text-slate-800">{fmtBRL(data?.recebidoMes ?? 0)}</p>
+                <p className="text-xs text-slate-400 font-medium mt-1">este mês</p>
+              </>
+            )}
           </button>
-          <button onClick={() => onNavigate("cadastro")} className="bg-white rounded-xl p-4 border border-[#4d8063]/10 shadow-sm text-left">
+
+          <button onClick={() => onNavigate("clientes")} className="bg-white rounded-xl p-4 border border-[#4d8063]/10 shadow-sm text-left">
             <div className="flex items-center justify-between mb-2">
               <p className="text-xs font-medium text-slate-500">Clientes Ativos</p>
               <Users className="w-4 h-4 text-[#4d8063]" />
             </div>
-            <p className="text-2xl font-bold text-slate-800">47</p>
-            <p className="text-xs text-slate-400 font-medium mt-1">+3 este mês</p>
+            {loading ? (
+              <><div className={`h-7 w-10 mb-1 ${skeletonCls}`} /><div className={`h-3 w-16 ${skeletonCls}`} /></>
+            ) : (
+              <>
+                <p className="text-2xl font-bold text-slate-800">{data?.totalClientes ?? 0}</p>
+                <p className="text-xs text-slate-400 font-medium mt-1">cadastrados</p>
+              </>
+            )}
           </button>
         </div>
 
@@ -80,7 +134,7 @@ export default function HomePage({ onNavigate }: HomePageProps) {
               { icon: "add_shopping_cart", label: "Nova Venda", page: "carrinho", color: "bg-[#4d8063] text-white" },
               { icon: "person_add", label: "Novo Cliente", page: "cadastro", color: "bg-white text-[#4d8063] border border-[#4d8063]/20" },
               { icon: "receipt_long", label: "Fiados", page: "fiados", color: "bg-white text-[#4d8063] border border-[#4d8063]/20" },
-              { icon: "account_balance_wallet", label: "Financeiro", page: "financeiro", color: "bg-white text-[#4d8063] border border-[#4d8063]/20" },
+              { icon: "group", label: "Clientes", page: "clientes", color: "bg-white text-[#4d8063] border border-[#4d8063]/20" },
               { icon: "task_alt", label: "Cobranças", page: "cobranca", color: "bg-white text-[#4d8063] border border-[#4d8063]/20" },
               { icon: "inventory_2", label: "Catálogo", page: "perfumaria", color: "bg-white text-[#4d8063] border border-[#4d8063]/20" },
             ].map((a) => (
@@ -102,29 +156,52 @@ export default function HomePage({ onNavigate }: HomePageProps) {
             <h3 className="text-sm font-bold text-slate-700">Fiados Pendentes</h3>
             <button onClick={() => onNavigate("fiados")} className="text-[#4d8063] text-xs font-bold">Ver todos</button>
           </div>
-          <div className="bg-white rounded-xl border border-[#4d8063]/10 shadow-sm overflow-hidden">
-            {fiados.map((f, i) => (
-              <button
-                key={f.name}
-                onClick={() => onNavigate("cobranca")}
-                className={`w-full flex items-center justify-between px-4 py-3 text-left hover:bg-slate-50 ${i < fiados.length - 1 ? "border-b border-slate-100" : ""}`}
-              >
-                <div className="flex items-center gap-3">
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${f.urgente ? "bg-red-100 text-red-600" : "bg-[#4d8063]/10 text-[#4d8063]"}`}>
-                    {f.name.split(" ")[0][0]}
+
+          {loading ? (
+            <div className="bg-white rounded-xl border border-[#4d8063]/10 shadow-sm overflow-hidden divide-y divide-slate-100">
+              {[1,2,3].map(i => (
+                <div key={i} className="flex items-center gap-3 px-4 py-3">
+                  <div className={`w-8 h-8 rounded-full ${skeletonCls}`} />
+                  <div className="flex-1">
+                    <div className={`h-3.5 w-28 mb-1.5 ${skeletonCls}`} />
+                    <div className={`h-3 w-20 ${skeletonCls}`} />
                   </div>
-                  <div>
-                    <p className="text-sm font-semibold">{f.name}</p>
-                    <p className={`text-xs ${f.urgente ? "text-red-500" : "text-slate-500"}`}>{f.dias} em atraso</p>
+                  <div className={`h-4 w-16 ${skeletonCls}`} />
+                </div>
+              ))}
+            </div>
+          ) : (data?.topFiados ?? []).length === 0 ? (
+            <div className="bg-white rounded-xl border border-dashed border-[#4d8063]/20 py-8 flex flex-col items-center gap-2 text-slate-400">
+              <span className="material-symbols-outlined text-3xl opacity-30">thumb_up</span>
+              <p className="text-sm font-medium">Nenhum fiado em aberto</p>
+            </div>
+          ) : (
+            <div className="bg-white rounded-xl border border-[#4d8063]/10 shadow-sm overflow-hidden">
+              {data!.topFiados.map((f, i) => (
+                <button
+                  key={f.nome}
+                  onClick={() => onNavigate("fiados")}
+                  className={`w-full flex items-center justify-between px-4 py-3 text-left hover:bg-slate-50 ${i < data!.topFiados.length - 1 ? "border-b border-slate-100" : ""}`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${f.dias > 7 ? "bg-red-100 text-red-600" : "bg-[#4d8063]/10 text-[#4d8063]"}`}>
+                      {f.nome.split(" ")[0][0]}
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold">{f.nome}</p>
+                      <p className={`text-xs ${f.dias > 7 ? "text-red-500" : "text-slate-500"}`}>
+                        {f.dias === 0 ? "hoje" : `${f.dias} dia${f.dias !== 1 ? "s" : ""} em atraso`}
+                      </p>
+                    </div>
                   </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <p className={`text-sm font-bold ${f.urgente ? "text-red-600" : "text-slate-700"}`}>{f.valor}</p>
-                  <span className="material-symbols-outlined text-[#4d8063] text-lg">chevron_right</span>
-                </div>
-              </button>
-            ))}
-          </div>
+                  <div className="flex items-center gap-2">
+                    <p className={`text-sm font-bold ${f.dias > 7 ? "text-red-600" : "text-slate-700"}`}>{fmtBRL(f.em_aberto)}</p>
+                    <span className="material-symbols-outlined text-[#4d8063] text-lg">chevron_right</span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Últimas vendas */}
@@ -133,31 +210,60 @@ export default function HomePage({ onNavigate }: HomePageProps) {
             <h3 className="text-sm font-bold text-slate-700">Últimas Vendas</h3>
             <button onClick={() => onNavigate("financeiro")} className="text-[#4d8063] text-xs font-bold">Ver todas</button>
           </div>
-          <div className="bg-white rounded-xl border border-[#4d8063]/10 shadow-sm overflow-hidden">
-            {recentes.map((v, i) => (
+
+          {loading ? (
+            <div className="bg-white rounded-xl border border-[#4d8063]/10 shadow-sm overflow-hidden divide-y divide-slate-100">
+              {[1,2,3].map(i => (
+                <div key={i} className="flex items-center gap-3 px-4 py-3">
+                  <div className={`w-8 h-8 rounded-full ${skeletonCls}`} />
+                  <div className="flex-1">
+                    <div className={`h-3.5 w-24 mb-1.5 ${skeletonCls}`} />
+                    <div className={`h-3 w-32 ${skeletonCls}`} />
+                  </div>
+                  <div className={`h-4 w-16 ${skeletonCls}`} />
+                </div>
+              ))}
+            </div>
+          ) : (data?.ultimasVendas ?? []).length === 0 ? (
+            <div className="bg-white rounded-xl border border-dashed border-[#4d8063]/20 py-8 flex flex-col items-center gap-2 text-slate-400">
+              <span className="material-symbols-outlined text-3xl opacity-30">shopping_bag</span>
+              <p className="text-sm font-medium">Nenhuma venda registrada ainda</p>
               <button
-                key={i}
-                onClick={() => onNavigate("financeiro")}
-                className={`w-full flex items-center justify-between px-4 py-3 hover:bg-slate-50 ${i < recentes.length - 1 ? "border-b border-slate-100" : ""}`}
+                onClick={() => onNavigate("carrinho")}
+                className="mt-1 bg-[#4d8063] text-white text-xs font-bold px-4 py-2 rounded-xl"
               >
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-[#4d8063]/10 flex items-center justify-center text-xs font-bold text-[#4d8063]">
-                    {v.client.split(" ")[0][0]}
-                  </div>
-                  <div className="text-left">
-                    <p className="text-sm font-semibold">{v.client}</p>
-                    <p className="text-xs text-slate-500">{v.produto} · {v.hora}</p>
-                  </div>
-                </div>
-                <div className="flex flex-col items-end gap-1">
-                  <p className="text-sm font-bold text-slate-800">{v.valor}</p>
-                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${v.pago ? "bg-emerald-100 text-emerald-700" : "bg-orange-100 text-orange-700"}`}>
-                    {v.pago ? "Pago" : "Fiado"}
-                  </span>
-                </div>
+                Registrar Venda
               </button>
-            ))}
-          </div>
+            </div>
+          ) : (
+            <div className="bg-white rounded-xl border border-[#4d8063]/10 shadow-sm overflow-hidden">
+              {data!.ultimasVendas.map((v, i) => {
+                const st = statusLabel[v.status] ?? { label: v.status, cls: "bg-slate-100 text-slate-500" };
+                const hora = new Date(v.created_at).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+                return (
+                  <button
+                    key={v.id}
+                    onClick={() => onNavigate("financeiro")}
+                    className={`w-full flex items-center justify-between px-4 py-3 hover:bg-slate-50 ${i < data!.ultimasVendas.length - 1 ? "border-b border-slate-100" : ""}`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-[#4d8063]/10 flex items-center justify-center text-xs font-bold text-[#4d8063]">
+                        {v.cliente_nome.split(" ")[0][0]}
+                      </div>
+                      <div className="text-left">
+                        <p className="text-sm font-semibold">{v.cliente_nome}</p>
+                        <p className="text-xs text-slate-500">{v.primeiro_item ? `${v.primeiro_item} · ` : ""}{hora}</p>
+                      </div>
+                    </div>
+                    <div className="flex flex-col items-end gap-1">
+                      <p className="text-sm font-bold text-slate-800">{fmtBRL(parseFloat(v.total))}</p>
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${st.cls}`}>{st.label}</span>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </div>
       </main>
     </div>
