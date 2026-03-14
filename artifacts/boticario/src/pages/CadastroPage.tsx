@@ -50,7 +50,7 @@ export default function CadastroPage({ onNavigate }: CadastroPageProps) {
   };
 
   return (
-    <div className="bg-[#f6f7f7] min-h-screen max-w-md mx-auto flex flex-col">
+    <div className="bg-[#f6f7f7] min-h-screen max-w-md lg:max-w-2xl mx-auto flex flex-col">
       <header className="sticky top-0 z-20 bg-white/95 backdrop-blur-md border-b border-[#4d8063]/10 px-4 py-4 flex items-center gap-4">
         <button onClick={() => onNavigate("home")} className="flex items-center justify-center size-10 rounded-full hover:bg-[#4d8063]/10 text-[#4d8063]">
           <ArrowLeft className="w-5 h-5" />
@@ -175,7 +175,7 @@ export default function CadastroPage({ onNavigate }: CadastroPageProps) {
         )}
       </main>
 
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-white/90 backdrop-blur-md border-t border-[#4d8063]/10 max-w-md mx-auto z-20">
+      <div className="fixed bottom-0 left-0 right-0 p-4 bg-white/90 backdrop-blur-md border-t border-[#4d8063]/10 max-w-md mx-auto lg:max-w-2xl lg:left-60 z-20">
         {sucesso ? (
           <div className="flex items-center justify-center gap-2 bg-emerald-100 text-emerald-700 font-bold py-4 rounded-xl">
             <CheckCircle className="w-5 h-5" />

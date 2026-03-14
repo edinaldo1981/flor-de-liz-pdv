@@ -75,7 +75,7 @@ export default function CobrancaPage({ onNavigate }: CobrancaPageProps) {
 
   if (!venda) {
     return (
-      <div className="flex min-h-screen items-center justify-center max-w-md mx-auto">
+      <div className="flex min-h-screen items-center justify-center max-w-md lg:max-w-2xl mx-auto">
         <div className="text-center">
           <span className="material-symbols-outlined text-5xl text-slate-300 block mb-3">receipt_long</span>
           <p className="text-slate-500">Nenhum fiado selecionado.</p>
@@ -193,7 +193,7 @@ export default function CobrancaPage({ onNavigate }: CobrancaPageProps) {
   };
 
   return (
-    <div className="font-sans bg-[#f6f7f7] min-h-screen flex flex-col max-w-md mx-auto relative">
+    <div className="font-sans bg-[#f6f7f7] min-h-screen flex flex-col max-w-md lg:max-w-2xl mx-auto relative">
       <header className="sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-[#4d8063]/10">
         <div className="flex items-center p-4 gap-4">
           <button onClick={() => onNavigate("fiados")} className="size-10 rounded-full hover:bg-[#4d8063]/10 text-[#4d8063] flex items-center justify-center">

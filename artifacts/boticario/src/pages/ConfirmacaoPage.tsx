@@ -76,7 +76,7 @@ export default function ConfirmacaoPage({ onNavigate }: ConfirmacaoPageProps) {
   };
 
   return (
-    <div className="relative flex min-h-screen w-full flex-col max-w-md mx-auto bg-white">
+    <div className="relative flex min-h-screen w-full flex-col max-w-md lg:max-w-2xl mx-auto bg-white">
       <div className="flex flex-col items-center px-6 pt-12 pb-6 gap-5">
         <div className="flex items-center justify-center bg-[#4d8063]/10 size-24 rounded-full">
           <CheckCircle className="w-14 h-14 text-[#4d8063]" strokeWidth={1.5} />

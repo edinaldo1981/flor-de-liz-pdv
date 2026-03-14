@@ -145,7 +145,7 @@ export default function CarrinhoPage({ onNavigate }: CarrinhoPageProps) {
   };
 
   return (
-    <div className="bg-[#f6f7f7] min-h-screen max-w-md mx-auto flex flex-col">
+    <div className="bg-[#f6f7f7] min-h-screen flex flex-col">
 
       {/* ── Cabeçalho ── */}
       <header className="sticky top-0 z-20 bg-white border-b border-[#4d8063]/10 px-4 py-3 flex items-center gap-3">

@@ -6,7 +6,7 @@ interface ProfilePageProps {
 
 export default function ProfilePage({ onNavigate }: ProfilePageProps) {
   return (
-    <div className="bg-[#f6f7f7] min-h-screen pb-8 max-w-md mx-auto">
+    <div className="bg-[#f6f7f7] min-h-screen pb-8 max-w-md lg:max-w-2xl mx-auto">
       <header className="bg-white border-b border-[#4d8063]/10 px-4 py-4 flex items-center gap-4">
         <button onClick={() => onNavigate("home")}>
           <ArrowLeft className="w-5 h-5" />

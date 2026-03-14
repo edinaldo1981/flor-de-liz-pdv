@@ -65,7 +65,7 @@ export default function ProdutoPage({ onNavigate }: ProdutoPageProps) {
 
   if (!produto) {
     return (
-      <div className="bg-[#f6f7f7] min-h-screen max-w-md mx-auto flex flex-col items-center justify-center gap-4 text-slate-400">
+      <div className="bg-[#f6f7f7] min-h-screen max-w-md lg:max-w-2xl mx-auto flex flex-col items-center justify-center gap-4 text-slate-400">
         <Package className="w-12 h-12" />
         <p className="text-sm">Nenhum produto selecionado</p>
         <button onClick={() => onNavigate("perfumaria")} className="bg-[#4d8063] text-white px-4 py-2 rounded-xl text-sm font-bold">
@@ -76,7 +76,7 @@ export default function ProdutoPage({ onNavigate }: ProdutoPageProps) {
   }
 
   return (
-    <div className="bg-[#f6f7f7] min-h-screen max-w-md mx-auto flex flex-col">
+    <div className="bg-[#f6f7f7] min-h-screen max-w-md lg:max-w-2xl mx-auto flex flex-col">
       <header className="sticky top-0 z-10 bg-white border-b border-[#4d8063]/10 px-4 py-4 flex items-center gap-3">
         <button onClick={() => onNavigate("perfumaria")} className="p-1">
           <ArrowLeft className="w-5 h-5" />

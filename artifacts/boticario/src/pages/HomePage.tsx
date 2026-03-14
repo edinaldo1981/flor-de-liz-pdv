@@ -35,9 +35,9 @@ export default function HomePage({ onNavigate }: HomePageProps) {
         </p>
       </header>
 
-      <main className="max-w-md mx-auto">
+      <main className="max-w-md mx-auto lg:max-w-none">
         {/* Stats do dia */}
-        <div className="px-4 -mt-1 pt-4 grid grid-cols-2 gap-3 mb-4">
+        <div className="px-4 -mt-1 pt-4 grid grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
           <button onClick={() => onNavigate("financeiro")} className="bg-white rounded-xl p-4 border border-[#4d8063]/10 shadow-sm text-left">
             <div className="flex items-center justify-between mb-2">
               <p className="text-xs font-medium text-slate-500">Vendas Hoje</p>
@@ -75,7 +75,7 @@ export default function HomePage({ onNavigate }: HomePageProps) {
         {/* Ações rápidas */}
         <div className="px-4 mb-5">
           <h3 className="text-sm font-bold text-slate-700 mb-3">Ações Rápidas</h3>
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-3 lg:grid-cols-6 gap-3">
             {[
               { icon: "add_shopping_cart", label: "Nova Venda", page: "carrinho", color: "bg-[#4d8063] text-white" },
               { icon: "person_add", label: "Novo Cliente", page: "cadastro", color: "bg-white text-[#4d8063] border border-[#4d8063]/20" },

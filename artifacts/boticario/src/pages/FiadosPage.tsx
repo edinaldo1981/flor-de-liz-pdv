@@ -68,7 +68,7 @@ export default function FiadosPage({ onNavigate }: FiadosPageProps) {
   }
 
   return (
-    <div className="relative flex min-h-screen w-full flex-col max-w-md mx-auto bg-white shadow-xl overflow-x-hidden">
+    <div className="relative flex min-h-screen w-full flex-col bg-white shadow-xl overflow-x-hidden">
       <header className="flex items-center bg-white p-4 pb-2 justify-between sticky top-0 z-10 border-b border-[#4d8063]/10">
         <button onClick={() => onNavigate("home")} className="text-[#4d8063] flex size-12 shrink-0 items-center">
           <span className="material-symbols-outlined text-3xl">arrow_back</span>
@@ -120,7 +120,7 @@ export default function FiadosPage({ onNavigate }: FiadosPageProps) {
           <span className="text-[#4d8063] text-sm font-semibold">{filtrados.length} cliente{filtrados.length !== 1 ? "s" : ""}</span>
         </div>
 
-        <div className="flex flex-col gap-1 px-2 pb-24">
+        <div className="flex flex-col lg:grid lg:grid-cols-2 xl:grid-cols-3 gap-1 lg:gap-3 px-2 lg:px-4 pb-24 lg:pb-8">
           {loading ? (
             <p className="text-center text-slate-400 text-sm py-8">Carregando...</p>
           ) : filtrados.length === 0 ? (
@@ -168,7 +168,7 @@ export default function FiadosPage({ onNavigate }: FiadosPageProps) {
         </div>
       </main>
 
-      <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md border-t border-[#4d8063]/10 bg-white px-4 pb-4 pt-2 flex justify-between items-end z-20">
+      <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md border-t border-[#4d8063]/10 bg-white px-4 pb-4 pt-2 flex justify-between items-end z-20 lg:hidden">
         <button onClick={() => onNavigate("home")} className="flex flex-1 flex-col items-center justify-center gap-1 text-slate-400">
           <span className="material-symbols-outlined text-2xl">home</span>
           <p className="text-[10px] font-medium uppercase tracking-wider">Início</p>

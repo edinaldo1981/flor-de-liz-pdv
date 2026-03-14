@@ -76,7 +76,7 @@ export default function FinanceiroPage({ onNavigate }: FinanceiroPageProps) {
   const [periodo, setPeriodo] = useState<Periodo>("mes");
 
   return (
-    <div className="bg-[#f6f7f7] min-h-screen flex flex-col pb-24 max-w-md mx-auto">
+    <div className="bg-[#f6f7f7] min-h-screen flex flex-col pb-24 lg:pb-8">
       <header className="flex items-center bg-white p-4 border-b border-[#4d8063]/10 sticky top-0 z-10">
         <button onClick={() => onNavigate("home")} className="text-[#4d8063] flex size-10 items-center justify-center rounded-lg bg-[#4d8063]/10">
           <ArrowLeft className="w-5 h-5" />
@@ -116,8 +116,9 @@ export default function FinanceiroPage({ onNavigate }: FinanceiroPageProps) {
           ))}
         </div>
 
-        {/* Brand Cards */}
-        <div className="px-4 space-y-3">
+        {/* Brand Cards + Transactions — side by side on lg */}
+        <div className="lg:flex lg:gap-6 lg:px-4">
+        <div className="px-4 lg:px-0 space-y-3 lg:flex-1">
           {brands.map((b) => (
             <div key={b.name} className="bg-white rounded-xl p-4 border border-[#4d8063]/5 shadow-sm">
               <div className="flex items-center gap-4 mb-3">
@@ -143,7 +144,7 @@ export default function FinanceiroPage({ onNavigate }: FinanceiroPageProps) {
         </div>
 
         {/* Recent Transactions */}
-        <div className="mt-6 px-4">
+        <div className="mt-6 lg:mt-0 px-4 lg:px-0 lg:w-96 lg:shrink-0">
           <div className="flex justify-between items-center mb-3">
             <h3 className="font-bold">Transações Recentes</h3>
             <span className="text-[#4d8063] text-sm font-semibold">{transacoes.length} registros</span>
@@ -163,9 +164,10 @@ export default function FinanceiroPage({ onNavigate }: FinanceiroPageProps) {
             ))}
           </div>
         </div>
+        </div>
       </main>
 
-      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-[#4d8063]/10 px-4 pb-6 pt-2 flex justify-around items-center max-w-md mx-auto">
+      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-[#4d8063]/10 px-4 pb-6 pt-2 flex justify-around items-center max-w-md mx-auto lg:hidden">
         {[
           { icon: "home", label: "Início", page: "home" },
           { icon: "receipt_long", label: "Fiados", page: "fiados" },

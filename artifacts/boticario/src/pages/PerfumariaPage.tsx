@@ -176,7 +176,7 @@ export default function PerfumariaPage({ onNavigate }: PerfumariaPageProps) {
   };
 
   return (
-    <div className="bg-[#f6f7f7] min-h-screen flex flex-col max-w-md mx-auto">
+    <div className="bg-[#f6f7f7] min-h-screen flex flex-col">
       <header className="sticky top-0 z-20 bg-white border-b border-[#4d8063]/10">
         <div className="flex items-center gap-3 px-4 py-4">
           <button onClick={() => onNavigate("home")} className="p-1 text-slate-700">
@@ -215,7 +215,7 @@ export default function PerfumariaPage({ onNavigate }: PerfumariaPageProps) {
           </div>
         )}
 
-        <div className="flex flex-col gap-3">
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3">
           {filtered.map(p => {
             const selected = selecionados.includes(p.id);
             return (
@@ -278,7 +278,7 @@ export default function PerfumariaPage({ onNavigate }: PerfumariaPageProps) {
       </main>
 
       {selecionados.length > 0 && (
-        <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto p-4 bg-white border-t border-[#4d8063]/10 z-10">
+        <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-[#4d8063]/10 z-10 max-w-md mx-auto lg:max-w-none lg:left-60 lg:mx-0">
           <button
             onClick={irParaVenda}
             className="w-full bg-[#4d8063] text-white font-bold py-4 rounded-xl flex items-center justify-center gap-2"
