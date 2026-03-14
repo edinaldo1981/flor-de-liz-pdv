@@ -61,13 +61,20 @@ export default function ClienteDetalhePage({ onNavigate }: Props) {
   const [loading, setLoading] = useState(true);
   const [expandedVenda, setExpandedVenda] = useState<number | null>(null);
   const [printingVenda, setPrintingVenda] = useState<Venda | null>(null);
+  const [saldoHaver, setSaldoHaver] = useState<number>(0);
 
   useEffect(() => {
     const id = localStorage.getItem("cliente_detalhe_id");
     if (!id) { onNavigate("clientes"); return; }
-    fetch(`${API_BASE}/clientes/${id}/historico`)
-      .then(r => r.json())
-      .then(setData)
+
+    Promise.all([
+      fetch(`${API_BASE}/clientes/${id}/historico`).then(r => r.json()),
+      fetch(`${API_BASE}/clientes/${id}/haveres`).then(r => r.ok ? r.json() : { total: 0 }).catch(() => ({ total: 0 })),
+    ])
+      .then(([historico, haverData]) => {
+        setData(historico);
+        setSaldoHaver(parseFloat(haverData.total) || 0);
+      })
       .catch(() => onNavigate("clientes"))
       .finally(() => setLoading(false));
   }, []);
@@ -175,7 +182,7 @@ export default function ClienteDetalhePage({ onNavigate }: Props) {
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-3 gap-3">
+          <div className={`grid gap-3 ${saldoHaver > 0 ? "grid-cols-2" : "grid-cols-3"}`}>
             <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-3 text-center">
               <p className="text-[10px] text-slate-400 font-medium uppercase tracking-wide">Compras</p>
               <p className="text-xl font-bold text-slate-700 mt-1">{stats.totalVendas}</p>
@@ -190,6 +197,12 @@ export default function ClienteDetalhePage({ onNavigate }: Props) {
                 {fmtBRL(stats.totalEmAberto)}
               </p>
             </div>
+            {saldoHaver > 0 && (
+              <div className="bg-blue-50 border border-blue-100 rounded-xl shadow-sm p-3 text-center">
+                <p className="text-[10px] text-blue-400 font-medium uppercase tracking-wide">Haver</p>
+                <p className="text-lg font-bold text-blue-600 mt-1">{fmtBRL(saldoHaver)}</p>
+              </div>
+            )}
           </div>
 
           {/* Histórico de compras */}
