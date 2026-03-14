@@ -9,15 +9,18 @@ import CadastroPage from "@/pages/CadastroPage";
 import FiadosPage from "@/pages/FiadosPage";
 import CobrancaPage from "@/pages/CobrancaPage";
 import FinanceiroPage from "@/pages/FinanceiroPage";
+import ClientesPage from "@/pages/ClientesPage";
+import ClienteDetalhePage from "@/pages/ClienteDetalhePage";
 
-type Page = "home" | "perfumaria" | "produto" | "carrinho" | "confirmacao" | "profile" | "cadastro" | "fiados" | "cobranca" | "financeiro";
+type Page = "home" | "perfumaria" | "produto" | "carrinho" | "confirmacao" | "profile" | "cadastro" | "fiados" | "cobranca" | "financeiro" | "clientes" | "cliente_detalhe";
 
-const mainNavPages: Page[] = ["home", "fiados", "financeiro", "profile"];
+const mainNavPages: Page[] = ["home", "fiados", "financeiro", "clientes", "profile"];
 
 const sidebarTabs: { icon: string; label: string; page: Page }[] = [
   { icon: "home", label: "Início", page: "home" },
   { icon: "add_shopping_cart", label: "Venda", page: "carrinho" },
   { icon: "receipt_long", label: "Fiados", page: "fiados" },
+  { icon: "group", label: "Clientes", page: "clientes" },
   { icon: "account_balance_wallet", label: "Financeiro", page: "financeiro" },
   { icon: "person", label: "Perfil", page: "profile" },
 ];
@@ -28,6 +31,7 @@ const pageParentMap: Partial<Record<Page, Page>> = {
   confirmacao: "carrinho",
   cadastro: "profile",
   cobranca: "fiados",
+  cliente_detalhe: "clientes",
 };
 
 function Sidebar({ current, onNavigate }: { current: Page; onNavigate: (p: Page) => void }) {
@@ -83,7 +87,7 @@ function BottomNav({ current, onNavigate }: { current: Page; onNavigate: (p: Pag
     { icon: "home", label: "Início", page: "home" },
     { icon: "add_shopping_cart", label: "Venda", page: "carrinho" },
     { icon: "receipt_long", label: "Fiados", page: "fiados" },
-    { icon: "account_balance_wallet", label: "Financeiro", page: "financeiro" },
+    { icon: "group", label: "Clientes", page: "clientes" },
     { icon: "person", label: "Perfil", page: "profile" },
   ];
 
@@ -129,6 +133,8 @@ export default function App() {
         {page === "fiados" && <FiadosPage onNavigate={onNavigate} />}
         {page === "cobranca" && <CobrancaPage onNavigate={onNavigate} />}
         {page === "financeiro" && <FinanceiroPage onNavigate={onNavigate} />}
+        {page === "clientes" && <ClientesPage onNavigate={onNavigate} />}
+        {page === "cliente_detalhe" && <ClienteDetalhePage onNavigate={onNavigate} />}
         <BottomNav current={page} onNavigate={setPage} />
       </div>
     </div>
