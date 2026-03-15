@@ -21,6 +21,17 @@ interface Venda {
   created_at: string;
 }
 
+interface GrupoCliente {
+  cliente_id: number;
+  cliente_nome: string;
+  fiados: Venda[];
+  totalSaldo: number;
+}
+
+function saldo(v: Venda) {
+  return Math.max(0, parseFloat(v.total) - parseFloat(v.valor_pago || "0"));
+}
+
 function diasAtras(dateStr: string) {
   const diff = Date.now() - new Date(dateStr).getTime();
   const d = Math.floor(diff / 86400000);
@@ -29,14 +40,11 @@ function diasAtras(dateStr: string) {
   return `${d} dias`;
 }
 
-function saldo(v: Venda) {
-  return Math.max(0, parseFloat(v.total) - parseFloat(v.valor_pago || "0"));
-}
-
 export default function FiadosPage({ onNavigate }: FiadosPageProps) {
   const [busca, setBusca] = useState("");
   const [fiados, setFiados] = useState<Venda[]>([]);
   const [loading, setLoading] = useState(true);
+  const [expandido, setExpandido] = useState<number | null>(null);
 
   useEffect(() => {
     fetch(`${API_BASE}/vendas`)
@@ -48,23 +56,27 @@ export default function FiadosPage({ onNavigate }: FiadosPageProps) {
       .finally(() => setLoading(false));
   }, []);
 
-  const filtrados = fiados.filter(v =>
-    (v.cliente_nome ?? "").toLowerCase().includes(busca.toLowerCase())
-  );
-
   const totalAReceber = fiados.reduce((acc, v) => acc + saldo(v), 0);
 
-  function handleClick(v: Venda) {
-    localStorage.setItem("fiado_selecionado", JSON.stringify(v));
-    onNavigate("cobranca");
-  }
+  const grupos: GrupoCliente[] = [];
+  fiados.forEach(v => {
+    const g = grupos.find(g => g.cliente_id === v.cliente_id);
+    if (g) {
+      g.fiados.push(v);
+      g.totalSaldo += saldo(v);
+    } else {
+      grupos.push({ cliente_id: v.cliente_id, cliente_nome: v.cliente_nome ?? "Cliente", fiados: [v], totalSaldo: saldo(v) });
+    }
+  });
+  grupos.sort((a, b) => b.totalSaldo - a.totalSaldo);
 
-  function asaasLabel(status: string | null) {
-    if (!status) return null;
-    if (status === "RECEIVED" || status === "CONFIRMED") return { label: "Pago", color: "text-emerald-600 bg-emerald-50" };
-    if (status === "OVERDUE") return { label: "Vencido", color: "text-red-600 bg-red-50" };
-    if (status === "PENDING") return { label: "Aguardando", color: "text-orange-600 bg-orange-50" };
-    return { label: status, color: "text-slate-500 bg-slate-100" };
+  const filtrados = grupos.filter(g =>
+    g.cliente_nome.toLowerCase().includes(busca.toLowerCase())
+  );
+
+  function handleAbrirNota(g: GrupoCliente) {
+    localStorage.setItem("nota_cliente", JSON.stringify({ cliente_id: g.cliente_id, cliente_nome: g.cliente_nome }));
+    onNavigate("nota_cliente");
   }
 
   return (
@@ -86,9 +98,9 @@ export default function FiadosPage({ onNavigate }: FiadosPageProps) {
             </p>
           </div>
           <div className="flex min-w-[158px] flex-1 flex-col gap-2 rounded-xl p-5 border border-[#4d8063]/20 bg-[#4d8063]/5">
-            <p className="text-slate-600 text-sm font-medium">Fiados Ativos</p>
+            <p className="text-slate-600 text-sm font-medium">Clientes com Fiado</p>
             <p className="text-2xl font-bold">
-              {loading ? "..." : fiados.length}
+              {loading ? "..." : grupos.length}
             </p>
           </div>
         </div>
@@ -106,11 +118,11 @@ export default function FiadosPage({ onNavigate }: FiadosPageProps) {
         </div>
 
         <div className="flex items-center justify-between px-4 pb-2">
-          <h3 className="text-lg font-bold">Lista de Fiados</h3>
+          <h3 className="text-lg font-bold">Notas em Aberto</h3>
           <span className="text-[#4d8063] text-sm font-semibold">{filtrados.length} cliente{filtrados.length !== 1 ? "s" : ""}</span>
         </div>
 
-        <div className="flex flex-col lg:grid lg:grid-cols-2 xl:grid-cols-3 gap-1 lg:gap-3 px-2 lg:px-4 pb-32 lg:pb-8">
+        <div className="flex flex-col gap-2 px-3 pb-32 lg:pb-8">
           {loading ? (
             <p className="text-center text-slate-400 text-sm py-8">Carregando...</p>
           ) : filtrados.length === 0 ? (
@@ -119,45 +131,70 @@ export default function FiadosPage({ onNavigate }: FiadosPageProps) {
               <p className="text-slate-400 text-sm">Nenhum fiado em aberto</p>
             </div>
           ) : (
-            filtrados.map((v) => {
-              const saldoV = saldo(v);
-              const dias = diasAtras(v.created_at);
-              const atrasado = v.status === "fiado_atrasado";
-              const badge = asaasLabel(v.asaas_status);
+            filtrados.map(g => {
+              const isExp = expandido === g.cliente_id;
+              const temAtrasado = g.fiados.some(v => v.status === "fiado_atrasado");
               return (
-                <button
-                  key={v.id}
-                  onClick={() => handleClick(v)}
-                  className="flex items-center gap-4 bg-white hover:bg-[#4d8063]/5 p-3 rounded-xl transition-colors border-b border-[#4d8063]/5 w-full text-left"
-                >
-                  <div className={`w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold shrink-0 border-2 ${atrasado ? "bg-red-100 text-red-600 border-red-200" : "bg-[#4d8063]/10 text-[#4d8063] border-[#4d8063]/20"}`}>
-                    {(v.cliente_nome ?? "?")[0].toUpperCase()}
-                  </div>
-                  <div className="flex flex-1 flex-col justify-center min-w-0">
-                    <div className="flex items-center gap-2">
-                      <p className="text-base font-bold truncate">{v.cliente_nome ?? "Cliente"}</p>
-                      {v.asaas_invoice_url && (
-                        <span className="material-symbols-outlined text-[#4d8063] text-base shrink-0" title="Link de pagamento gerado">link</span>
-                      )}
+                <div key={g.cliente_id} className="bg-white rounded-2xl border border-[#4d8063]/10 shadow-sm overflow-hidden">
+                  {/* Cabeçalho do cliente */}
+                  <button
+                    className="flex items-center gap-3 w-full p-4 text-left hover:bg-[#4d8063]/5 transition-colors"
+                    onClick={() => setExpandido(isExp ? null : g.cliente_id)}
+                  >
+                    <div className={`size-12 rounded-full flex items-center justify-center text-lg font-bold shrink-0 border-2 ${temAtrasado ? "bg-red-100 text-red-600 border-red-200" : "bg-[#4d8063]/10 text-[#4d8063] border-[#4d8063]/20"}`}>
+                      {g.cliente_nome[0].toUpperCase()}
                     </div>
-                    <p className="text-slate-500 text-xs">Fiado #{v.id} · {dias}</p>
-                    <div className="flex items-center gap-2 mt-0.5">
-                      <p className={`text-sm font-bold ${atrasado ? "text-rose-600" : "text-[#4d8063]"}`}>
-                        R$ {saldoV.toFixed(2).replace(".", ",")} em aberto
+                    <div className="flex-1 min-w-0">
+                      <p className="font-bold text-base truncate">{g.cliente_nome}</p>
+                      <p className="text-slate-500 text-xs">
+                        {g.fiados.length} compra{g.fiados.length !== 1 ? "s" : ""} em aberto
                       </p>
-                      {badge && (
-                        <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${badge.color}`}>{badge.label}</span>
-                      )}
                     </div>
-                  </div>
-                  <span className="material-symbols-outlined text-slate-400 shrink-0">chevron_right</span>
-                </button>
+                    <div className="text-right shrink-0">
+                      <p className={`text-base font-bold ${temAtrasado ? "text-rose-600" : "text-[#4d8063]"}`}>
+                        R$ {g.totalSaldo.toFixed(2).replace(".", ",")}
+                      </p>
+                    </div>
+                    <span className={`material-symbols-outlined text-slate-400 shrink-0 transition-transform ${isExp ? "rotate-180" : ""}`}>
+                      expand_more
+                    </span>
+                  </button>
+
+                  {/* Lista de fiados expandida */}
+                  {isExp && (
+                    <div className="border-t border-[#4d8063]/10">
+                      {g.fiados.map(v => {
+                        const s = saldo(v);
+                        return (
+                          <div key={v.id} className="flex items-center justify-between px-4 py-3 border-b border-slate-50 last:border-b-0">
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-semibold">Fiado #{v.id}</p>
+                              <p className="text-xs text-slate-400">{diasAtras(v.created_at)}</p>
+                            </div>
+                            <p className="text-sm font-bold text-[#4d8063] shrink-0 mr-3">
+                              R$ {s.toFixed(2).replace(".", ",")}
+                            </p>
+                          </div>
+                        );
+                      })}
+                      {/* Botão ver nota completa */}
+                      <div className="p-3 bg-[#4d8063]/5">
+                        <button
+                          onClick={() => handleAbrirNota(g)}
+                          className="w-full bg-[#4d8063] text-white font-bold py-3 rounded-xl text-sm flex items-center justify-center gap-2"
+                        >
+                          <span className="material-symbols-outlined text-base">receipt_long</span>
+                          Ver Nota Completa · Pagar / Editar
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
               );
             })
           )}
         </div>
       </main>
-
     </div>
   );
 }

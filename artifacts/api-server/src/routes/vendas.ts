@@ -103,6 +103,31 @@ router.get("/vendas/:id", async (req, res) => {
   }
 });
 
+router.delete("/vendas/:id", async (req, res) => {
+  try {
+    const r = await pool.query("DELETE FROM vendas WHERE id = $1 RETURNING id", [req.params.id]);
+    if (r.rows.length === 0) return res.status(404).json({ error: "Venda não encontrada" });
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: "Erro ao excluir venda" });
+  }
+});
+
+router.patch("/vendas/:id", async (req, res) => {
+  const { total, descricao } = req.body;
+  try {
+    const r = await pool.query(
+      `UPDATE vendas SET total = COALESCE($1, total)
+       WHERE id = $2 RETURNING *`,
+      [total ?? null, req.params.id]
+    );
+    if (r.rows.length === 0) return res.status(404).json({ error: "Venda não encontrada" });
+    res.json(r.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: "Erro ao editar venda" });
+  }
+});
+
 router.patch("/vendas/:id/baixa", async (req, res) => {
   const { valor_pago } = req.body;
   try {
