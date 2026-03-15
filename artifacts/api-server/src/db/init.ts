@@ -20,6 +20,12 @@ export async function initDatabase() {
       descricao       TEXT,
       created_at      TIMESTAMPTZ DEFAULT now()
     );
+
+    CREATE TABLE IF NOT EXISTS config (
+      key        VARCHAR(100) PRIMARY KEY,
+      value      TEXT,
+      updated_at TIMESTAMPTZ DEFAULT now()
+    );
   `);
 
   console.log("[DB] Tabelas verificadas/criadas com sucesso.");

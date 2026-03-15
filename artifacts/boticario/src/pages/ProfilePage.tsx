@@ -1,4 +1,4 @@
-import { ArrowLeft, ChevronRight, Pencil, Check, X } from "lucide-react";
+import { ArrowLeft, ChevronRight, Pencil, Check, X, RefreshCw, ExternalLink } from "lucide-react";
 import { useState, useEffect } from "react";
 
 interface ProfilePageProps {
@@ -19,6 +19,36 @@ export default function ProfilePage({ onNavigate }: ProfilePageProps) {
 
   const [stats, setStats] = useState({ vendas: 0, clientes: 0, fiados: 0, recebidoMes: 0 });
   const [loadingStats, setLoadingStats] = useState(true);
+
+  const [sheetUrl, setSheetUrl] = useState<string | null>(null);
+  const [syncing, setSyncing] = useState(false);
+  const [syncMsg, setSyncMsg] = useState<{ ok: boolean; text: string } | null>(null);
+
+  useEffect(() => {
+    fetch(`${API_BASE}/sheets/status`)
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d?.spreadsheetId) setSheetUrl(`https://docs.google.com/spreadsheets/d/${d.spreadsheetId}`); })
+      .catch(() => {});
+  }, []);
+
+  const sincronizarSheets = async () => {
+    setSyncing(true);
+    setSyncMsg(null);
+    try {
+      const r = await fetch(`${API_BASE}/sheets/sync`, { method: "POST" });
+      const d = await r.json();
+      if (r.ok && d.ok) {
+        setSheetUrl(d.sheetUrl);
+        setSyncMsg({ ok: true, text: "Sincronizado com sucesso!" });
+      } else {
+        setSyncMsg({ ok: false, text: d.error || "Erro ao sincronizar." });
+      }
+    } catch {
+      setSyncMsg({ ok: false, text: "Erro de conexão." });
+    } finally {
+      setSyncing(false);
+    }
+  };
 
   useEffect(() => {
     fetch(`${API_BASE}/dashboard`)
@@ -187,6 +217,55 @@ export default function ProfilePage({ onNavigate }: ProfilePageProps) {
             <ChevronRight className="w-4 h-4 text-slate-400 shrink-0" />
           </button>
         ))}
+
+        {/* Google Sheets Backup */}
+        <div className="mt-2 bg-white rounded-2xl border border-emerald-100 shadow-sm overflow-hidden">
+          <div className="flex items-center gap-3 px-4 py-3 bg-emerald-50 border-b border-emerald-100">
+            <div className="w-9 h-9 rounded-xl bg-white flex items-center justify-center shadow-sm shrink-0">
+              <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none">
+                <rect width="24" height="24" rx="4" fill="#0F9D58"/>
+                <rect x="5" y="4" width="14" height="16" rx="1" fill="white"/>
+                <rect x="7" y="7" width="10" height="1.5" rx="0.5" fill="#0F9D58"/>
+                <rect x="7" y="10" width="10" height="1.5" rx="0.5" fill="#0F9D58"/>
+                <rect x="7" y="13" width="7" height="1.5" rx="0.5" fill="#0F9D58"/>
+              </svg>
+            </div>
+            <div className="flex-1">
+              <p className="text-sm font-bold text-emerald-800">Backup Google Sheets</p>
+              <p className="text-[11px] text-emerald-600">Clientes, vendas e fiados na sua planilha</p>
+            </div>
+          </div>
+
+          <div className="px-4 py-3 space-y-2.5">
+            {syncMsg && (
+              <div className={`flex items-center gap-2 text-xs font-medium px-3 py-2 rounded-lg ${syncMsg.ok ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-red-600"}`}>
+                <span className="material-symbols-outlined text-base">{syncMsg.ok ? "check_circle" : "error"}</span>
+                {syncMsg.text}
+              </div>
+            )}
+
+            <button
+              onClick={sincronizarSheets}
+              disabled={syncing}
+              className="w-full flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl text-sm disabled:opacity-60 transition-colors"
+            >
+              <RefreshCw className={`w-4 h-4 ${syncing ? "animate-spin" : ""}`} />
+              {syncing ? "Sincronizando..." : sheetUrl ? "Sincronizar Agora" : "Criar Planilha e Sincronizar"}
+            </button>
+
+            {sheetUrl && (
+              <a
+                href={sheetUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full flex items-center justify-center gap-2 border border-emerald-200 text-emerald-700 font-semibold py-2.5 rounded-xl text-sm bg-emerald-50"
+              >
+                <ExternalLink className="w-4 h-4" />
+                Abrir Planilha no Google Sheets
+              </a>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );

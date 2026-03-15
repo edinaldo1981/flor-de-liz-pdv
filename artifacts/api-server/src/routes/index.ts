@@ -9,6 +9,7 @@ import haveresRouter from "./haveres";
 import dashboardRouter from "./dashboard";
 import financeiroRouter from "./financeiro";
 import importarRouter from "./importar";
+import sheetsRouter from "./sheets";
 
 const router: IRouter = Router();
 
@@ -22,5 +23,6 @@ router.use(portalRouter);
 router.use(haveresRouter);
 router.use(financeiroRouter);
 router.use(importarRouter);
+router.use(sheetsRouter);
 
 export default router;
