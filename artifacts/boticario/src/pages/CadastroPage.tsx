@@ -21,6 +21,13 @@ function maskPhone(v: string) {
   return d.replace(/(\d{2})(\d{5})(\d{0,4})/, "($1) $2-$3").trim().replace(/-$/, "");
 }
 
+function maskDate(v: string) {
+  const d = v.replace(/\D/g, "").slice(0, 8);
+  if (d.length <= 2) return d;
+  if (d.length <= 4) return `${d.slice(0, 2)}/${d.slice(2)}`;
+  return `${d.slice(0, 2)}/${d.slice(2, 4)}/${d.slice(4)}`;
+}
+
 export default function CadastroPage({ onNavigate }: CadastroPageProps) {
   const [editando, setEditando] = useState<{ id: number } | null>(null);
   const [form, setForm] = useState({
@@ -61,6 +68,9 @@ export default function CadastroPage({ onNavigate }: CadastroPageProps) {
 
   const setPhone = (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm(f => ({ ...f, telefone: maskPhone(e.target.value) }));
+
+  const setDate = (e: React.ChangeEvent<HTMLInputElement>) =>
+    setForm(f => ({ ...f, nascimento: maskDate(e.target.value) }));
 
   const handleSalvar = async () => {
     if (!form.nome.trim()) { setErro("Nome é obrigatório."); return; }
@@ -160,8 +170,9 @@ export default function CadastroPage({ onNavigate }: CadastroPageProps) {
                   className="w-full rounded-lg border border-slate-200 h-12 pl-10 pr-3 text-base placeholder-slate-400 outline-none focus:ring-2 focus:ring-[#4d8063]/30"
                   placeholder="DD/MM/AAAA"
                   type="text"
+                  inputMode="numeric"
                   value={form.nascimento}
-                  onChange={set("nascimento")}
+                  onChange={setDate}
                 />
               </div>
             </label>
