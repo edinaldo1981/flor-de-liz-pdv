@@ -54,7 +54,7 @@ router.post("/importar-vendas", async (req, res) => {
       }
 
       const status =
-        venda.forma_pagamento === "a_prazo" ? "a_prazo" : "confirmada";
+        venda.forma_pagamento === "a_prazo" ? "fiado" : "confirmada";
       const valorPago =
         venda.forma_pagamento === "a_prazo" ? 0 : total;
 
