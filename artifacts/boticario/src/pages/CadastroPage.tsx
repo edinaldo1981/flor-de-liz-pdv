@@ -7,12 +7,26 @@ interface CadastroPageProps {
 
 const API_BASE = "/api";
 
+function maskCPF(v: string) {
+  return v.replace(/\D/g, "").slice(0, 11)
+    .replace(/(\d{3})(\d)/, "$1.$2")
+    .replace(/(\d{3})(\d)/, "$1.$2")
+    .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+}
+
+function maskPhone(v: string) {
+  const d = v.replace(/\D/g, "").slice(0, 11);
+  if (d.length <= 10)
+    return d.replace(/(\d{2})(\d{4})(\d{0,4})/, "($1) $2-$3").trim().replace(/-$/, "");
+  return d.replace(/(\d{2})(\d{5})(\d{0,4})/, "($1) $2-$3").trim().replace(/-$/, "");
+}
+
 export default function CadastroPage({ onNavigate }: CadastroPageProps) {
   const [editando, setEditando] = useState<{ id: number } | null>(null);
   const [form, setForm] = useState({
     nome: "", cpf: "", nascimento: "",
     email: "", telefone: "",
-    rua: "", bairro: "", cidade: "",
+    rua: "", cidade: "",
     notas: "",
   });
   const [saving, setSaving] = useState(false);
@@ -42,19 +56,30 @@ export default function CadastroPage({ onNavigate }: CadastroPageProps) {
   const set = (key: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
     setForm(f => ({ ...f, [key]: e.target.value }));
 
+  const setCPF = (e: React.ChangeEvent<HTMLInputElement>) =>
+    setForm(f => ({ ...f, cpf: maskCPF(e.target.value) }));
+
+  const setPhone = (e: React.ChangeEvent<HTMLInputElement>) =>
+    setForm(f => ({ ...f, telefone: maskPhone(e.target.value) }));
+
   const handleSalvar = async () => {
     if (!form.nome.trim()) { setErro("Nome é obrigatório."); return; }
+    if (!form.cpf.trim() || form.cpf.replace(/\D/g, "").length < 11) {
+      setErro("CPF é obrigatório e deve ter 11 dígitos."); return;
+    }
+    if (!form.telefone.trim() || form.telefone.replace(/\D/g, "").length < 10) {
+      setErro("Celular é obrigatório. Informe com DDD."); return;
+    }
     setSaving(true);
     setErro("");
     try {
-      const endereco = [form.rua, form.bairro, form.cidade].filter(Boolean).join(", ");
       const body = {
         nome: form.nome,
         telefone: form.telefone || null,
         whatsapp: form.telefone || null,
         email: form.email || null,
         cpf: form.cpf || null,
-        endereco: endereco || null,
+        endereco: [form.rua, form.cidade].filter(Boolean).join(", ") || null,
         notas: form.notas || null,
       };
 
@@ -90,27 +115,56 @@ export default function CadastroPage({ onNavigate }: CadastroPageProps) {
         <section className="flex flex-col gap-4">
           <h3 className="text-[#4d8063] text-sm font-bold uppercase tracking-wider">Informações Pessoais</h3>
           <div className="flex flex-col gap-4 bg-white p-4 rounded-xl shadow-sm border border-[#4d8063]/5">
-            {[
-              { label: "Nome completo", key: "nome", placeholder: "Ex: João da Silva", type: "text", icon: "person", required: true },
-              { label: "CPF", key: "cpf", placeholder: "000.000.000-00", type: "text", icon: "badge" },
-              { label: "Data de nascimento", key: "nascimento", placeholder: "DD/MM/AAAA", type: "text", icon: "cake" },
-            ].map((field) => (
-              <label key={field.key} className="flex flex-col w-full">
-                <p className="text-slate-700 text-sm font-medium pb-1.5">
-                  {field.label} {field.required && <span className="text-red-500">*</span>}
-                </p>
-                <div className="relative flex items-center">
-                  <span className="material-symbols-outlined absolute left-3 text-[#4d8063] text-xl">{field.icon}</span>
-                  <input
-                    className="w-full rounded-lg border border-slate-200 h-12 pl-10 pr-3 text-base placeholder-slate-400 outline-none focus:ring-2 focus:ring-[#4d8063]/30"
-                    placeholder={field.placeholder}
-                    type={field.type}
-                    value={form[field.key as keyof typeof form]}
-                    onChange={set(field.key)}
-                  />
-                </div>
-              </label>
-            ))}
+
+            {/* Nome */}
+            <label className="flex flex-col w-full">
+              <p className="text-slate-700 text-sm font-medium pb-1.5">
+                Nome completo <span className="text-red-500">*</span>
+              </p>
+              <div className="relative flex items-center">
+                <span className="material-symbols-outlined absolute left-3 text-[#4d8063] text-xl">person</span>
+                <input
+                  className="w-full rounded-lg border border-slate-200 h-12 pl-10 pr-3 text-base placeholder-slate-400 outline-none focus:ring-2 focus:ring-[#4d8063]/30"
+                  placeholder="Ex: Maria da Silva"
+                  type="text"
+                  value={form.nome}
+                  onChange={set("nome")}
+                />
+              </div>
+            </label>
+
+            {/* CPF */}
+            <label className="flex flex-col w-full">
+              <p className="text-slate-700 text-sm font-medium pb-1.5">
+                CPF <span className="text-red-500">*</span>
+              </p>
+              <div className="relative flex items-center">
+                <span className="material-symbols-outlined absolute left-3 text-[#4d8063] text-xl">badge</span>
+                <input
+                  className="w-full rounded-lg border border-slate-200 h-12 pl-10 pr-3 text-base placeholder-slate-400 outline-none focus:ring-2 focus:ring-[#4d8063]/30"
+                  placeholder="000.000.000-00"
+                  type="text"
+                  inputMode="numeric"
+                  value={form.cpf}
+                  onChange={setCPF}
+                />
+              </div>
+            </label>
+
+            {/* Data de nascimento */}
+            <label className="flex flex-col w-full">
+              <p className="text-slate-700 text-sm font-medium pb-1.5">Data de nascimento</p>
+              <div className="relative flex items-center">
+                <span className="material-symbols-outlined absolute left-3 text-[#4d8063] text-xl">cake</span>
+                <input
+                  className="w-full rounded-lg border border-slate-200 h-12 pl-10 pr-3 text-base placeholder-slate-400 outline-none focus:ring-2 focus:ring-[#4d8063]/30"
+                  placeholder="DD/MM/AAAA"
+                  type="text"
+                  value={form.nascimento}
+                  onChange={set("nascimento")}
+                />
+              </div>
+            </label>
           </div>
         </section>
 
@@ -118,24 +172,39 @@ export default function CadastroPage({ onNavigate }: CadastroPageProps) {
         <section className="flex flex-col gap-4">
           <h3 className="text-[#4d8063] text-sm font-bold uppercase tracking-wider">Contato</h3>
           <div className="flex flex-col gap-4 bg-white p-4 rounded-xl shadow-sm border border-[#4d8063]/5">
-            {[
-              { label: "E-mail", key: "email", placeholder: "email@exemplo.com", type: "email", icon: "mail" },
-              { label: "Telefone / WhatsApp", key: "telefone", placeholder: "(00) 00000-0000", type: "tel", icon: "phone" },
-            ].map((field) => (
-              <label key={field.key} className="flex flex-col w-full">
-                <p className="text-slate-700 text-sm font-medium pb-1.5">{field.label}</p>
-                <div className="relative flex items-center">
-                  <span className="material-symbols-outlined absolute left-3 text-[#4d8063] text-xl">{field.icon}</span>
-                  <input
-                    className="w-full rounded-lg border border-slate-200 h-12 pl-10 pr-3 text-base placeholder-slate-400 outline-none focus:ring-2 focus:ring-[#4d8063]/30"
-                    placeholder={field.placeholder}
-                    type={field.type}
-                    value={form[field.key as keyof typeof form]}
-                    onChange={set(field.key)}
-                  />
-                </div>
-              </label>
-            ))}
+
+            {/* Celular */}
+            <label className="flex flex-col w-full">
+              <p className="text-slate-700 text-sm font-medium pb-1.5">
+                Celular / WhatsApp <span className="text-red-500">*</span>
+              </p>
+              <div className="relative flex items-center">
+                <span className="material-symbols-outlined absolute left-3 text-[#4d8063] text-xl">phone</span>
+                <input
+                  className="w-full rounded-lg border border-slate-200 h-12 pl-10 pr-3 text-base placeholder-slate-400 outline-none focus:ring-2 focus:ring-[#4d8063]/30"
+                  placeholder="(00) 90000-0000"
+                  type="tel"
+                  inputMode="numeric"
+                  value={form.telefone}
+                  onChange={setPhone}
+                />
+              </div>
+            </label>
+
+            {/* E-mail */}
+            <label className="flex flex-col w-full">
+              <p className="text-slate-700 text-sm font-medium pb-1.5">E-mail</p>
+              <div className="relative flex items-center">
+                <span className="material-symbols-outlined absolute left-3 text-[#4d8063] text-xl">mail</span>
+                <input
+                  className="w-full rounded-lg border border-slate-200 h-12 pl-10 pr-3 text-base placeholder-slate-400 outline-none focus:ring-2 focus:ring-[#4d8063]/30"
+                  placeholder="email@exemplo.com"
+                  type="email"
+                  value={form.email}
+                  onChange={set("email")}
+                />
+              </div>
+            </label>
           </div>
         </section>
 

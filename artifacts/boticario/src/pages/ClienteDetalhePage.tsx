@@ -232,14 +232,14 @@ export default function ClienteDetalhePage({ onNavigate }: Props) {
                       onClick={() => setExpandedVenda(expanded ? null : v.id)}
                       className="w-full flex items-center gap-3 px-4 py-3 text-left"
                     >
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 flex-wrap">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-1.5 flex-wrap mb-1">
                           <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${st.cls}`}>{st.label}</span>
                           <span className="text-[10px] text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">
                             {pagLabel[v.forma_pagamento] ?? v.forma_pagamento}
                           </span>
                         </div>
-                        <p className="text-xs text-slate-400 mt-1">{fmtDate(v.created_at)}</p>
+                        <p className="text-sm font-semibold text-slate-700">{fmtDate(v.created_at)}</p>
                       </div>
                       <div className="text-right shrink-0">
                         <p className="font-bold text-slate-800">{fmtBRL(parseFloat(v.total))}</p>
