@@ -20,12 +20,9 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
     fetch(`${API_BASE}/auth/config?slug=${encodeURIComponent(slugToCheck)}`)
       .then(r => r.json())
       .then(d => {
-        if (!d.configured) {
-          const fakeToken = "";
-          onLogin("admin", null);
-        }
+        // Se não configurado ainda, só mostra o form normalmente
       })
-      .catch(() => onLogin("admin", null))
+      .catch(() => {})
       .finally(() => setChecking(false));
   }, []);
 
