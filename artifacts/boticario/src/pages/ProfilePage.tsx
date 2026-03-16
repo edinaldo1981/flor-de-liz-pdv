@@ -1,8 +1,10 @@
-import { ArrowLeft, ChevronRight, Pencil, Check, X, RefreshCw, ExternalLink } from "lucide-react";
+import { ArrowLeft, ChevronRight, Pencil, Check, X, RefreshCw, ExternalLink, LogOut } from "lucide-react";
 import { useState, useEffect } from "react";
 
 interface ProfilePageProps {
   onNavigate: (page: string) => void;
+  role?: "admin" | "colaborador";
+  onLogout?: () => void;
 }
 
 const API_BASE = "/api";
@@ -10,7 +12,7 @@ const API_BASE = "/api";
 const fmtBRL = (v: number) =>
   v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
-export default function ProfilePage({ onNavigate }: ProfilePageProps) {
+export default function ProfilePage({ onNavigate, role = "admin", onLogout }: ProfilePageProps) {
   const [nome, setNome] = useState(() => localStorage.getItem("perfil_nome") || "Minha Loja");
   const [cargo, setCargo] = useState(() => localStorage.getItem("perfil_cargo") || "Revendedora • Flor de Liz");
   const [editando, setEditando] = useState(false);
@@ -144,7 +146,9 @@ export default function ProfilePage({ onNavigate }: ProfilePageProps) {
           <div className="text-center">
             <h2 className="text-xl font-bold">{nome}</h2>
             <p className="text-white/70 text-sm mt-0.5">{cargo}</p>
-            <p className="text-white/50 text-[11px] mt-1">Toque no lápis para editar</p>
+            <span className={`inline-block text-[10px] font-bold px-3 py-1 rounded-full mt-2 ${role === "admin" ? "bg-white/30 text-white" : "bg-orange-400/60 text-white"}`}>
+              {role === "admin" ? "Administradora" : "Colaboradora"}
+            </span>
           </div>
         )}
       </div>
@@ -218,6 +222,23 @@ export default function ProfilePage({ onNavigate }: ProfilePageProps) {
           </button>
         ))}
 
+        {/* Controle de Acesso — apenas admin */}
+        {role === "admin" && (
+          <button
+            onClick={() => onNavigate("config_acesso")}
+            className="bg-white w-full rounded-xl p-4 flex items-center gap-4 shadow-sm border border-[#4d8063]/5 text-left"
+          >
+            <div className="bg-orange-100 p-2.5 rounded-xl shrink-0">
+              <span className="material-symbols-outlined text-orange-500">admin_panel_settings</span>
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="font-semibold text-sm">Controle de Acesso</p>
+              <p className="text-xs text-slate-500 truncate">Senhas e permissões de colaboradora</p>
+            </div>
+            <ChevronRight className="w-4 h-4 text-slate-400 shrink-0" />
+          </button>
+        )}
+
         {/* Google Sheets Backup */}
         <div className="mt-2 bg-white rounded-2xl border border-emerald-100 shadow-sm overflow-hidden">
           <div className="flex items-center gap-3 px-4 py-3 bg-emerald-50 border-b border-emerald-100">
@@ -266,6 +287,16 @@ export default function ProfilePage({ onNavigate }: ProfilePageProps) {
             )}
           </div>
         </div>
+        {/* Botão Sair */}
+        {onLogout && (
+          <button
+            onClick={onLogout}
+            className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl border border-red-200 text-red-500 font-bold text-sm hover:bg-red-50 transition-colors mt-2"
+          >
+            <LogOut className="w-4 h-4" />
+            Sair do App
+          </button>
+        )}
       </div>
     </div>
   );

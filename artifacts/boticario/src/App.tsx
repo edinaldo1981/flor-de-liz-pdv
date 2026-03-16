@@ -13,25 +13,24 @@ import ClientesPage from "@/pages/ClientesPage";
 import ClienteDetalhePage from "@/pages/ClienteDetalhePage";
 import ImportarVendasPage from "@/pages/ImportarVendasPage";
 import NotaClientePage from "@/pages/NotaClientePage";
+import LoginPage from "@/pages/LoginPage";
+import ConfigAcessoPage from "@/pages/ConfigAcessoPage";
 
-type Page = "home" | "perfumaria" | "produto" | "carrinho" | "confirmacao" | "profile" | "cadastro" | "fiados" | "cobranca" | "financeiro" | "clientes" | "cliente_detalhe" | "importar_vendas" | "nota_cliente";
+type Page = "home" | "perfumaria" | "produto" | "carrinho" | "confirmacao" | "profile" | "cadastro"
+  | "fiados" | "cobranca" | "financeiro" | "clientes" | "cliente_detalhe"
+  | "importar_vendas" | "nota_cliente" | "config_acesso";
+
+type Role = "admin" | "colaborador";
+type Permissions = Record<string, boolean>;
 
 const mainNavPages: Page[] = ["home", "carrinho", "fiados", "clientes", "financeiro", "profile"];
-
-const sidebarTabs: { icon: string; label: string; page: Page }[] = [
-  { icon: "home", label: "Início", page: "home" },
-  { icon: "add_shopping_cart", label: "Venda", page: "carrinho" },
-  { icon: "receipt_long", label: "Fiados", page: "fiados" },
-  { icon: "group", label: "Clientes", page: "clientes" },
-  { icon: "account_balance_wallet", label: "Financeiro", page: "financeiro" },
-  { icon: "person", label: "Perfil", page: "profile" },
-];
 
 const pageParentMap: Partial<Record<Page, Page>> = {
   perfumaria: "carrinho",
   produto: "carrinho",
   confirmacao: "carrinho",
   cadastro: "profile",
+  config_acesso: "profile",
   cobranca: "fiados",
   nota_cliente: "fiados",
   cliente_detalhe: "clientes",
@@ -40,7 +39,16 @@ const pageParentMap: Partial<Record<Page, Page>> = {
 const fmtBRL = (v: number) =>
   v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
-function Sidebar({ current, onNavigate }: { current: Page; onNavigate: (p: Page) => void }) {
+function can(role: Role, permissions: Permissions | null, key: string): boolean {
+  if (role === "admin") return true;
+  if (!permissions) return true;
+  return permissions[key] !== false;
+}
+
+function Sidebar({ current, onNavigate, role, permissions, onLogout }: {
+  current: Page; onNavigate: (p: Page) => void;
+  role: Role; permissions: Permissions | null; onLogout: () => void;
+}) {
   const activePage = pageParentMap[current] ?? current;
   const [vendasHoje, setVendasHoje] = useState<number | null>(null);
 
@@ -50,6 +58,17 @@ function Sidebar({ current, onNavigate }: { current: Page; onNavigate: (p: Page)
       .then(d => { if (d) setVendasHoje(parseFloat(d.vendasHoje?.soma ?? d.vendasHoje ?? 0)); })
       .catch(() => {});
   }, []);
+
+  const allTabs: { icon: string; label: string; page: Page; permKey?: string }[] = [
+    { icon: "home", label: "Início", page: "home" },
+    { icon: "add_shopping_cart", label: "Venda", page: "carrinho" },
+    { icon: "receipt_long", label: "Fiados", page: "fiados", permKey: "ver_fiados" },
+    { icon: "group", label: "Clientes", page: "clientes", permKey: "ver_clientes" },
+    { icon: "account_balance_wallet", label: "Financeiro", page: "financeiro", permKey: "ver_financeiro" },
+    { icon: "person", label: "Perfil", page: "profile", permKey: "ver_perfil" },
+  ];
+
+  const tabs = allTabs.filter(t => !t.permKey || can(role, permissions, t.permKey));
 
   return (
     <aside className="hidden lg:flex flex-col w-60 shrink-0 bg-white border-r border-slate-200 min-h-screen sticky top-0 h-screen">
@@ -66,16 +85,14 @@ function Sidebar({ current, onNavigate }: { current: Page; onNavigate: (p: Page)
       </div>
 
       <nav className="flex-1 px-3 py-4 space-y-1">
-        {sidebarTabs.map((tab) => {
+        {tabs.map((tab) => {
           const active = activePage === tab.page;
           return (
             <button
               key={tab.page}
               onClick={() => onNavigate(tab.page)}
               className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
-                active
-                  ? "bg-[#4d8063] text-white shadow-sm"
-                  : "text-slate-600 hover:bg-slate-50"
+                active ? "bg-[#4d8063] text-white shadow-sm" : "text-slate-600 hover:bg-slate-50"
               }`}
             >
               <span className={`material-symbols-outlined text-xl ${active ? "fill-icon" : ""}`}>{tab.icon}</span>
@@ -85,30 +102,50 @@ function Sidebar({ current, onNavigate }: { current: Page; onNavigate: (p: Page)
         })}
       </nav>
 
-      <div className="px-3 pb-6">
+      <div className="px-3 pb-6 space-y-2">
         <div className="bg-[#4d8063]/5 rounded-xl p-4 border border-[#4d8063]/10">
-          <p className="text-xs text-slate-500 font-medium">Vendas Hoje</p>
-          <p className="text-lg font-bold text-[#4d8063]">
-            {vendasHoje === null ? "—" : fmtBRL(vendasHoje)}
-          </p>
+          <div className="flex justify-between items-center">
+            <div>
+              <p className="text-xs text-slate-500 font-medium">Vendas Hoje</p>
+              <p className="text-lg font-bold text-[#4d8063]">
+                {vendasHoje === null ? "—" : fmtBRL(vendasHoje)}
+              </p>
+            </div>
+            <div className="flex flex-col items-end">
+              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${role === "admin" ? "bg-[#4d8063]/20 text-[#4d8063]" : "bg-orange-100 text-orange-600"}`}>
+                {role === "admin" ? "Admin" : "Colaboradora"}
+              </span>
+            </div>
+          </div>
         </div>
+        <button
+          onClick={onLogout}
+          className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-sm text-slate-400 hover:bg-red-50 hover:text-red-500 transition-colors"
+        >
+          <span className="material-symbols-outlined text-lg">logout</span>
+          Sair
+        </button>
       </div>
     </aside>
   );
 }
 
-function BottomNav({ current, onNavigate }: { current: Page; onNavigate: (p: Page) => void }) {
+function BottomNav({ current, onNavigate, role, permissions }: {
+  current: Page; onNavigate: (p: Page) => void;
+  role: Role; permissions: Permissions | null;
+}) {
   if (!mainNavPages.includes(current)) return null;
-
   const activePage = pageParentMap[current] ?? current;
 
-  const tabs: { icon: string; label: string; page: Page; fab?: boolean }[] = [
+  const allTabs: { icon: string; label: string; page: Page; fab?: boolean; permKey?: string }[] = [
     { icon: "home", label: "Início", page: "home" },
-    { icon: "receipt_long", label: "Fiados", page: "fiados" },
+    { icon: "receipt_long", label: "Fiados", page: "fiados", permKey: "ver_fiados" },
     { icon: "add_shopping_cart", label: "Venda", page: "carrinho", fab: true },
-    { icon: "group", label: "Clientes", page: "clientes" },
-    { icon: "account_balance_wallet", label: "Financeiro", page: "financeiro" },
+    { icon: "group", label: "Clientes", page: "clientes", permKey: "ver_clientes" },
+    { icon: "account_balance_wallet", label: "Financeiro", page: "financeiro", permKey: "ver_financeiro" },
   ];
+
+  const tabs = allTabs.filter(t => !t.permKey || can(role, permissions, t.permKey));
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 lg:hidden" style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}>
@@ -122,7 +159,7 @@ function BottomNav({ current, onNavigate }: { current: Page; onNavigate: (p: Pag
               className={`flex flex-1 flex-col items-center justify-center gap-1 py-2 relative ${active ? "text-[#4d8063]" : "text-slate-400"}`}
             >
               {tab.fab ? (
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center shadow-lg -mt-5 bg-[#4d8063]`}>
+                <div className="w-12 h-12 rounded-full flex items-center justify-center shadow-lg -mt-5 bg-[#4d8063]">
                   <span className="material-symbols-outlined text-white text-2xl">{tab.icon}</span>
                 </div>
               ) : (
@@ -139,27 +176,90 @@ function BottomNav({ current, onNavigate }: { current: Page; onNavigate: (p: Pag
 
 export default function App() {
   const [page, setPage] = useState<Page>("home");
-  const onNavigate = (p: string) => setPage(p as Page);
+  const [role, setRole] = useState<Role | null>(null);
+  const [permissions, setPermissions] = useState<Permissions | null>(null);
+  const [authChecking, setAuthChecking] = useState(true);
+
+  useEffect(() => {
+    const savedRole = localStorage.getItem("auth_role") as Role | null;
+    const savedPerms = localStorage.getItem("auth_permissions");
+    if (savedRole) {
+      setRole(savedRole);
+      setPermissions(savedPerms ? JSON.parse(savedPerms) : null);
+      setAuthChecking(false);
+    } else {
+      setAuthChecking(false);
+    }
+  }, []);
+
+  const handleLogin = (r: Role, p: Permissions | null) => {
+    setRole(r);
+    setPermissions(p);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("auth_role");
+    localStorage.removeItem("auth_permissions");
+    setRole(null);
+    setPermissions(null);
+    setPage("home");
+  };
+
+  const onNavigate = (p: string) => {
+    const target = p as Page;
+    if (role === "colaborador" && permissions) {
+      const blocked: Record<Page, string> = {
+        fiados: "ver_fiados",
+        nota_cliente: "ver_fiados",
+        cobranca: "ver_fiados",
+        financeiro: "ver_financeiro",
+        clientes: "ver_clientes",
+        cliente_detalhe: "ver_clientes",
+        importar_vendas: "importar_vendas",
+        profile: "ver_perfil",
+        config_acesso: "ver_perfil",
+      } as Record<Page, string>;
+      if (blocked[target] && !can(role, permissions, blocked[target])) return;
+    }
+    setPage(target);
+  };
+
+  if (authChecking) {
+    return (
+      <div className="min-h-screen bg-[#f6f7f7] flex items-center justify-center">
+        <span className="material-symbols-outlined animate-spin text-4xl text-[#4d8063]">refresh</span>
+      </div>
+    );
+  }
+
+  if (!role) {
+    return <LoginPage onLogin={handleLogin} />;
+  }
+
+  const canEditVendas = can(role, permissions, "editar_excluir_vendas");
+  const canImportar = can(role, permissions, "importar_vendas");
+  const canRegistrarHaver = can(role, permissions, "registrar_haver");
 
   return (
     <div className="flex min-h-screen">
-      <Sidebar current={page} onNavigate={setPage} />
+      <Sidebar current={page} onNavigate={p => setPage(p)} role={role} permissions={permissions} onLogout={handleLogout} />
       <div className="flex-1 min-h-screen relative max-w-md mx-auto lg:max-w-none lg:mx-0">
         {page === "home" && <HomePage onNavigate={onNavigate} />}
         {page === "perfumaria" && <PerfumariaPage onNavigate={onNavigate} />}
         {page === "produto" && <ProdutoPage onNavigate={onNavigate} />}
         {page === "carrinho" && <CarrinhoPage onNavigate={onNavigate} />}
         {page === "confirmacao" && <ConfirmacaoPage onNavigate={onNavigate} />}
-        {page === "profile" && <ProfilePage onNavigate={onNavigate} />}
+        {page === "profile" && <ProfilePage onNavigate={onNavigate} role={role} onLogout={handleLogout} />}
         {page === "cadastro" && <CadastroPage onNavigate={onNavigate} />}
         {page === "fiados" && <FiadosPage onNavigate={onNavigate} />}
         {page === "cobranca" && <CobrancaPage onNavigate={onNavigate} />}
-        {page === "financeiro" && <FinanceiroPage onNavigate={onNavigate} />}
+        {page === "financeiro" && <FinanceiroPage onNavigate={onNavigate} canEdit={canEditVendas} />}
         {page === "clientes" && <ClientesPage onNavigate={onNavigate} />}
         {page === "cliente_detalhe" && <ClienteDetalhePage onNavigate={onNavigate} />}
-        {page === "importar_vendas" && <ImportarVendasPage onNavigate={onNavigate} />}
+        {page === "importar_vendas" && canImportar && <ImportarVendasPage onNavigate={onNavigate} />}
         {page === "nota_cliente" && <NotaClientePage onNavigate={onNavigate} />}
-        <BottomNav current={page} onNavigate={setPage} />
+        {page === "config_acesso" && role === "admin" && <ConfigAcessoPage onNavigate={onNavigate} />}
+        <BottomNav current={page} onNavigate={onNavigate} role={role} permissions={permissions} />
       </div>
     </div>
   );

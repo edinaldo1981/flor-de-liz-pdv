@@ -10,6 +10,7 @@ import dashboardRouter from "./dashboard";
 import financeiroRouter from "./financeiro";
 import importarRouter from "./importar";
 import sheetsRouter from "./sheets";
+import authRouter from "./auth";
 
 const router: IRouter = Router();
 
@@ -24,5 +25,6 @@ router.use(haveresRouter);
 router.use(financeiroRouter);
 router.use(importarRouter);
 router.use(sheetsRouter);
+router.use(authRouter);
 
 export default router;
