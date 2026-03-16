@@ -35,6 +35,54 @@ router.post("/clientes/:id/haveres", authMiddleware, async (req, res) => {
   }
 });
 
+router.patch("/clientes/:clienteId/haveres/:haverID", authMiddleware, async (req, res) => {
+  const lojaId = req.auth!.lojaId;
+  const { descricao, saldo_restante } = req.body;
+  try {
+    const existing = await pool.query(
+      "SELECT id FROM haveres WHERE id = $1 AND cliente_id = $2 AND loja_id = $3",
+      [req.params.haverID, req.params.clienteId, lojaId]
+    );
+    if (existing.rows.length === 0) return res.status(404).json({ error: "Haver não encontrado" });
+
+    const fields: string[] = [];
+    const vals: unknown[] = [];
+    let idx = 1;
+    if (descricao !== undefined) { fields.push(`descricao = $${idx++}`); vals.push(descricao); }
+    if (saldo_restante !== undefined) {
+      const v = parseFloat(saldo_restante);
+      if (isNaN(v) || v < 0) return res.status(400).json({ error: "Valor inválido" });
+      fields.push(`saldo_restante = $${idx++}`);
+      vals.push(v);
+    }
+    if (fields.length === 0) return res.status(400).json({ error: "Nada para atualizar" });
+    vals.push(req.params.haverID);
+    const r = await pool.query(
+      `UPDATE haveres SET ${fields.join(", ")} WHERE id = $${idx} RETURNING *`,
+      vals
+    );
+    res.json(r.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Erro ao editar haver" });
+  }
+});
+
+router.delete("/clientes/:clienteId/haveres/:haverID", authMiddleware, async (req, res) => {
+  const lojaId = req.auth!.lojaId;
+  try {
+    const r = await pool.query(
+      "DELETE FROM haveres WHERE id = $1 AND cliente_id = $2 AND loja_id = $3 RETURNING id",
+      [req.params.haverID, req.params.clienteId, lojaId]
+    );
+    if (r.rows.length === 0) return res.status(404).json({ error: "Haver não encontrado" });
+    res.json({ ok: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Erro ao excluir haver" });
+  }
+});
+
 router.post("/vendas/:id/aplicar-haver", authMiddleware, async (req, res) => {
   const { valor } = req.body;
   const lojaId = req.auth!.lojaId;

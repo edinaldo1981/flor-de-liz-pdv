@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { apiFetch } from "@/lib/api";
-import { ArrowLeft, Printer, Phone, Mail, MapPin, FileText, TrendingUp, AlertCircle, ChevronDown, ChevronUp, Edit } from "lucide-react";
+import { ArrowLeft, Printer, Phone, Mail, MapPin, FileText, TrendingUp, AlertCircle, ChevronDown, ChevronUp, Edit, Trash2, Pencil } from "lucide-react";
 
 interface Props {
   onNavigate: (page: string) => void;
@@ -41,9 +41,17 @@ interface Stats {
   totalEmAberto: number;
 }
 
+interface Haver {
+  id: number;
+  valor: string;
+  saldo_restante: string;
+  descricao: string;
+  created_at: string;
+}
 
 const fmtBRL = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 const fmtDate = (d: string) => new Date(d).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" });
+const fmtDateShort = (d: string) => new Date(d).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric" });
 
 const statusLabel: Record<string, { label: string; cls: string }> = {
   confirmada: { label: "Pago", cls: "bg-emerald-100 text-emerald-700" },
@@ -61,18 +69,38 @@ export default function ClienteDetalhePage({ onNavigate }: Props) {
   const [loading, setLoading] = useState(true);
   const [expandedVenda, setExpandedVenda] = useState<number | null>(null);
   const [printingVenda, setPrintingVenda] = useState<Venda | null>(null);
+  const [haveres, setHaveres] = useState<Haver[]>([]);
   const [saldoHaver, setSaldoHaver] = useState<number>(0);
+  const [clienteId, setClienteId] = useState<string | null>(null);
+
+  const [editHaver, setEditHaver] = useState<Haver | null>(null);
+  const [editForm, setEditForm] = useState({ descricao: "", saldo_restante: "" });
+  const [editLoading, setEditLoading] = useState(false);
+  const [editErro, setEditErro] = useState("");
+
+  const [deletingHaver, setDeletingHaver] = useState<Haver | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+
+  const fetchHaveres = async (id: string) => {
+    const r = await apiFetch(`/clientes/${id}/haveres`);
+    if (!r.ok) return;
+    const d = await r.json();
+    setHaveres(d.haveres || []);
+    setSaldoHaver(parseFloat(d.total) || 0);
+  };
 
   useEffect(() => {
     const id = localStorage.getItem("cliente_detalhe_id");
     if (!id) { onNavigate("clientes"); return; }
+    setClienteId(id);
 
     Promise.all([
       apiFetch(`/clientes/${id}/historico`).then(r => r.json()),
-      apiFetch(`/clientes/${id}/haveres`).then(r => r.ok ? r.json() : { total: 0 }).catch(() => ({ total: 0 })),
+      apiFetch(`/clientes/${id}/haveres`).then(r => r.ok ? r.json() : { total: 0, haveres: [] }).catch(() => ({ total: 0, haveres: [] })),
     ])
       .then(([historico, haverData]) => {
         setData(historico);
+        setHaveres(haverData.haveres || []);
         setSaldoHaver(parseFloat(haverData.total) || 0);
       })
       .catch(() => onNavigate("clientes"))
@@ -89,6 +117,42 @@ export default function ClienteDetalhePage({ onNavigate }: Props) {
     setTimeout(() => window.print(), 100);
   };
 
+  const openEdit = (haver: Haver) => {
+    setEditHaver(haver);
+    setEditForm({ descricao: haver.descricao, saldo_restante: parseFloat(haver.saldo_restante).toFixed(2) });
+    setEditErro("");
+  };
+
+  const handleSalvarEdit = async () => {
+    if (!editHaver || !clienteId) return;
+    const saldo = parseFloat(editForm.saldo_restante.replace(",", "."));
+    if (isNaN(saldo) || saldo < 0) { setEditErro("Valor inválido"); return; }
+    setEditLoading(true); setEditErro("");
+    try {
+      const r = await apiFetch(`/clientes/${clienteId}/haveres/${editHaver.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ descricao: editForm.descricao, saldo_restante: saldo }),
+      });
+      if (!r.ok) { const d = await r.json(); setEditErro(d.error || "Erro ao salvar"); return; }
+      setEditHaver(null);
+      fetchHaveres(clienteId);
+    } catch { setEditErro("Erro de conexão"); }
+    finally { setEditLoading(false); }
+  };
+
+  const handleExcluir = async () => {
+    if (!deletingHaver || !clienteId) return;
+    setDeleteLoading(true);
+    try {
+      const r = await apiFetch(`/clientes/${clienteId}/haveres/${deletingHaver.id}`, { method: "DELETE" });
+      if (!r.ok) return;
+      setDeletingHaver(null);
+      fetchHaveres(clienteId);
+    } catch {}
+    finally { setDeleteLoading(false); }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#f6f7f7]">
@@ -99,12 +163,10 @@ export default function ClienteDetalhePage({ onNavigate }: Props) {
 
   if (!data) return null;
   const { cliente, vendas, stats } = data;
-
   const initials = cliente.nome.split(" ").slice(0, 2).map(n => n[0]).join("").toUpperCase();
 
   return (
     <>
-      {/* ── Print styles ── */}
       <style>{`
         @media print {
           body * { visibility: hidden !important; }
@@ -122,18 +184,11 @@ export default function ClienteDetalhePage({ onNavigate }: Props) {
               <ArrowLeft className="w-5 h-5" />
             </button>
             <h1 className="text-lg font-bold flex-1 truncate">{cliente.nome}</h1>
-            <button
-              onClick={printHistorico}
-              className="p-2 rounded-xl bg-slate-100 text-slate-500"
-              title="Imprimir histórico completo"
-            >
+            <button onClick={printHistorico} className="p-2 rounded-xl bg-slate-100 text-slate-500" title="Imprimir histórico">
               <Printer className="w-4 h-4" />
             </button>
             <button
-              onClick={() => {
-                localStorage.setItem("cadastro_editar", JSON.stringify(cliente));
-                onNavigate("cadastro");
-              }}
+              onClick={() => { localStorage.setItem("cadastro_editar", JSON.stringify(cliente)); onNavigate("cadastro"); }}
               className="p-2 rounded-xl bg-[#4d8063]/10 text-[#4d8063]"
             >
               <Edit className="w-4 h-4" />
@@ -205,6 +260,56 @@ export default function ClienteDetalhePage({ onNavigate }: Props) {
             )}
           </div>
 
+          {/* Seção de Haveres */}
+          {haveres.length > 0 && (
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <span className="material-symbols-outlined text-blue-500 text-lg">account_balance_wallet</span>
+                <h3 className="text-sm font-bold text-slate-700">Haveres</h3>
+                <span className="text-xs bg-blue-100 text-blue-600 font-bold px-2 py-0.5 rounded-full">
+                  {fmtBRL(saldoHaver)} disponível
+                </span>
+              </div>
+              <div className="space-y-2">
+                {haveres.map(h => {
+                  const valor = parseFloat(h.valor);
+                  const saldo = parseFloat(h.saldo_restante);
+                  const usado = valor - saldo;
+                  return (
+                    <div key={h.id} className="bg-white rounded-xl border border-blue-100 px-4 py-3 flex items-center gap-3">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-slate-700 truncate">{h.descricao}</p>
+                        <p className="text-xs text-slate-400 mt-0.5">{fmtDateShort(h.created_at)}</p>
+                        <div className="flex items-center gap-2 mt-1 flex-wrap">
+                          <span className="text-xs text-blue-600 font-bold">{fmtBRL(saldo)} disponível</span>
+                          {usado > 0 && (
+                            <span className="text-xs text-slate-400">de {fmtBRL(valor)} · {fmtBRL(usado)} usado</span>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1 shrink-0">
+                        <button
+                          onClick={() => openEdit(h)}
+                          className="p-2 rounded-lg bg-blue-50 text-blue-500 hover:bg-blue-100 transition-colors"
+                          title="Editar haver"
+                        >
+                          <Pencil className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          onClick={() => setDeletingHaver(h)}
+                          className="p-2 rounded-lg bg-red-50 text-red-400 hover:bg-red-100 transition-colors"
+                          title="Excluir haver"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
           {/* Histórico de compras */}
           <div>
             <div className="flex items-center gap-2 mb-3">
@@ -227,7 +332,6 @@ export default function ClienteDetalhePage({ onNavigate }: Props) {
 
                 return (
                   <div key={v.id} className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
-                    {/* Cabeçalho da venda */}
                     <button
                       onClick={() => setExpandedVenda(expanded ? null : v.id)}
                       className="w-full flex items-center gap-3 px-4 py-3 text-left"
@@ -250,7 +354,6 @@ export default function ClienteDetalhePage({ onNavigate }: Props) {
                       {expanded ? <ChevronUp className="w-4 h-4 text-slate-400 shrink-0" /> : <ChevronDown className="w-4 h-4 text-slate-400 shrink-0" />}
                     </button>
 
-                    {/* Itens expandidos */}
                     {expanded && (
                       <div className="border-t border-slate-100 px-4 py-3 bg-slate-50">
                         <div className="space-y-2 mb-3">
@@ -276,9 +379,7 @@ export default function ClienteDetalhePage({ onNavigate }: Props) {
                           </button>
                           {v.asaas_invoice_url && (
                             <a
-                              href={v.asaas_invoice_url}
-                              target="_blank"
-                              rel="noopener noreferrer"
+                              href={v.asaas_invoice_url} target="_blank" rel="noopener noreferrer"
                               className="flex items-center gap-1.5 text-xs font-bold text-blue-600 bg-blue-50 px-3 py-2 rounded-lg"
                             >
                               <span className="material-symbols-outlined text-sm">open_in_new</span> Link de Pagamento
@@ -295,13 +396,107 @@ export default function ClienteDetalhePage({ onNavigate }: Props) {
         </main>
       </div>
 
-      {/* ── Área de Impressão ── */}
+      {/* Modal Editar Haver */}
+      {editHaver && (
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-end sm:items-center justify-center p-4 no-print">
+          <div className="bg-white rounded-2xl w-full max-w-sm p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="font-bold text-base text-slate-800">Editar Haver</h2>
+              <button onClick={() => setEditHaver(null)} className="text-slate-400 hover:text-slate-600">
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm font-medium text-slate-600 block mb-1">Descrição</label>
+                <input
+                  type="text"
+                  className="w-full h-11 px-3 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500"
+                  value={editForm.descricao}
+                  onChange={e => setEditForm(f => ({ ...f, descricao: e.target.value }))}
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-slate-600 block mb-1">Saldo disponível (R$)</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  className="w-full h-11 px-3 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500"
+                  value={editForm.saldo_restante}
+                  onChange={e => setEditForm(f => ({ ...f, saldo_restante: e.target.value }))}
+                />
+                <p className="text-xs text-slate-400 mt-1">Valor original: {fmtBRL(parseFloat(editHaver.valor))}</p>
+              </div>
+
+              {editErro && <p className="text-red-500 text-sm">{editErro}</p>}
+
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setEditHaver(null)}
+                  className="flex-1 h-11 border border-slate-200 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-50"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleSalvarEdit}
+                  disabled={editLoading}
+                  className="flex-1 h-11 bg-blue-600 text-white rounded-xl text-sm font-bold disabled:opacity-60 flex items-center justify-center gap-2 hover:bg-blue-700"
+                >
+                  {editLoading
+                    ? <span className="material-symbols-outlined animate-spin text-lg">refresh</span>
+                    : <><span className="material-symbols-outlined text-lg">save</span>Salvar</>
+                  }
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Confirmar Exclusão */}
+      {deletingHaver && (
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-end sm:items-center justify-center p-4 no-print">
+          <div className="bg-white rounded-2xl w-full max-w-sm p-6">
+            <div className="flex flex-col items-center text-center gap-3 mb-5">
+              <div className="w-14 h-14 rounded-full bg-red-100 flex items-center justify-center">
+                <Trash2 className="w-6 h-6 text-red-500" />
+              </div>
+              <h2 className="font-bold text-base text-slate-800">Excluir Haver?</h2>
+              <p className="text-sm text-slate-500">
+                Tem certeza que quer excluir o haver <strong>"{deletingHaver.descricao}"</strong> de{" "}
+                <strong>{fmtBRL(parseFloat(deletingHaver.saldo_restante))}</strong>?
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setDeletingHaver(null)}
+                className="flex-1 h-11 border border-slate-200 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-50"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleExcluir}
+                disabled={deleteLoading}
+                className="flex-1 h-11 bg-red-500 text-white rounded-xl text-sm font-bold disabled:opacity-60 flex items-center justify-center gap-2 hover:bg-red-600"
+              >
+                {deleteLoading
+                  ? <span className="material-symbols-outlined animate-spin text-lg">refresh</span>
+                  : <><Trash2 className="w-4 h-4" />Excluir</>
+                }
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Área de Impressão */}
       <div className="print-area" style={{ display: "none" }}>
         {printingVenda ? (
-          /* Imprimir nota individual */
           <div style={{ fontFamily: "monospace", fontSize: 12, padding: 8, width: "80mm" }}>
             <div style={{ textAlign: "center", marginBottom: 8 }}>
-              <p style={{ fontWeight: "bold", fontSize: 14 }}>FLOR DE LIZ</p>
+              <p style={{ fontWeight: "bold", fontSize: 14 }}>{localStorage.getItem("auth_loja_nome") || "LOJA"}</p>
               <p>Nota de Venda #{printingVenda.id}</p>
               <p>{fmtDate(printingVenda.created_at)}</p>
               <p>{"─".repeat(32)}</p>
@@ -325,10 +520,9 @@ export default function ClienteDetalhePage({ onNavigate }: Props) {
             <p style={{ textAlign: "center", marginTop: 12, fontSize: 10 }}>Obrigada pela preferência! ♥</p>
           </div>
         ) : (
-          /* Imprimir histórico completo */
           <div style={{ fontFamily: "monospace", fontSize: 11, padding: 8, width: "80mm" }}>
             <div style={{ textAlign: "center", marginBottom: 8 }}>
-              <p style={{ fontWeight: "bold", fontSize: 14 }}>FLOR DE LIZ</p>
+              <p style={{ fontWeight: "bold", fontSize: 14 }}>{localStorage.getItem("auth_loja_nome") || "LOJA"}</p>
               <p style={{ fontWeight: "bold" }}>Histórico — {cliente.nome}</p>
               {cliente.cpf && <p>CPF: {cliente.cpf}</p>}
               {(cliente.whatsapp || cliente.telefone) && <p>Tel: {cliente.whatsapp || cliente.telefone}</p>}
@@ -339,6 +533,7 @@ export default function ClienteDetalhePage({ onNavigate }: Props) {
               <p>Total de compras: {stats.totalVendas}</p>
               <p>Total pago: {fmtBRL(stats.totalGasto)}</p>
               {stats.totalEmAberto > 0 && <p><b>Em aberto: {fmtBRL(stats.totalEmAberto)}</b></p>}
+              {saldoHaver > 0 && <p>Haver disponível: {fmtBRL(saldoHaver)}</p>}
             </div>
             <p>{"─".repeat(32)}</p>
             {vendas.map(v => (
