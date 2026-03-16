@@ -33,8 +33,8 @@ export default function HomePage({ onNavigate }: HomePageProps) {
 
   useEffect(() => {
     apiFetch(`/dashboard`)
-      .then(r => r.json())
-      .then(setData)
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d && d.vendasHoje) setData(d); })
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
@@ -70,9 +70,9 @@ export default function HomePage({ onNavigate }: HomePageProps) {
               <><div className={`h-7 w-24 mb-1 ${skeletonCls}`} /><div className={`h-3 w-20 ${skeletonCls}`} /></>
             ) : (
               <>
-                <p className="text-2xl font-bold text-slate-800">{fmtBRL(data?.vendasHoje.soma ?? 0)}</p>
+                <p className="text-2xl font-bold text-slate-800">{fmtBRL(data?.vendasHoje?.soma ?? 0)}</p>
                 <p className="text-xs text-emerald-600 font-medium mt-1">
-                  {data?.vendasHoje.qtd ?? 0} {data?.vendasHoje.qtd === 1 ? "venda realizada" : "vendas realizadas"}
+                  {data?.vendasHoje?.qtd ?? 0} {data?.vendasHoje?.qtd === 1 ? "venda realizada" : "vendas realizadas"}
                 </p>
               </>
             )}
@@ -87,9 +87,9 @@ export default function HomePage({ onNavigate }: HomePageProps) {
               <><div className={`h-7 w-24 mb-1 ${skeletonCls}`} /><div className={`h-3 w-20 ${skeletonCls}`} /></>
             ) : (
               <>
-                <p className="text-2xl font-bold text-slate-800">{fmtBRL(data?.fiadosAbertos.soma ?? 0)}</p>
-                <p className={`text-xs font-medium mt-1 ${(data?.fiadosAbertos.clientes ?? 0) > 0 ? "text-orange-500" : "text-slate-400"}`}>
-                  {data?.fiadosAbertos.clientes ?? 0} {data?.fiadosAbertos.clientes === 1 ? "cliente devendo" : "clientes devendo"}
+                <p className="text-2xl font-bold text-slate-800">{fmtBRL(data?.fiadosAbertos?.soma ?? 0)}</p>
+                <p className={`text-xs font-medium mt-1 ${(data?.fiadosAbertos?.clientes ?? 0) > 0 ? "text-orange-500" : "text-slate-400"}`}>
+                  {data?.fiadosAbertos?.clientes ?? 0} {data?.fiadosAbertos?.clientes === 1 ? "cliente devendo" : "clientes devendo"}
                 </p>
               </>
             )}
