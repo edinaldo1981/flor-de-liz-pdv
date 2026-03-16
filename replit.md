@@ -143,6 +143,16 @@ git add -A && git commit -m "SaaS build"
 
 Servidor de produção: `node artifacts/api-server/dist/index.cjs`
 
+### ⚠️ Aviso sobre migrações de banco
+
+O Replit compara o **banco de dev** com o **banco de produção** para gerar migrations automáticas. Como o `init.ts` adiciona colunas SaaS (`loja_id`, tabela `lojas`, etc.) no banco de dev em cada startup, haverá sempre diferença entre dev e prod após o primeiro deploy.
+
+**Se o deploy travar em "Migrations failed validation":**
+- Selecionar **"Copy your development database schema & data to production"**
+- Isso copia o banco de dev (correto) para produção — é seguro porque o `init.ts` garante que a estrutura sempre esteja atualizada em dev
+
+**Estrutura de tabelas gerenciada por**: `artifacts/api-server/src/db/init.ts` (não pelo Drizzle schema)
+
 ---
 
 ## Variáveis de Ambiente
