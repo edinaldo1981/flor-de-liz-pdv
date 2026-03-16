@@ -57,4 +57,28 @@ router.post("/auth/config", async (req, res) => {
   }
 });
 
+router.get("/config/pix", async (_req, res) => {
+  try {
+    const r = await pool.query("SELECT value FROM config WHERE key = 'pix_key'");
+    res.json({ pixKey: r.rows.length > 0 ? r.rows[0].value : "" });
+  } catch {
+    res.status(500).json({ error: "Erro ao buscar chave PIX" });
+  }
+});
+
+router.post("/config/pix", async (req, res) => {
+  const { pixKey } = req.body;
+  if (pixKey === undefined) return res.status(400).json({ error: "Informe pixKey" });
+  try {
+    await pool.query(
+      `INSERT INTO config (key, value) VALUES ('pix_key', $1)
+       ON CONFLICT (key) DO UPDATE SET value = $1`,
+      [String(pixKey)]
+    );
+    res.json({ ok: true });
+  } catch {
+    res.status(500).json({ error: "Erro ao salvar chave PIX" });
+  }
+});
+
 export default router;

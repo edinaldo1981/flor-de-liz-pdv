@@ -26,6 +26,42 @@ export default function ProfilePage({ onNavigate, role = "admin", onLogout }: Pr
   const [syncing, setSyncing] = useState(false);
   const [syncMsg, setSyncMsg] = useState<{ ok: boolean; text: string } | null>(null);
 
+  const [pixKey, setPixKey] = useState("");
+  const [pixTemp, setPixTemp] = useState("");
+  const [editandoPix, setEditandoPix] = useState(false);
+  const [savingPix, setSavingPix] = useState(false);
+  const [pixMsg, setPixMsg] = useState<{ ok: boolean; text: string } | null>(null);
+
+  useEffect(() => {
+    fetch(`${API_BASE}/config/pix`)
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d?.pixKey) { setPixKey(d.pixKey); setPixTemp(d.pixKey); } })
+      .catch(() => {});
+  }, []);
+
+  const salvarPix = async () => {
+    setSavingPix(true);
+    setPixMsg(null);
+    try {
+      const r = await fetch(`${API_BASE}/config/pix`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pixKey: pixTemp.trim() }),
+      });
+      if (r.ok) {
+        setPixKey(pixTemp.trim());
+        setPixMsg({ ok: true, text: "Chave PIX salva!" });
+        setEditandoPix(false);
+      } else {
+        setPixMsg({ ok: false, text: "Erro ao salvar." });
+      }
+    } catch {
+      setPixMsg({ ok: false, text: "Erro de conexão." });
+    } finally {
+      setSavingPix(false);
+    }
+  };
+
   useEffect(() => {
     fetch(`${API_BASE}/sheets/status`)
       .then(r => r.ok ? r.json() : null)
@@ -237,6 +273,70 @@ export default function ProfilePage({ onNavigate, role = "admin", onLogout }: Pr
             </div>
             <ChevronRight className="w-4 h-4 text-slate-400 shrink-0" />
           </button>
+        )}
+
+        {/* Chave PIX — apenas admin */}
+        {role === "admin" && (
+          <div className="bg-white rounded-2xl border border-blue-100 shadow-sm overflow-hidden">
+            <div className="flex items-center gap-3 px-4 py-3 bg-blue-50 border-b border-blue-100">
+              <div className="w-9 h-9 rounded-xl bg-white flex items-center justify-center shadow-sm shrink-0">
+                <span className="material-symbols-outlined text-blue-600 text-xl">qr_code</span>
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-bold text-blue-800">Chave PIX para Pagamento</p>
+                <p className="text-[11px] text-blue-600">Exibida no portal do cliente</p>
+              </div>
+            </div>
+            <div className="px-4 py-3 space-y-2.5">
+              {pixMsg && (
+                <div className={`flex items-center gap-2 text-xs font-medium px-3 py-2 rounded-lg ${pixMsg.ok ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-red-600"}`}>
+                  <span className="material-symbols-outlined text-base">{pixMsg.ok ? "check_circle" : "error"}</span>
+                  {pixMsg.text}
+                </div>
+              )}
+              {editandoPix ? (
+                <>
+                  <input
+                    className="w-full border border-slate-200 rounded-xl h-11 px-3 text-sm outline-none focus:ring-2 focus:ring-blue-500/30"
+                    placeholder="CPF, telefone, e-mail ou chave aleatória"
+                    value={pixTemp}
+                    onChange={e => setPixTemp(e.target.value)}
+                  />
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => { setEditandoPix(false); setPixTemp(pixKey); }}
+                      className="flex-1 py-2.5 rounded-xl border border-slate-200 text-slate-600 text-sm font-semibold"
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      onClick={salvarPix}
+                      disabled={savingPix}
+                      className="flex-1 py-2.5 rounded-xl bg-blue-600 text-white text-sm font-bold disabled:opacity-60"
+                    >
+                      {savingPix ? "Salvando..." : "Salvar"}
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  {pixKey ? (
+                    <div className="bg-slate-50 rounded-xl px-3 py-2.5 flex items-center gap-2">
+                      <span className="flex-1 text-sm font-mono text-slate-700 break-all">{pixKey}</span>
+                    </div>
+                  ) : (
+                    <p className="text-xs text-slate-400 text-center py-1">Nenhuma chave configurada</p>
+                  )}
+                  <button
+                    onClick={() => { setEditandoPix(true); setPixMsg(null); }}
+                    className="w-full py-2.5 rounded-xl border border-blue-200 text-blue-600 font-bold text-sm bg-blue-50"
+                  >
+                    {pixKey ? "Alterar Chave PIX" : "Configurar Chave PIX"}
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
         )}
 
         {/* Google Sheets Backup */}

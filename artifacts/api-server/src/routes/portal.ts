@@ -70,6 +70,15 @@ router.get("/portal/cliente", async (req, res) => {
     );
     const saldoHaver = parseFloat(haveresResult.rows[0].total);
 
+    const haveresListResult = await pool.query(
+      `SELECT id, valor, saldo_restante, descricao, created_at
+       FROM haveres WHERE cliente_id = $1 ORDER BY created_at DESC`,
+      [cliente.id]
+    );
+
+    const pixResult = await pool.query("SELECT value FROM config WHERE key = 'pix_key'");
+    const pixKey = pixResult.rows.length > 0 ? pixResult.rows[0].value : null;
+
     res.json({
       cliente: {
         nome: cliente.nome,
@@ -81,6 +90,8 @@ router.get("/portal/cliente", async (req, res) => {
       historico: historico.slice(0, 10),
       totalEmAberto: abertas.reduce((acc, v) => acc + Math.max(0, parseFloat(v.total) - parseFloat(v.valor_pago || 0)), 0),
       saldoHaver,
+      haveres: haveresListResult.rows,
+      pixKey,
     });
   } catch (err) {
     console.error("[Portal] Erro:", err);
