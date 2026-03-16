@@ -248,9 +248,10 @@ export default function App() {
         <LoginPage onLogin={handleLogin} />
         <button
           onClick={() => setShowSuperAdmin(true)}
-          className="fixed bottom-4 right-4 text-[10px] text-slate-300/40 hover:text-slate-400 transition-colors"
+          className="fixed bottom-5 right-5 w-9 h-9 rounded-full bg-slate-200/60 hover:bg-slate-300/80 flex items-center justify-center transition-colors"
+          title="Super Admin"
         >
-          admin
+          <span className="material-symbols-outlined text-slate-500 text-lg">admin_panel_settings</span>
         </button>
       </div>
     );
