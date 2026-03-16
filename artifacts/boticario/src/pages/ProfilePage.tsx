@@ -14,7 +14,7 @@ const fmtBRL = (v: number) =>
 
 export default function ProfilePage({ onNavigate, role = "admin", onLogout }: ProfilePageProps) {
   const [nome, setNome] = useState(() => localStorage.getItem("perfil_nome") || "Minha Loja");
-  const [cargo, setCargo] = useState(() => localStorage.getItem("perfil_cargo") || "Revendedora • Flor de Liz");
+  const [cargo, setCargo] = useState(() => localStorage.getItem("perfil_cargo") || ("Revendedora • " + (localStorage.getItem("auth_loja_nome") || "Minha Loja")));
   const [editando, setEditando] = useState(false);
   const [nomeTemp, setNomeTemp] = useState(nome);
   const [cargoTemp, setCargoTemp] = useState(cargo);
@@ -106,7 +106,7 @@ export default function ProfilePage({ onNavigate, role = "admin", onLogout }: Pr
 
   const salvarPerfil = () => {
     const n = nomeTemp.trim() || "Minha Loja";
-    const c = cargoTemp.trim() || "Revendedora • Flor de Liz";
+    const c = cargoTemp.trim() || ("Revendedora • " + (localStorage.getItem("auth_loja_nome") || "Minha Loja"));
     setNome(n);
     setCargo(c);
     localStorage.setItem("perfil_nome", n);

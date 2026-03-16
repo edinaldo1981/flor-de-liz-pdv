@@ -175,7 +175,7 @@ export default function SuperAdminPage({ onExit }: { onExit: () => void }) {
           </div>
           <div>
             <h1 className="font-bold text-base">Super Admin</h1>
-            <p className="text-xs text-slate-400">Plataforma Flor de Liz</p>
+            <p className="text-xs text-slate-400">Plataforma Anota Fácil</p>
           </div>
         </div>
         <div className="flex items-center gap-2">

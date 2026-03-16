@@ -4,6 +4,7 @@ import { ShoppingBag, TrendingUp, AlertCircle, Users } from "lucide-react";
 
 interface HomePageProps {
   onNavigate: (page: string) => void;
+  lojaNome?: string;
 }
 
 const fmtBRL = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -27,7 +28,8 @@ interface DashboardData {
   topFiados: { nome: string; em_aberto: number; dias: number }[];
 }
 
-export default function HomePage({ onNavigate }: HomePageProps) {
+export default function HomePage({ onNavigate, lojaNome }: HomePageProps) {
+  const nomeLoja = lojaNome || localStorage.getItem("auth_loja_nome") || "Minha Loja";
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -47,7 +49,7 @@ export default function HomePage({ onNavigate }: HomePageProps) {
         <div className="flex items-center justify-between mb-1">
           <div>
             <p className="text-white/70 text-xs font-medium">Bem-vinda de volta,</p>
-            <h1 className="text-white text-xl font-bold">Flor de Liz</h1>
+            <h1 className="text-white text-xl font-bold">{nomeLoja}</h1>
           </div>
           <button onClick={() => onNavigate("profile")} className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center border border-white/30">
             <span className="material-symbols-outlined text-white">person</span>

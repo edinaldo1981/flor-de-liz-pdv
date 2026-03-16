@@ -33,26 +33,28 @@ router.post("/auth/login", async (req, res) => {
   try {
     let lojaId = 1;
     let lojaSlug = "flordeliz";
+    let lojaNome = "Minha Loja";
     if (slug) {
-      const lr = await pool.query("SELECT id, slug FROM lojas WHERE slug = $1 AND status = 'ativo'", [slug]);
+      const lr = await pool.query("SELECT id, slug, nome FROM lojas WHERE slug = $1 AND status = 'ativo'", [slug]);
       if (lr.rows.length === 0) return res.status(404).json({ error: "Loja não encontrada ou inativa" });
       lojaId = lr.rows[0].id;
       lojaSlug = lr.rows[0].slug;
+      lojaNome = lr.rows[0].nome;
     }
     const r = await pool.query("SELECT value FROM config WHERE key = 'auth_config' AND loja_id = $1", [lojaId]);
     if (r.rows.length === 0) {
       const token = signToken({ lojaId, lojaSlug, role: "admin", permissions: null });
-      return res.json({ role: "admin", permissions: null, token });
+      return res.json({ role: "admin", permissions: null, token, lojaNome });
     }
     const cfg = JSON.parse(r.rows[0].value);
     if (cfg.admin_password && password === cfg.admin_password) {
       const token = signToken({ lojaId, lojaSlug, role: "admin", permissions: null });
-      return res.json({ role: "admin", permissions: null, token });
+      return res.json({ role: "admin", permissions: null, token, lojaNome });
     }
     if (cfg.colaborador_password && password === cfg.colaborador_password) {
       const perms = cfg.colaborador_permissions || {};
       const token = signToken({ lojaId, lojaSlug, role: "colaborador", permissions: perms });
-      return res.json({ role: "colaborador", permissions: perms, token });
+      return res.json({ role: "colaborador", permissions: perms, token, lojaNome });
     }
     return res.status(401).json({ error: "Senha incorreta" });
   } catch {

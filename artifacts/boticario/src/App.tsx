@@ -47,9 +47,9 @@ function can(role: Role, permissions: Permissions | null, key: string): boolean 
   return permissions[key] !== false;
 }
 
-function Sidebar({ current, onNavigate, role, permissions, onLogout }: {
+function Sidebar({ current, onNavigate, role, permissions, onLogout, lojaNome }: {
   current: Page; onNavigate: (p: Page) => void;
-  role: Role; permissions: Permissions | null; onLogout: () => void;
+  role: Role; permissions: Permissions | null; onLogout: () => void; lojaNome: string;
 }) {
   const activePage = pageParentMap[current] ?? current;
   const [vendasHoje, setVendasHoje] = useState<number | null>(null);
@@ -80,7 +80,7 @@ function Sidebar({ current, onNavigate, role, permissions, onLogout }: {
             <span className="material-symbols-outlined text-white text-xl">spa</span>
           </div>
           <div>
-            <h1 className="text-base font-bold text-slate-800 leading-tight">Flor de Liz</h1>
+            <h1 className="text-base font-bold text-slate-800 leading-tight">{lojaNome}</h1>
             <p className="text-[10px] text-slate-400 font-medium">Gestão de Vendas</p>
           </div>
         </div>
@@ -180,29 +180,34 @@ export default function App() {
   const [page, setPage] = useState<Page>("home");
   const [role, setRole] = useState<Role | null>(null);
   const [permissions, setPermissions] = useState<Permissions | null>(null);
+  const [lojaNome, setLojaNome] = useState<string>(() => localStorage.getItem("auth_loja_nome") || "Minha Loja");
   const [authChecking, setAuthChecking] = useState(true);
   const [showSuperAdmin, setShowSuperAdmin] = useState(false);
 
   useEffect(() => {
     const savedRole = localStorage.getItem("auth_role") as Role | null;
     const savedPerms = localStorage.getItem("auth_permissions");
+    const savedNome = localStorage.getItem("auth_loja_nome");
     const token = getToken();
     if (savedRole && token) {
       setRole(savedRole);
       setPermissions(savedPerms ? JSON.parse(savedPerms) : null);
+      if (savedNome) setLojaNome(savedNome);
     }
     setAuthChecking(false);
   }, []);
 
-  const handleLogin = (r: Role, p: Permissions | null) => {
+  const handleLogin = (r: Role, p: Permissions | null, nome: string) => {
     setRole(r);
     setPermissions(p);
+    setLojaNome(nome);
   };
 
   const handleLogout = () => {
     clearToken();
     setRole(null);
     setPermissions(null);
+    setLojaNome("Minha Loja");
     setPage("home");
   };
 
@@ -251,15 +256,16 @@ export default function App() {
     );
   }
 
+
   const canEditVendas = can(role, permissions, "editar_excluir_vendas");
   const canImportar = can(role, permissions, "importar_vendas");
   const canRegistrarHaver = can(role, permissions, "registrar_haver");
 
   return (
     <div className="flex min-h-screen">
-      <Sidebar current={page} onNavigate={p => setPage(p)} role={role} permissions={permissions} onLogout={handleLogout} />
+      <Sidebar current={page} onNavigate={p => setPage(p)} role={role} permissions={permissions} onLogout={handleLogout} lojaNome={lojaNome} />
       <div className="flex-1 min-h-screen relative max-w-md mx-auto lg:max-w-none lg:mx-0">
-        {page === "home" && <HomePage onNavigate={onNavigate} />}
+        {page === "home" && <HomePage onNavigate={onNavigate} lojaNome={lojaNome} />}
         {page === "perfumaria" && <PerfumariaPage onNavigate={onNavigate} />}
         {page === "produto" && <ProdutoPage onNavigate={onNavigate} />}
         {page === "carrinho" && <CarrinhoPage onNavigate={onNavigate} />}
