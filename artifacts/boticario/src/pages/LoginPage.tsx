@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { setToken } from "@/lib/api";
 
 interface LoginPageProps {
   onLogin: (role: "admin" | "colaborador", permissions: Record<string, boolean> | null) => void;
@@ -7,6 +8,7 @@ interface LoginPageProps {
 const API_BASE = "/api";
 
 export default function LoginPage({ onLogin }: LoginPageProps) {
+  const [slug, setSlug] = useState(() => localStorage.getItem("auth_slug") || "");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState("");
@@ -14,10 +16,12 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
   const [checking, setChecking] = useState(true);
 
   useEffect(() => {
-    fetch(`${API_BASE}/auth/config`)
+    const slugToCheck = slug || "flordeliz";
+    fetch(`${API_BASE}/auth/config?slug=${encodeURIComponent(slugToCheck)}`)
       .then(r => r.json())
       .then(d => {
         if (!d.configured) {
+          const fakeToken = "";
           onLogin("admin", null);
         }
       })
@@ -30,15 +34,18 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
     setLoading(true);
     setErro("");
     try {
+      const lojaSlug = slug.trim() || "flordeliz";
       const r = await fetch(`${API_BASE}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password }),
+        body: JSON.stringify({ password, slug: lojaSlug }),
       });
       const data = await r.json();
       if (!r.ok) { setErro(data.error || "Senha incorreta"); return; }
+      if (data.token) setToken(data.token);
       localStorage.setItem("auth_role", data.role);
       localStorage.setItem("auth_permissions", JSON.stringify(data.permissions || {}));
+      localStorage.setItem("auth_slug", lojaSlug);
       onLogin(data.role, data.permissions);
     } catch {
       setErro("Erro de conexão. Tente novamente.");
@@ -58,8 +65,6 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
   return (
     <div className="min-h-screen bg-[#f6f7f7] flex flex-col items-center justify-center px-6">
       <div className="w-full max-w-sm">
-
-        {/* Logo */}
         <div className="flex flex-col items-center mb-10">
           <div className="w-20 h-20 rounded-3xl bg-[#4d8063] flex items-center justify-center shadow-xl mb-4">
             <span className="material-symbols-outlined text-white text-4xl">spa</span>
@@ -68,10 +73,23 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
           <p className="text-slate-500 text-sm mt-1">Gestão de Vendas</p>
         </div>
 
-        {/* Card */}
         <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
           <h2 className="text-base font-bold text-slate-700 mb-1">Bem-vinda de volta!</h2>
           <p className="text-sm text-slate-400 mb-5">Digite sua senha para acessar o app</p>
+
+          <div className="mb-4">
+            <label className="text-sm font-medium text-slate-600 block mb-1.5">Loja (slug)</label>
+            <div className="relative">
+              <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xl">store</span>
+              <input
+                type="text"
+                className="w-full h-12 pl-10 pr-4 border border-slate-200 rounded-xl text-base outline-none focus:ring-2 focus:ring-[#4d8063]/30 focus:border-[#4d8063]"
+                placeholder="flordeliz"
+                value={slug}
+                onChange={e => { setSlug(e.target.value.toLowerCase().replace(/\s/g, "")); setErro(""); }}
+              />
+            </div>
+          </div>
 
           <div className="mb-4">
             <label className="text-sm font-medium text-slate-600 block mb-1.5">Senha</label>

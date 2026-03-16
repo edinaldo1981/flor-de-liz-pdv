@@ -1,11 +1,11 @@
 import { ArrowLeft, Check, Copy, ExternalLink, Plus } from "lucide-react";
+import { apiFetch } from "@/lib/api";
 import { useEffect, useState } from "react";
 
 interface CobrancaPageProps {
   onNavigate: (page: string) => void;
 }
 
-const API_BASE = "/api";
 
 interface Venda {
   id: number;
@@ -64,7 +64,7 @@ export default function CobrancaPage({ onNavigate }: CobrancaPageProps) {
 
   const fetchHaveres = async (clienteId: number) => {
     try {
-      const resp = await fetch(`${API_BASE}/clientes/${clienteId}/haveres`);
+      const resp = await apiFetch(`/clientes/${clienteId}/haveres`);
       if (resp.ok) {
         const data = await resp.json();
         setHaveres(data.haveres);
@@ -105,7 +105,7 @@ export default function CobrancaPage({ onNavigate }: CobrancaPageProps) {
     setDandoBaixa(true);
     setErro("");
     try {
-      const resp = await fetch(`${API_BASE}/vendas/${venda.id}/baixa`, {
+      const resp = await apiFetch(`/vendas/${venda.id}/baixa`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ valor_pago: valor }),
@@ -132,7 +132,7 @@ export default function CobrancaPage({ onNavigate }: CobrancaPageProps) {
     setAplicandoHaver(true);
     setErro("");
     try {
-      const resp = await fetch(`${API_BASE}/vendas/${venda.id}/aplicar-haver`, {
+      const resp = await apiFetch(`/vendas/${venda.id}/aplicar-haver`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ valor }),
@@ -158,7 +158,7 @@ export default function CobrancaPage({ onNavigate }: CobrancaPageProps) {
     if (isNaN(valor) || valor <= 0) return;
     setSalvandoHaver(true);
     try {
-      const resp = await fetch(`${API_BASE}/clientes/${venda.cliente_id}/haveres`, {
+      const resp = await apiFetch(`/clientes/${venda.cliente_id}/haveres`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ valor, descricao: novoHaverDesc || "Haver registrado" }),

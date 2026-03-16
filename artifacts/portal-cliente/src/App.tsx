@@ -1,6 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const API_BASE = "/api";
+
+function getLojaSlug(): string {
+  const params = new URLSearchParams(window.location.search);
+  return params.get("loja") || "flordeliz";
+}
 
 interface Haver {
   id: number;
@@ -73,7 +78,8 @@ function LoginScreen({ onLogin }: { onLogin: (data: ClienteData) => void }) {
     setLoading(true);
     setErro("");
     try {
-      const params = new URLSearchParams({ [tipo]: valor });
+      const lojaSlug = getLojaSlug();
+      const params = new URLSearchParams({ [tipo]: valor, loja: lojaSlug });
       const resp = await fetch(`${API_BASE}/portal/cliente?${params}`);
       if (resp.status === 404) { setErro("Cliente não encontrado. Verifique os dados e tente novamente."); return; }
       if (!resp.ok) throw new Error();

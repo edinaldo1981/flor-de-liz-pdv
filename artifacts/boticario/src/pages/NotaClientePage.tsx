@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
+import { apiFetch } from "@/lib/api";
 import { ArrowLeft, Check, Plus, Trash2, Pencil, X } from "lucide-react";
 
 interface NotaClientePageProps {
   onNavigate: (page: string) => void;
 }
 
-const API_BASE = "/api";
 
 interface Item {
   nome_produto: string;
@@ -88,7 +88,7 @@ export default function NotaClientePage({ onNavigate }: NotaClientePageProps) {
     if (!raw) return;
     const { cliente_id } = JSON.parse(raw);
     setLoading(true);
-    fetch(`${API_BASE}/clientes/${cliente_id}/historico`)
+    apiFetch(`/clientes/${cliente_id}/historico`)
       .then(r => r.json())
       .then(data => {
         setCliente(data.cliente);
@@ -101,7 +101,7 @@ export default function NotaClientePage({ onNavigate }: NotaClientePageProps) {
 
   const fetchHaveres = async (clienteId: number) => {
     try {
-      const r = await fetch(`${API_BASE}/clientes/${clienteId}/haveres`);
+      const r = await apiFetch(`/clientes/${clienteId}/haveres`);
       if (r.ok) {
         const d = await r.json();
         setHaveres(d.haveres);
@@ -118,7 +118,7 @@ export default function NotaClientePage({ onNavigate }: NotaClientePageProps) {
     setPagando(true);
     setErro("");
     try {
-      const r = await fetch(`${API_BASE}/vendas/${v.id}/baixa`, {
+      const r = await apiFetch(`/vendas/${v.id}/baixa`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ valor_pago: valor }),
@@ -147,7 +147,7 @@ export default function NotaClientePage({ onNavigate }: NotaClientePageProps) {
     setAplicandoHaver(true);
     setErro("");
     try {
-      const r = await fetch(`${API_BASE}/vendas/${v.id}/aplicar-haver`, {
+      const r = await apiFetch(`/vendas/${v.id}/aplicar-haver`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ valor }),
@@ -173,7 +173,7 @@ export default function NotaClientePage({ onNavigate }: NotaClientePageProps) {
     if (isNaN(valor) || valor <= 0 || !cliente) return;
     setSalvandoHaver(true);
     try {
-      const r = await fetch(`${API_BASE}/clientes/${cliente.id}/haveres`, {
+      const r = await apiFetch(`/clientes/${cliente.id}/haveres`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ valor, descricao: novoHaverDesc || "Haver registrado" }),
@@ -196,7 +196,7 @@ export default function NotaClientePage({ onNavigate }: NotaClientePageProps) {
     setSalvandoEdit(true);
     setErro("");
     try {
-      const r = await fetch(`${API_BASE}/vendas/${v.id}`, {
+      const r = await apiFetch(`/vendas/${v.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ total: novoTotal }),
@@ -216,7 +216,7 @@ export default function NotaClientePage({ onNavigate }: NotaClientePageProps) {
   const handleExcluir = async (id: number) => {
     setExcluindoId(id);
     try {
-      const r = await fetch(`${API_BASE}/vendas/${id}`, { method: "DELETE" });
+      const r = await apiFetch(`/vendas/${id}`, { method: "DELETE" });
       if (!r.ok) throw new Error();
       setVendas(prev => prev.filter(x => x.id !== id));
       setConfirmDelete(null);

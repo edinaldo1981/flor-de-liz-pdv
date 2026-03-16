@@ -1,4 +1,5 @@
 import { ArrowLeft, Trash2, Plus, Minus, Search, AlertCircle, Package, ShoppingCart } from "lucide-react";
+import { apiFetch } from "@/lib/api";
 import { useState, useEffect, useRef } from "react";
 
 interface CarrinhoPageProps {
@@ -36,7 +37,6 @@ const formasPagamento = [
   { key: "a_prazo", icon: "receipt_long", label: "A Prazo" },
 ];
 
-const API_BASE = "/api";
 
 function loadCartFromStorage(): CartItem[] {
   try {
@@ -91,7 +91,7 @@ export default function CarrinhoPage({ onNavigate }: CarrinhoPageProps) {
 
   const fetchProdutos = async () => {
     try {
-      const r = await fetch(`${API_BASE}/produtos`);
+      const r = await apiFetch(`/produtos`);
       if (r.ok) setProdutos(await r.json());
     } catch { /* ignore */ }
   };
@@ -99,8 +99,8 @@ export default function CarrinhoPage({ onNavigate }: CarrinhoPageProps) {
   const fetchClientes = async (q: string) => {
     setLoadingClientes(true);
     try {
-      const url = q ? `${API_BASE}/clientes?q=${encodeURIComponent(q)}` : `${API_BASE}/clientes`;
-      const r = await fetch(url);
+      const url = q ? `/clientes?q=${encodeURIComponent(q)}` : `/clientes`;
+      const r = await apiFetch(url);
       if (r.ok) setClientes(await r.json());
     } catch { /* ignore */ } finally { setLoadingClientes(false); }
   };
@@ -123,7 +123,7 @@ export default function CarrinhoPage({ onNavigate }: CarrinhoPageProps) {
     setSubmitting(true);
     setErro("");
     try {
-      const resp = await fetch(`${API_BASE}/vendas`, {
+      const resp = await apiFetch(`/vendas`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

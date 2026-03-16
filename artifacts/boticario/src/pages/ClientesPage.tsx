@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { apiFetch } from "@/lib/api";
 import { Search, Pencil, Trash2, Users } from "lucide-react";
 
 interface ClientesPageProps {
@@ -15,7 +16,6 @@ interface Cliente {
   fiados_abertos: number;
 }
 
-const API_BASE = "/api";
 
 export default function ClientesPage({ onNavigate }: ClientesPageProps) {
   const [clientes, setClientes] = useState<Cliente[]>([]);
@@ -31,8 +31,8 @@ export default function ClientesPage({ onNavigate }: ClientesPageProps) {
   const fetchClientes = async (q = "") => {
     setLoading(true);
     try {
-      const url = q ? `${API_BASE}/clientes?q=${encodeURIComponent(q)}` : `${API_BASE}/clientes`;
-      const res = await fetch(url);
+      const url = q ? `/clientes?q=${encodeURIComponent(q)}` : `/clientes`;
+      const res = await apiFetch(url);
       if (res.ok) {
         const data = await res.json();
         if (Array.isArray(data)) setClientes(data);
@@ -60,7 +60,7 @@ export default function ClientesPage({ onNavigate }: ClientesPageProps) {
   const handleDeletar = async (c: Cliente) => {
     setDeletando(c.id);
     try {
-      const res = await fetch(`${API_BASE}/clientes/${c.id}`, { method: "DELETE" });
+      const res = await apiFetch(`/clientes/${c.id}`, { method: "DELETE" });
       if (res.ok) {
         setClientes(prev => prev.filter(cl => cl.id !== c.id));
       }

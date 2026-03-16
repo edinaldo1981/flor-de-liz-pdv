@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { apiFetch } from "@/lib/api";
 import { ArrowLeft, Plus, Trash2, ChevronDown, CheckCircle, AlertCircle } from "lucide-react";
 
 interface Props {
@@ -131,7 +132,7 @@ export default function ImportarVendasPage({ onNavigate }: Props) {
     }));
 
     try {
-      const res = await fetch("/api/importar-vendas", {
+      const res = await apiFetch("/importar-vendas", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ vendas: payload }),

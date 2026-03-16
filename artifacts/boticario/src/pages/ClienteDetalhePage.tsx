@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { apiFetch } from "@/lib/api";
 import { ArrowLeft, Printer, Phone, Mail, MapPin, FileText, TrendingUp, AlertCircle, ChevronDown, ChevronUp, Edit } from "lucide-react";
 
 interface Props {
@@ -40,7 +41,6 @@ interface Stats {
   totalEmAberto: number;
 }
 
-const API_BASE = "/api";
 
 const fmtBRL = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 const fmtDate = (d: string) => new Date(d).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" });
@@ -68,8 +68,8 @@ export default function ClienteDetalhePage({ onNavigate }: Props) {
     if (!id) { onNavigate("clientes"); return; }
 
     Promise.all([
-      fetch(`${API_BASE}/clientes/${id}/historico`).then(r => r.json()),
-      fetch(`${API_BASE}/clientes/${id}/haveres`).then(r => r.ok ? r.json() : { total: 0 }).catch(() => ({ total: 0 })),
+      apiFetch(`/clientes/${id}/historico`).then(r => r.json()),
+      apiFetch(`/clientes/${id}/haveres`).then(r => r.ok ? r.json() : { total: 0 }).catch(() => ({ total: 0 })),
     ])
       .then(([historico, haverData]) => {
         setData(historico);

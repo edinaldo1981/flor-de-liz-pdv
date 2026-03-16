@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
+import { apiFetch } from "@/lib/api";
 import { ShoppingBag, TrendingUp, AlertCircle, Users } from "lucide-react";
 
 interface HomePageProps {
   onNavigate: (page: string) => void;
 }
 
-const API_BASE = "/api";
 const fmtBRL = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 const statusLabel: Record<string, { label: string; cls: string }> = {
@@ -32,7 +32,7 @@ export default function HomePage({ onNavigate }: HomePageProps) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`${API_BASE}/dashboard`)
+    apiFetch(`/dashboard`)
       .then(r => r.json())
       .then(setData)
       .catch(() => {})

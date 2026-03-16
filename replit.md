@@ -1,115 +1,168 @@
-# Workspace
+# Flor de Liz PDV — SaaS Multi-Tenant
 
-## Overview
+## Visão Geral
 
-pnpm workspace monorepo using TypeScript. Each package manages its own dependencies.
+Plataforma SaaS multi-tenant para revendedoras de beleza. Cada loja tem dados isolados, autenticação própria, chave PIX e planilha Google Sheets. O sistema permite gerenciar vendas, fiados, haver, clientes, produtos e financeiro via app mobile-style.
+
+**URL de produção**: `https://perfumariaflordeliz.replit.app`
+
+---
 
 ## Stack
 
-- **Monorepo tool**: pnpm workspaces
-- **Node.js version**: 24
-- **Package manager**: pnpm
-- **TypeScript version**: 5.9
-- **API framework**: Express 5
-- **Database**: PostgreSQL + Drizzle ORM
-- **Validation**: Zod (`zod/v4`), `drizzle-zod`
-- **API codegen**: Orval (from OpenAPI spec)
-- **Build**: esbuild (CJS bundle)
+- **Monorepo**: pnpm workspaces
+- **Node.js**: 24 | **TypeScript**: 5.9
+- **API**: Express 5 (artifacts/api-server)
+- **Frontend PDV**: React + Vite + Tailwind CSS (artifacts/boticario)
+- **Portal do Cliente**: React + Vite (artifacts/portal-cliente)
+- **Database**: PostgreSQL (Replit managed, via `DATABASE_URL`)
+- **Auth**: JWT (jsonwebtoken) com 30d expiry para lojas, 8h para super admin
+- **Pagamentos**: Asaas (PIX cobranças)
+- **Backup**: Google Sheets (via Replit integration)
 
-## Structure
+---
 
-```text
-artifacts-monorepo/
-├── artifacts/              # Deployable applications
-│   └── api-server/         # Express API server
-├── lib/                    # Shared libraries
-│   ├── api-spec/           # OpenAPI spec + Orval codegen config
-│   ├── api-client-react/   # Generated React Query hooks
-│   ├── api-zod/            # Generated Zod schemas from OpenAPI
-│   └── db/                 # Drizzle ORM schema + DB connection
-├── scripts/                # Utility scripts (single workspace package)
-│   └── src/                # Individual .ts scripts, run via `pnpm --filter @workspace/scripts run <script>`
-├── pnpm-workspace.yaml     # pnpm workspace (artifacts/*, lib/*, lib/integrations/*, scripts)
-├── tsconfig.base.json      # Shared TS options (composite, bundler resolution, es2022)
-├── tsconfig.json           # Root TS project references
-└── package.json            # Root package with hoisted devDeps
+## Estrutura do Projeto
+
+```
+artifacts/
+├── api-server/         # Express API — src/routes/, src/middleware/
+├── boticario/          # PDV app React+Vite (admin/colaborador)
+├── portal-cliente/     # Portal público do cliente (fiados, pagamentos)
+└── mockup-sandbox/     # Sandbox de componentes UI
+
+lib/
+├── db/                 # Pool PostgreSQL + verificação de tabelas
+├── api-spec/           # OpenAPI spec + Orval codegen
+├── api-client-react/   # React Query hooks gerados
+└── api-zod/            # Zod schemas gerados
+
+scripts/
+└── build-production.sh # Build de todos os artefatos para produção
 ```
 
-## TypeScript & Composite Projects
+---
 
-Every package extends `tsconfig.base.json` which sets `composite: true`. The root `tsconfig.json` lists all packages as project references. This means:
+## Banco de Dados — Tabelas
 
-- **Always typecheck from the root** — run `pnpm run typecheck` (which runs `tsc --build --emitDeclarationOnly`). This builds the full dependency graph so that cross-package imports resolve correctly. Running `tsc` inside a single package will fail if its dependencies haven't been built yet.
-- **`emitDeclarationOnly`** — we only emit `.d.ts` files during typecheck; actual JS bundling is handled by esbuild/tsx/vite...etc, not `tsc`.
-- **Project references** — when package A depends on package B, A's `tsconfig.json` must list B in its `references` array. `tsc --build` uses this to determine build order and skip up-to-date packages.
+| Tabela | Campos relevantes |
+|--------|-------------------|
+| `lojas` | id, nome, slug, status, plano, created_at |
+| `clientes` | id, nome, cpf, telefone, whatsapp, email, loja_id |
+| `vendas` | id, cliente_id, total, valor_pago, status, forma_pagamento, loja_id |
+| `venda_itens` | id, venda_id, nome_produto, marca, preco_unit, quantidade |
+| `produtos` | id, marca, nome, preco, estoque, img_url, loja_id |
+| `haveres` | id, cliente_id, valor, saldo_restante, descricao, loja_id |
+| `config` | key, value, loja_id — UNIQUE(key, loja_id) |
 
-## Root Scripts
+**Flor de Liz**: loja_id=1, slug="flordeliz"
 
-- `pnpm run build` — runs `typecheck` first, then recursively runs `build` in all packages that define it
-- `pnpm run typecheck` — runs `tsc --build --emitDeclarationOnly` using project references
+---
 
-## Packages
+## Auth & JWT
 
-### `artifacts/api-server` (`@workspace/api-server`)
+- **Login de loja**: `POST /api/auth/login` → `{ slug, password }` → JWT `{ lojaId, lojaSlug, role, permissions }`
+- **Login super admin**: `POST /api/superadmin/login` → `{ password }` → JWT `{ superAdmin: true }`
+- **JWT_SECRET**: env var (96 chars auto-gerado)
+- **SUPER_ADMIN_PASSWORD**: secret configurado
+- **authMiddleware**: extrai lojaId do Bearer token em todas as rotas protegidas
+- **Frontend**: JWT salvo em `localStorage("auth_token")` e enviado via `Authorization: Bearer`
 
-Express 5 API server. Routes live in `src/routes/` and use `@workspace/api-zod` for request and response validation and `@workspace/db` for persistence.
+---
 
-- Entry: `src/index.ts` — reads `PORT`, starts Express
-- App setup: `src/app.ts` — mounts CORS, JSON/urlencoded parsing, routes at `/api`
-- Routes: `src/routes/index.ts` mounts sub-routers; `src/routes/health.ts` exposes `GET /health` (full path: `/api/health`)
-- Depends on: `@workspace/db`, `@workspace/api-zod`
-- `pnpm --filter @workspace/api-server run dev` — run the dev server
-- `pnpm --filter @workspace/api-server run build` — production esbuild bundle (`dist/index.cjs`)
-- Build bundles an allowlist of deps (express, cors, pg, drizzle-orm, zod, etc.) and externalizes the rest
+## API Routes
 
-### `lib/db` (`@workspace/db`)
+### Auth (públicas)
+- `GET /api/auth/config?slug=` — verifica se loja tem senha configurada
+- `POST /api/auth/login` — `{ slug, password }` → `{ token, role, permissions }`
+- `GET/POST /api/config/pix` — chave PIX da loja (requer auth)
+- `POST /api/auth/config` — salva senhas admin/colab (requer auth admin)
 
-Database layer using Drizzle ORM with PostgreSQL. Exports a Drizzle client instance and schema models.
+### Super Admin
+- `POST /api/superadmin/login` — senha master → token super admin
+- `GET /api/superadmin/lojas` — listar todas as lojas com stats
+- `POST /api/superadmin/lojas` — criar nova loja
+- `PATCH /api/superadmin/lojas/:id` — editar loja (status, plano, nome, senha)
+- `POST /api/superadmin/loja-token` — gerar token admin para uma loja
 
-- `src/index.ts` — creates a `Pool` + Drizzle instance, exports schema
-- `src/schema/index.ts` — barrel re-export of all models
-- `src/schema/<modelname>.ts` — table definitions with `drizzle-zod` insert schemas (no models definitions exist right now)
-- `drizzle.config.ts` — Drizzle Kit config (requires `DATABASE_URL`, automatically provided by Replit)
-- Exports: `.` (pool, db, schema), `./schema` (schema only)
+### Portal (público)
+- `GET /api/portal/cliente?cpf=&loja=` — dados do cliente (fiados, haveres, histórico)
 
-Production migrations are handled by Replit when publishing. In development, we just use `pnpm --filter @workspace/db run push`, and we fallback to `pnpm --filter @workspace/db run push-force`.
+### Rotas protegidas (requerem Bearer token)
+- `/api/clientes` — CRUD clientes
+- `/api/vendas` — CRUD vendas + fiados
+- `/api/produtos` — CRUD produtos
+- `/api/haveres` — CRUD haveres
+- `/api/dashboard` — stats do dia
+- `/api/financeiro` — relatório financeiro
+- `/api/importar-vendas` — importação em lote
+- `/api/sheets/status` e `/api/sheets/sync` — Google Sheets backup
 
-### `lib/api-spec` (`@workspace/api-spec`)
+---
 
-Owns the OpenAPI 3.1 spec (`openapi.yaml`) and the Orval config (`orval.config.ts`). Running codegen produces output into two sibling packages:
+## Frontend — Boticário
 
-1. `lib/api-client-react/src/generated/` — React Query hooks + fetch client
-2. `lib/api-zod/src/generated/` — Zod schemas
+- **Auth flow**: LoginPage → slug + senha → JWT → `localStorage(auth_token, auth_role, auth_permissions, auth_slug)`
+- **API calls**: todas usam `apiFetch()` de `src/lib/api.ts` (injeta Bearer token automaticamente)
+- **Logout**: `clearToken()` limpa todo o localStorage
+- **Super Admin**: botão "admin" discreto na tela de login → `SuperAdminPage` (fundo escuro, separado)
+- **Permissões**: admin = acesso total; colaborador = permissões configuráveis
 
-Run codegen: `pnpm --filter @workspace/api-spec run codegen`
+### Páginas
+| Página | Acesso |
+|--------|--------|
+| LoginPage | Público |
+| SuperAdminPage | Super admin (senha master) |
+| HomePage | Todos autenticados |
+| CarrinhoPage | Todos |
+| FiadosPage | `ver_fiados` |
+| ClientesPage | `ver_clientes` |
+| FinanceiroPage | `ver_financeiro` |
+| ProfilePage | `ver_perfil` |
+| ConfigAcessoPage | Admin only |
+| ImportarVendasPage | `importar_vendas` |
 
-### `lib/api-zod` (`@workspace/api-zod`)
+---
 
-Generated Zod schemas from the OpenAPI spec (e.g. `HealthCheckResponse`). Used by `api-server` for response validation.
+## Portal do Cliente
 
-### `lib/api-client-react` (`@workspace/api-client-react`)
+- URL: `/portal-cliente/?loja=<slug>`
+- Sem autenticação — cliente busca por CPF ou telefone
+- Mostra: fiados em aberto, haver disponível, histórico, chave PIX para pagamento
+- Se loja não informada, usa `flordeliz` como padrão
 
-Generated React Query hooks and fetch client from the OpenAPI spec (e.g. `useHealthCheck`, `healthCheck`).
+---
 
-### `artifacts/boticario` (`@workspace/boticario`)
+## Deploy
 
-Mobile-style PDV (Point of Sale) web app "Flor de Liz" built with React + Vite + Tailwind CSS. Internal system for beauty product resellers.
+```bash
+bash scripts/build-production.sh
+git add -A && git commit -m "SaaS build"
+# Clicar em Deploy no Replit
+```
 
-- Brand color: `#4d8063`, font: Work Sans
-- Navigation: single-page with `onNavigate(page)` pattern in `App.tsx`
-- Pages: `home`, `perfumaria` (catalog CRUD), `produto` (product detail), `carrinho` (cart/sale), `confirmacao`, `profile`, `cadastro` (client registration), `fiados`, `cobranca`, `financeiro`
-- API calls use `const API_BASE = "/api-server/api"` (Vite proxies to port 8080)
-- Cart data flows via `localStorage` key `carrinho_items` (PerfumariaPage → CarrinhoPage)
-- Product detail flows via `localStorage` key `produto_detalhe` (PerfumariaPage → ProdutoPage)
-- Product edit handoff via `localStorage` key `produto_editar` (ProdutoPage → PerfumariaPage auto-opens edit modal)
+Servidor de produção: `node artifacts/api-server/dist/index.cjs`
 
-**API Routes** (`artifacts/api-server/src/routes/`):
-- `clientes.ts`: GET/POST `/api/clientes` (search via `?q=`)
-- `vendas.ts`: GET/POST `/api/vendas`
-- `produtos.ts`: GET/POST `/api/produtos`, PUT/DELETE `/api/produtos/:id`
+---
 
-**DB Tables**: `clientes`, `vendas`, `vendas_itens`, `produtos` (id, marca, nome, preco, estoque, img_url, created_at)
+## Variáveis de Ambiente
 
-### `scripts` (`@workspace/scripts`)
+| Var | Tipo | Descrição |
+|-----|------|-----------|
+| `DATABASE_URL` | Auto Replit | Conexão PostgreSQL |
+| `JWT_SECRET` | Env var | 96 chars, auto-gerado |
+| `SUPER_ADMIN_PASSWORD` | Secret | Senha master do super admin |
+| `ASAAS_API_KEY` | Secret | API key da Asaas para PIX |
 
-Utility scripts package. Each script is a `.ts` file in `src/` with a corresponding npm script in `package.json`. Run scripts via `pnpm --filter @workspace/scripts run <script>`. Scripts can import any workspace package (e.g., `@workspace/db`) by adding it as a dependency in `scripts/package.json`.
+---
+
+## PWA Cache
+
+- Boticário: `api-cache-v3`
+- Portal: cache separado
+
+---
+
+## GitHub
+
+Remote: `origin` → `https://github.com/edinaldo1981/flor-de-liz-pdv.git`

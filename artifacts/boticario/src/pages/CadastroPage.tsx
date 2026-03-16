@@ -1,11 +1,11 @@
 import { ArrowLeft, Save, CheckCircle } from "lucide-react";
+import { apiFetch } from "@/lib/api";
 import { useState, useEffect } from "react";
 
 interface CadastroPageProps {
   onNavigate: (page: string) => void;
 }
 
-const API_BASE = "/api";
 
 function maskCPF(v: string) {
   return v.replace(/\D/g, "").slice(0, 11)
@@ -87,10 +87,10 @@ export default function CadastroPage({ onNavigate }: CadastroPageProps) {
         notas: form.notas || null,
       };
 
-      const url = editando ? `${API_BASE}/clientes/${editando.id}` : `${API_BASE}/clientes`;
+      const url = editando ? `/clientes/${editando.id}` : `/clientes`;
       const method = editando ? "PUT" : "POST";
 
-      const resp = await fetch(url, {
+      const resp = await apiFetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),

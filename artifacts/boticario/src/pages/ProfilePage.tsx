@@ -1,4 +1,5 @@
 import { ArrowLeft, ChevronRight, Pencil, Check, X, RefreshCw, ExternalLink, LogOut } from "lucide-react";
+import { apiFetch } from "@/lib/api";
 import { useState, useEffect } from "react";
 
 interface ProfilePageProps {
@@ -7,7 +8,6 @@ interface ProfilePageProps {
   onLogout?: () => void;
 }
 
-const API_BASE = "/api";
 
 const fmtBRL = (v: number) =>
   v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -33,7 +33,7 @@ export default function ProfilePage({ onNavigate, role = "admin", onLogout }: Pr
   const [pixMsg, setPixMsg] = useState<{ ok: boolean; text: string } | null>(null);
 
   useEffect(() => {
-    fetch(`${API_BASE}/config/pix`)
+    apiFetch(`/config/pix`)
       .then(r => r.ok ? r.json() : null)
       .then(d => { if (d?.pixKey) { setPixKey(d.pixKey); setPixTemp(d.pixKey); } })
       .catch(() => {});
@@ -43,7 +43,7 @@ export default function ProfilePage({ onNavigate, role = "admin", onLogout }: Pr
     setSavingPix(true);
     setPixMsg(null);
     try {
-      const r = await fetch(`${API_BASE}/config/pix`, {
+      const r = await apiFetch(`/config/pix`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ pixKey: pixTemp.trim() }),
@@ -63,7 +63,7 @@ export default function ProfilePage({ onNavigate, role = "admin", onLogout }: Pr
   };
 
   useEffect(() => {
-    fetch(`${API_BASE}/sheets/status`)
+    apiFetch(`/sheets/status`)
       .then(r => r.ok ? r.json() : null)
       .then(d => { if (d?.spreadsheetId) setSheetUrl(`https://docs.google.com/spreadsheets/d/${d.spreadsheetId}`); })
       .catch(() => {});
@@ -73,7 +73,7 @@ export default function ProfilePage({ onNavigate, role = "admin", onLogout }: Pr
     setSyncing(true);
     setSyncMsg(null);
     try {
-      const r = await fetch(`${API_BASE}/sheets/sync`, { method: "POST" });
+      const r = await apiFetch(`/sheets/sync`, { method: "POST" });
       const d = await r.json();
       if (r.ok && d.ok) {
         setSheetUrl(d.sheetUrl);
@@ -89,7 +89,7 @@ export default function ProfilePage({ onNavigate, role = "admin", onLogout }: Pr
   };
 
   useEffect(() => {
-    fetch(`${API_BASE}/dashboard`)
+    apiFetch(`/dashboard`)
       .then(r => r.ok ? r.json() : null)
       .then(d => {
         if (!d) return;

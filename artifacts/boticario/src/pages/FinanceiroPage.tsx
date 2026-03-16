@@ -1,4 +1,5 @@
 import { ArrowLeft, TrendingUp, TrendingDown, Package, Pencil, Trash2, X, Check } from "lucide-react";
+import { apiFetch } from "@/lib/api";
 import { useState, useEffect } from "react";
 
 interface FinanceiroPageProps {
@@ -42,7 +43,6 @@ interface VendaConfirmada {
   created_at: string;
 }
 
-const API_BASE = "/api";
 
 type Periodo = "mes" | "tri" | "sem" | "ano";
 type Aba = "resumo" | "vendas";
@@ -106,7 +106,7 @@ export default function FinanceiroPage({ onNavigate, canEdit = true }: Financeir
 
   useEffect(() => {
     setLoading(true);
-    fetch(`${API_BASE}/financeiro`)
+    apiFetch(`/financeiro`)
       .then(r => r.ok ? r.json() : Promise.reject())
       .then(setData)
       .catch(() => setErro("Erro ao carregar dados financeiros."))
@@ -121,7 +121,7 @@ export default function FinanceiroPage({ onNavigate, canEdit = true }: Financeir
 
   const fetchVendas = () => {
     setLoadingVendas(true);
-    fetch(`${API_BASE}/vendas`)
+    apiFetch(`/vendas`)
       .then(r => r.json())
       .then((all: VendaConfirmada[]) => {
         setVendas(all.filter(v => v.status === "confirmada"));
@@ -136,7 +136,7 @@ export default function FinanceiroPage({ onNavigate, canEdit = true }: Financeir
     setSalvandoEdit(true);
     setErroOp("");
     try {
-      const r = await fetch(`${API_BASE}/vendas/${v.id}`, {
+      const r = await apiFetch(`/vendas/${v.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ total: novoTotal }),
@@ -156,7 +156,7 @@ export default function FinanceiroPage({ onNavigate, canEdit = true }: Financeir
   const handleExcluir = async (id: number) => {
     setExcluindoId(id);
     try {
-      const r = await fetch(`${API_BASE}/vendas/${id}`, { method: "DELETE" });
+      const r = await apiFetch(`/vendas/${id}`, { method: "DELETE" });
       if (!r.ok) throw new Error();
       setVendas(prev => prev.filter(x => x.id !== id));
       setConfirmDel(null);

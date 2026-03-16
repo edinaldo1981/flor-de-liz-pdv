@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
+import { apiFetch } from "@/lib/api";
 import { ArrowLeft, Check, Eye, EyeOff } from "lucide-react";
 
 interface ConfigAcessoPageProps {
   onNavigate: (page: string) => void;
 }
 
-const API_BASE = "/api";
 
 const PERMISSOES = [
   { key: "ver_fiados", label: "Ver Fiados", icon: "receipt_long", desc: "Acessar a lista de fiados e notas de clientes" },
@@ -41,7 +41,7 @@ export default function ConfigAcessoPage({ onNavigate }: ConfigAcessoPageProps) 
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`${API_BASE}/auth/config`)
+    apiFetch(`/auth/config`)
       .then(r => r.json())
       .then(d => {
         if (d.colaborador_permissions && Object.keys(d.colaborador_permissions).length > 0) {
@@ -61,7 +61,7 @@ export default function ConfigAcessoPage({ onNavigate }: ConfigAcessoPageProps) 
       if (adminPass) body.admin_password = adminPass;
       if (colaborPass) body.colaborador_password = colaborPass;
 
-      const r = await fetch(`${API_BASE}/auth/config`, {
+      const r = await apiFetch(`/auth/config`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),

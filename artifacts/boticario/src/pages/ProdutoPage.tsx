@@ -1,4 +1,5 @@
 import { ArrowLeft, Pencil, Trash2, Plus, Package } from "lucide-react";
+import { apiFetch } from "@/lib/api";
 import { useEffect, useState } from "react";
 
 interface ProdutoPageProps {
@@ -14,7 +15,6 @@ interface Produto {
   img_url?: string;
 }
 
-const API_BASE = "/api";
 
 export default function ProdutoPage({ onNavigate }: ProdutoPageProps) {
   const [produto, setProduto] = useState<Produto | null>(null);
@@ -55,7 +55,7 @@ export default function ProdutoPage({ onNavigate }: ProdutoPageProps) {
     if (!window.confirm(`Excluir "${produto.marca} — ${produto.nome}"?`)) return;
     setDeleteError("");
     try {
-      const resp = await fetch(`${API_BASE}/produtos/${produto.id}`, { method: "DELETE" });
+      const resp = await apiFetch(`/produtos/${produto.id}`, { method: "DELETE" });
       if (!resp.ok) throw new Error();
       onNavigate("perfumaria");
     } catch {

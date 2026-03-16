@@ -1,18 +1,21 @@
 import { Router } from "express";
 import { pool } from "@workspace/db";
+import { authMiddleware } from "../middleware/auth";
 
 const router = Router();
 
-router.get("/produtos", async (req, res) => {
+router.get("/produtos", authMiddleware, async (req, res) => {
   const { q } = req.query;
+  const lojaId = req.auth!.lojaId;
   try {
     let query: string;
-    let params: string[] = [];
+    let params: unknown[];
     if (q && typeof q === "string" && q.trim()) {
-      query = "SELECT * FROM produtos WHERE nome ILIKE $1 OR marca ILIKE $1 ORDER BY marca, nome";
-      params = [`%${q.trim()}%`];
+      query = "SELECT * FROM produtos WHERE loja_id = $1 AND (nome ILIKE $2 OR marca ILIKE $2) ORDER BY marca, nome";
+      params = [lojaId, `%${q.trim()}%`];
     } else {
-      query = "SELECT * FROM produtos ORDER BY marca, nome";
+      query = "SELECT * FROM produtos WHERE loja_id = $1 ORDER BY marca, nome";
+      params = [lojaId];
     }
     const result = await pool.query(query, params);
     res.json(result.rows);
@@ -22,15 +25,14 @@ router.get("/produtos", async (req, res) => {
   }
 });
 
-router.post("/produtos", async (req, res) => {
+router.post("/produtos", authMiddleware, async (req, res) => {
   const { marca, nome, preco, estoque, img_url } = req.body;
-  if (!marca || !nome || preco == null) {
-    return res.status(400).json({ error: "Marca, nome e preço são obrigatórios" });
-  }
+  const lojaId = req.auth!.lojaId;
+  if (!marca || !nome || preco == null) return res.status(400).json({ error: "Marca, nome e preço são obrigatórios" });
   try {
     const result = await pool.query(
-      "INSERT INTO produtos (marca, nome, preco, estoque, img_url) VALUES ($1,$2,$3,$4,$5) RETURNING *",
-      [marca, nome, preco, estoque ?? 0, img_url || null]
+      "INSERT INTO produtos (marca, nome, preco, estoque, img_url, loja_id) VALUES ($1,$2,$3,$4,$5,$6) RETURNING *",
+      [marca, nome, preco, estoque ?? 0, img_url || null, lojaId]
     );
     res.status(201).json(result.rows[0]);
   } catch (err) {
@@ -39,16 +41,15 @@ router.post("/produtos", async (req, res) => {
   }
 });
 
-router.put("/produtos/:id", async (req, res) => {
+router.put("/produtos/:id", authMiddleware, async (req, res) => {
   const { id } = req.params;
+  const lojaId = req.auth!.lojaId;
   const { marca, nome, preco, estoque, img_url } = req.body;
-  if (!marca || !nome || preco == null) {
-    return res.status(400).json({ error: "Marca, nome e preço são obrigatórios" });
-  }
+  if (!marca || !nome || preco == null) return res.status(400).json({ error: "Marca, nome e preço são obrigatórios" });
   try {
     const result = await pool.query(
-      "UPDATE produtos SET marca=$1, nome=$2, preco=$3, estoque=$4, img_url=$5 WHERE id=$6 RETURNING *",
-      [marca, nome, preco, estoque ?? 0, img_url || null, id]
+      "UPDATE produtos SET marca=$1, nome=$2, preco=$3, estoque=$4, img_url=$5 WHERE id=$6 AND loja_id=$7 RETURNING *",
+      [marca, nome, preco, estoque ?? 0, img_url || null, id, lojaId]
     );
     if (result.rows.length === 0) return res.status(404).json({ error: "Produto não encontrado" });
     res.json(result.rows[0]);
@@ -58,10 +59,11 @@ router.put("/produtos/:id", async (req, res) => {
   }
 });
 
-router.delete("/produtos/:id", async (req, res) => {
+router.delete("/produtos/:id", authMiddleware, async (req, res) => {
   const { id } = req.params;
+  const lojaId = req.auth!.lojaId;
   try {
-    const result = await pool.query("DELETE FROM produtos WHERE id=$1 RETURNING id", [id]);
+    const result = await pool.query("DELETE FROM produtos WHERE id=$1 AND loja_id=$2 RETURNING id", [id, lojaId]);
     if (result.rows.length === 0) return res.status(404).json({ error: "Produto não encontrado" });
     res.json({ deleted: true });
   } catch (err) {

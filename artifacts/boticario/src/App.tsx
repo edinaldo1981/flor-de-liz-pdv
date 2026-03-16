@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { getToken, clearToken, apiFetch } from "@/lib/api";
 import HomePage from "@/pages/HomePage";
 import PerfumariaPage from "@/pages/PerfumariaPage";
 import ProdutoPage from "@/pages/ProdutoPage";
@@ -15,10 +16,11 @@ import ImportarVendasPage from "@/pages/ImportarVendasPage";
 import NotaClientePage from "@/pages/NotaClientePage";
 import LoginPage from "@/pages/LoginPage";
 import ConfigAcessoPage from "@/pages/ConfigAcessoPage";
+import SuperAdminPage from "@/pages/SuperAdminPage";
 
 type Page = "home" | "perfumaria" | "produto" | "carrinho" | "confirmacao" | "profile" | "cadastro"
   | "fiados" | "cobranca" | "financeiro" | "clientes" | "cliente_detalhe"
-  | "importar_vendas" | "nota_cliente" | "config_acesso";
+  | "importar_vendas" | "nota_cliente" | "config_acesso" | "superadmin";
 
 type Role = "admin" | "colaborador";
 type Permissions = Record<string, boolean>;
@@ -53,7 +55,7 @@ function Sidebar({ current, onNavigate, role, permissions, onLogout }: {
   const [vendasHoje, setVendasHoje] = useState<number | null>(null);
 
   useEffect(() => {
-    fetch("/api/dashboard")
+    apiFetch("/dashboard")
       .then(r => r.ok ? r.json() : null)
       .then(d => { if (d) setVendasHoje(parseFloat(d.vendasHoje?.soma ?? d.vendasHoje ?? 0)); })
       .catch(() => {});
@@ -179,17 +181,17 @@ export default function App() {
   const [role, setRole] = useState<Role | null>(null);
   const [permissions, setPermissions] = useState<Permissions | null>(null);
   const [authChecking, setAuthChecking] = useState(true);
+  const [showSuperAdmin, setShowSuperAdmin] = useState(false);
 
   useEffect(() => {
     const savedRole = localStorage.getItem("auth_role") as Role | null;
     const savedPerms = localStorage.getItem("auth_permissions");
-    if (savedRole) {
+    const token = getToken();
+    if (savedRole && token) {
       setRole(savedRole);
       setPermissions(savedPerms ? JSON.parse(savedPerms) : null);
-      setAuthChecking(false);
-    } else {
-      setAuthChecking(false);
     }
+    setAuthChecking(false);
   }, []);
 
   const handleLogin = (r: Role, p: Permissions | null) => {
@@ -198,8 +200,7 @@ export default function App() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("auth_role");
-    localStorage.removeItem("auth_permissions");
+    clearToken();
     setRole(null);
     setPermissions(null);
     setPage("home");
@@ -232,8 +233,22 @@ export default function App() {
     );
   }
 
+  if (showSuperAdmin) {
+    return <SuperAdminPage onExit={() => setShowSuperAdmin(false)} />;
+  }
+
   if (!role) {
-    return <LoginPage onLogin={handleLogin} />;
+    return (
+      <div className="relative">
+        <LoginPage onLogin={handleLogin} />
+        <button
+          onClick={() => setShowSuperAdmin(true)}
+          className="fixed bottom-4 right-4 text-[10px] text-slate-300/40 hover:text-slate-400 transition-colors"
+        >
+          admin
+        </button>
+      </div>
+    );
   }
 
   const canEditVendas = can(role, permissions, "editar_excluir_vendas");

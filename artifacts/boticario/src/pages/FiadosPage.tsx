@@ -1,11 +1,11 @@
 import { Search } from "lucide-react";
+import { apiFetch } from "@/lib/api";
 import { useEffect, useState } from "react";
 
 interface FiadosPageProps {
   onNavigate: (page: string) => void;
 }
 
-const API_BASE = "/api";
 
 interface Venda {
   id: number;
@@ -47,7 +47,7 @@ export default function FiadosPage({ onNavigate }: FiadosPageProps) {
   const [expandido, setExpandido] = useState<number | null>(null);
 
   useEffect(() => {
-    fetch(`${API_BASE}/vendas`)
+    apiFetch(`/vendas`)
       .then(r => r.json())
       .then((data: Venda[]) => {
         setFiados(data.filter(v => v.status === "fiado" || v.status === "fiado_atrasado"));

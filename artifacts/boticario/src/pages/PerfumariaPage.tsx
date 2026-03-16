@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { apiFetch } from "@/lib/api";
 import { ArrowLeft, Search, Plus, Pencil, Trash2, X, Save, Package } from "lucide-react";
 
 interface PerfumariaPageProps {
@@ -14,7 +15,6 @@ interface Produto {
   img_url?: string;
 }
 
-const API_BASE = "/api";
 
 export default function PerfumariaPage({ onNavigate }: PerfumariaPageProps) {
   const [search, setSearch] = useState("");
@@ -103,7 +103,7 @@ export default function PerfumariaPage({ onNavigate }: PerfumariaPageProps) {
   const fetchProdutos = async () => {
     setLoading(true);
     try {
-      const resp = await fetch(`${API_BASE}/produtos`);
+      const resp = await apiFetch(`/produtos`);
       if (resp.ok) setProdutos(await resp.json());
     } catch { /* silently fail */ } finally { setLoading(false); }
   };
@@ -188,9 +188,9 @@ export default function PerfumariaPage({ onNavigate }: PerfumariaPageProps) {
         estoque: parseInt(form.estoque) || 0,
         img_url: form.img_url || null,
       };
-      const url = editando ? `${API_BASE}/produtos/${editando.id}` : `${API_BASE}/produtos`;
+      const url = editando ? `/produtos/${editando.id}` : `/produtos`;
       const method = editando ? "PUT" : "POST";
-      const resp = await fetch(url, {
+      const resp = await apiFetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
@@ -210,7 +210,7 @@ export default function PerfumariaPage({ onNavigate }: PerfumariaPageProps) {
 
   const handleDelete = async (produto: Produto) => {
     try {
-      const resp = await fetch(`${API_BASE}/produtos/${produto.id}`, { method: "DELETE" });
+      const resp = await apiFetch(`/produtos/${produto.id}`, { method: "DELETE" });
       if (!resp.ok) throw new Error();
       setConfirmDelete(null);
       setSelecionados(prev => prev.filter(id => id !== produto.id));

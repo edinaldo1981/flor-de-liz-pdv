@@ -11,20 +11,22 @@ import financeiroRouter from "./financeiro";
 import importarRouter from "./importar";
 import sheetsRouter from "./sheets";
 import authRouter from "./auth";
+import superadminRouter from "./superadmin";
 
 const router: IRouter = Router();
 
 router.use(healthRouter);
+router.use(authRouter);
+router.use(superadminRouter);
+router.use(portalRouter);
+router.use(webhookRouter);
 router.use(dashboardRouter);
 router.use(clientesRouter);
 router.use(vendasRouter);
 router.use(produtosRouter);
-router.use(webhookRouter);
-router.use(portalRouter);
 router.use(haveresRouter);
 router.use(financeiroRouter);
 router.use(importarRouter);
 router.use(sheetsRouter);
-router.use(authRouter);
 
 export default router;
