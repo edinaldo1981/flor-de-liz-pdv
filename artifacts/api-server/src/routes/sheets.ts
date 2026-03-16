@@ -84,12 +84,16 @@ router.post("/sheets/sync", authMiddleware, async (req, res) => {
     ];
     const produtosSheet: any[][] = [
       ["ID", "Marca", "Nome", "Preço (R$)", "Estoque", "Imagem URL"],
-      ...produtosRes.rows.map(p => [
-        p.id, p.marca, p.nome,
-        parseFloat(p.preco).toFixed(2).replace(".", ","),
-        p.estoque ?? 0,
-        p.img_url || "",
-      ]),
+      ...produtosRes.rows.map(p => {
+        const imgUrl = p.img_url || "";
+        const imgExport = imgUrl.startsWith("data:") ? "(imagem local)" : imgUrl.slice(0, 500);
+        return [
+          p.id, p.marca, p.nome,
+          parseFloat(p.preco).toFixed(2).replace(".", ","),
+          p.estoque ?? 0,
+          imgExport,
+        ];
+      }),
     ];
     const resumo: any[][] = [
       [`📊 Resumo ${lojaNome}`], [],
