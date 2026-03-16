@@ -1,0 +1,17 @@
+root@srv1381634:~# ss -tlnp
+State           Recv-Q          Send-Q                   Local Address:Port                   Peer Address:Port         Process                                                                 
+LISTEN          0               511                            0.0.0.0:8080                        0.0.0.0:*             users:(("nginx",pid=2056228,fd=6),("nginx",pid=2056227,fd=6))          
+LISTEN          0               4096                           0.0.0.0:8081                        0.0.0.0:*             users:(("docker-proxy",pid=424840,fd=8))                               
+LISTEN          0               4096                        127.0.0.54:53                          0.0.0.0:*             users:(("systemd-resolve",pid=3893565,fd=17))                          
+LISTEN          0               4096                         127.0.0.1:5433                        0.0.0.0:*             users:(("docker-proxy",pid=420181,fd=8))                               
+LISTEN          0               511                            0.0.0.0:8443                        0.0.0.0:*             users:(("nginx",pid=2056228,fd=5),("nginx",pid=2056227,fd=5))          
+LISTEN          0               4096                           0.0.0.0:22                          0.0.0.0:*             users:(("sshd",pid=3928000,fd=3),("systemd",pid=1,fd=155))             
+LISTEN          0               4096                           0.0.0.0:80                          0.0.0.0:*             users:(("docker-proxy",pid=288100,fd=8))                               
+LISTEN          0               4096                     127.0.0.53%lo:53                          0.0.0.0:*             users:(("systemd-resolve",pid=3893565,fd=15))                          
+LISTEN          0               4096                           0.0.0.0:3000                        0.0.0.0:*             users:(("docker-proxy",pid=424732,fd=8))                               
+LISTEN          0               4096                              [::]:8081                           [::]:*             users:(("docker-proxy",pid=424845,fd=8))                               
+LISTEN          0               4096                              [::]:22                             [::]:*             users:(("sshd",pid=3928000,fd=4),("systemd",pid=1,fd=158))             
+LISTEN          0               4096                              [::]:80                             [::]:*             users:(("docker-proxy",pid=288109,fd=8))                               
+LISTEN          0               4096                              [::]:3000                           [::]:*             users:(("docker-proxy",pid=424738,fd=8))                               
+LISTEN          0               511                                  *:9000                              *:*             users:(("node",pid=337311,fd=24))                                      
+root@srv1381634:~# 
