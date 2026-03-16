@@ -34,8 +34,8 @@ router.post("/sheets/sync", authMiddleware, async (req, res) => {
     const lojaRes = await pool.query("SELECT nome FROM lojas WHERE id = $1", [lojaId]);
     const lojaNome = lojaRes.rows[0]?.nome ?? "Loja";
 
-    const [clientesRes, vendasRes, fiadosRes] = await Promise.all([
-      pool.query(`SELECT id, nome, cpf, telefone, whatsapp, email, endereco, notas, created_at FROM clientes WHERE loja_id = $1 ORDER BY nome`, [lojaId]),
+    const [clientesRes, vendasRes, fiadosRes, produtosRes] = await Promise.all([
+      pool.query(`SELECT id, nome, cpf, telefone, whatsapp, email, endereco, notas FROM clientes WHERE loja_id = $1 ORDER BY nome`, [lojaId]),
       pool.query(`
         SELECT v.id, c.nome AS cliente, v.total, v.forma_pagamento, v.status, v.valor_pago,
                to_char(v.created_at AT TIME ZONE 'America/Sao_Paulo', 'DD/MM/YYYY HH24:MI') AS data
@@ -48,6 +48,7 @@ router.post("/sheets/sync", authMiddleware, async (req, res) => {
         FROM vendas v LEFT JOIN clientes c ON c.id = v.cliente_id
         WHERE v.loja_id = $1 AND v.status IN ('fiado', 'fiado_atrasado')
         ORDER BY v.created_at ASC`, [lojaId]),
+      pool.query(`SELECT id, marca, nome, preco, estoque, img_url FROM produtos WHERE loja_id = $1 ORDER BY marca, nome`, [lojaId]),
     ]);
 
     const formaMap: Record<string, string> = {
@@ -81,10 +82,20 @@ router.post("/sheets/sync", authMiddleware, async (req, res) => {
         parseFloat(f.em_aberto || "0").toFixed(2).replace(".", ","),
       ]),
     ];
+    const produtosSheet: any[][] = [
+      ["ID", "Marca", "Nome", "Preço (R$)", "Estoque", "Imagem URL"],
+      ...produtosRes.rows.map(p => [
+        p.id, p.marca, p.nome,
+        parseFloat(p.preco).toFixed(2).replace(".", ","),
+        p.estoque ?? 0,
+        p.img_url || "",
+      ]),
+    ];
     const resumo: any[][] = [
       [`📊 Resumo ${lojaNome}`], [],
       ["Atualizado em", new Date().toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" })], [],
       ["Total de Clientes", clientesRes.rows.length],
+      ["Total de Produtos", produtosRes.rows.length],
       ["Total de Vendas", vendasRes.rows.length],
       ["Fiados em Aberto", fiadosRes.rows.length],
       ["Total em Fiados (R$)", fiadosRes.rows.reduce((s, f) => s + parseFloat(f.em_aberto || "0"), 0).toFixed(2).replace(".", ",")],
@@ -101,16 +112,31 @@ router.post("/sheets/sync", authMiddleware, async (req, res) => {
             { properties: { title: "Clientes", sheetId: 1 } },
             { properties: { title: "Vendas", sheetId: 2 } },
             { properties: { title: "Fiados em Aberto", sheetId: 3 } },
+            { properties: { title: "Catálogo de Produtos", sheetId: 4 } },
           ],
         },
       });
       spreadsheetId = created.data.spreadsheetId!;
       await saveSpreadsheetId(spreadsheetId, lojaId);
+    } else {
+      // Garantir que a aba Catálogo existe (pode ter sido criada antes sem ela)
+      try {
+        const sheetMeta = await sheets.spreadsheets.get({ spreadsheetId });
+        const tabNames = sheetMeta.data.sheets?.map(s => s.properties?.title) ?? [];
+        if (!tabNames.includes("Catálogo de Produtos")) {
+          await sheets.spreadsheets.batchUpdate({
+            spreadsheetId,
+            requestBody: {
+              requests: [{ addSheet: { properties: { title: "Catálogo de Produtos", sheetId: 4 } } }],
+            },
+          });
+        }
+      } catch {}
     }
 
     await sheets.spreadsheets.values.batchClear({
       spreadsheetId,
-      requestBody: { ranges: ["Resumo", "Clientes", "Vendas", "Fiados em Aberto"] },
+      requestBody: { ranges: ["Resumo", "Clientes", "Vendas", "Fiados em Aberto", "Catálogo de Produtos"] },
     });
     await sheets.spreadsheets.values.batchUpdate({
       spreadsheetId,
@@ -121,6 +147,7 @@ router.post("/sheets/sync", authMiddleware, async (req, res) => {
           { range: "Clientes!A1", values: clientesSheet },
           { range: "Vendas!A1", values: vendasSheet },
           { range: "Fiados em Aberto!A1", values: fiadosSheet },
+          { range: "Catálogo de Produtos!A1", values: produtosSheet },
         ],
       },
     });
@@ -129,6 +156,48 @@ router.post("/sheets/sync", authMiddleware, async (req, res) => {
   } catch (err: any) {
     console.error("Erro ao sincronizar Google Sheets:", err.message);
     res.status(500).json({ error: "Erro ao sincronizar: " + (err.message || "desconhecido") });
+  }
+});
+
+// Importar produtos do Google Sheets de volta para o banco
+router.post("/sheets/importar-produtos", authMiddleware, async (req, res) => {
+  const lojaId = req.auth!.lojaId;
+  try {
+    const spreadsheetId = await getSpreadsheetId(lojaId);
+    if (!spreadsheetId) return res.status(400).json({ error: "Planilha não conectada" });
+
+    const sheets = await getUncachableGoogleSheetClient();
+    const resp = await sheets.spreadsheets.values.get({
+      spreadsheetId,
+      range: "Catálogo de Produtos!A2:F1000",
+    });
+
+    const rows = resp.data.values ?? [];
+    if (rows.length === 0) return res.json({ ok: true, importados: 0 });
+
+    let importados = 0;
+    for (const row of rows) {
+      const marca = row[1]?.trim();
+      const nome = row[2]?.trim();
+      const preco = parseFloat((row[3] ?? "0").replace(",", "."));
+      const estoque = parseInt(row[4] ?? "0") || 0;
+      const img_url = row[5]?.trim() || null;
+
+      if (!marca || !nome || isNaN(preco)) continue;
+
+      await pool.query(
+        `INSERT INTO produtos (marca, nome, preco, estoque, img_url, loja_id)
+         VALUES ($1, $2, $3, $4, $5, $6)
+         ON CONFLICT DO NOTHING`,
+        [marca, nome, preco, estoque, img_url, lojaId]
+      );
+      importados++;
+    }
+
+    res.json({ ok: true, importados });
+  } catch (err: any) {
+    console.error("Erro ao importar produtos:", err.message);
+    res.status(500).json({ error: "Erro ao importar: " + (err.message || "desconhecido") });
   }
 });
 
