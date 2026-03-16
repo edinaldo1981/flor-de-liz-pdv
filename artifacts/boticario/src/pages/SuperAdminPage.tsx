@@ -12,6 +12,8 @@ interface Loja {
   total_clientes: string;
   total_vendas: string;
   tem_senha: boolean;
+  google_email: string | null;
+  sheets_id: string | null;
 }
 
 function fmtDate(d: string) {
@@ -27,10 +29,14 @@ export default function SuperAdminPage({ onExit }: { onExit: () => void }) {
   const [loadingLojas, setLoadingLojas] = useState(false);
   const [modal, setModal] = useState<"criar" | "editar" | null>(null);
   const [editLoja, setEditLoja] = useState<Loja | null>(null);
-  const [form, setForm] = useState({ nome: "", slug: "", admin_password: "", colaborador_password: "", plano: "basico" });
+  const [form, setForm] = useState({
+    nome: "", slug: "", admin_password: "", colaborador_password: "", plano: "basico", google_email: "",
+  });
   const [saving, setSaving] = useState(false);
   const [erroForm, setErroForm] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
+  const [criandoPlanilha, setCriandoPlanilha] = useState<number | null>(null);
+  const [planilhaMsgs, setPlanilhaMsgs] = useState<Record<number, { ok: boolean; texto: string; url?: string }>>({});
 
   useEffect(() => {
     if (token) fetchLojas();
@@ -73,7 +79,7 @@ export default function SuperAdminPage({ onExit }: { onExit: () => void }) {
       if (!r.ok) { setErroForm(d.error || "Erro ao criar loja"); return; }
       setSuccessMsg(`Loja "${form.nome}" criada com sucesso!`);
       setModal(null);
-      setForm({ nome: "", slug: "", admin_password: "", colaborador_password: "", plano: "basico" });
+      setForm({ nome: "", slug: "", admin_password: "", colaborador_password: "", plano: "basico", google_email: "" });
       fetchLojas();
       setTimeout(() => setSuccessMsg(""), 4000);
     } catch { setErroForm("Erro de conexão"); } finally { setSaving(false); }
@@ -83,7 +89,7 @@ export default function SuperAdminPage({ onExit }: { onExit: () => void }) {
     if (!editLoja) return;
     setSaving(true); setErroForm("");
     try {
-      const body: any = { nome: form.nome, plano: form.plano };
+      const body: any = { nome: form.nome, plano: form.plano, google_email: form.google_email };
       if (form.admin_password) body.admin_password = form.admin_password;
       const r = await fetch(`${API_BASE}/superadmin/lojas/${editLoja.id}`, {
         method: "PATCH", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
@@ -109,9 +115,37 @@ export default function SuperAdminPage({ onExit }: { onExit: () => void }) {
     } catch {}
   };
 
+  const handleCriarPlanilha = async (loja: Loja) => {
+    if (!loja.google_email) {
+      setPlanilhaMsgs(m => ({ ...m, [loja.id]: { ok: false, texto: "Adicione o e-mail Google da loja antes de criar a planilha." } }));
+      return;
+    }
+    setCriandoPlanilha(loja.id);
+    setPlanilhaMsgs(m => ({ ...m, [loja.id]: { ok: true, texto: "Criando planilha..." } }));
+    try {
+      const r = await fetch(`${API_BASE}/superadmin/lojas/${loja.id}/criar-planilha`, {
+        method: "POST", headers: { Authorization: `Bearer ${token}` },
+      });
+      const d = await r.json();
+      if (!r.ok) {
+        setPlanilhaMsgs(m => ({ ...m, [loja.id]: { ok: false, texto: d.error || "Erro ao criar planilha" } }));
+        return;
+      }
+      const texto = d.compartilhado
+        ? `Planilha criada e compartilhada com ${d.googleEmail}!`
+        : `Planilha criada! ${d.erroCompartilhamento ? "Não foi possível compartilhar automaticamente — abra o link e compartilhe manualmente com " + d.googleEmail + "." : ""}`;
+      setPlanilhaMsgs(m => ({ ...m, [loja.id]: { ok: true, texto, url: d.sheetUrl } }));
+      fetchLojas();
+    } catch {
+      setPlanilhaMsgs(m => ({ ...m, [loja.id]: { ok: false, texto: "Erro de conexão" } }));
+    } finally {
+      setCriandoPlanilha(null);
+    }
+  };
+
   const openEditar = (loja: Loja) => {
     setEditLoja(loja);
-    setForm({ nome: loja.nome, slug: loja.slug, admin_password: "", colaborador_password: "", plano: loja.plano });
+    setForm({ nome: loja.nome, slug: loja.slug, admin_password: "", colaborador_password: "", plano: loja.plano, google_email: loja.google_email || "" });
     setErroForm("");
     setModal("editar");
   };
@@ -167,7 +201,6 @@ export default function SuperAdminPage({ onExit }: { onExit: () => void }) {
 
   return (
     <div className="min-h-screen bg-slate-900 text-white">
-      {/* Header */}
       <header className="bg-slate-800 border-b border-slate-700 px-6 py-4 flex items-center justify-between sticky top-0 z-10">
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-xl bg-violet-600 flex items-center justify-center">
@@ -180,7 +213,7 @@ export default function SuperAdminPage({ onExit }: { onExit: () => void }) {
         </div>
         <div className="flex items-center gap-2">
           <button
-            onClick={() => { setForm({ nome: "", slug: "", admin_password: "", colaborador_password: "", plano: "basico" }); setErroForm(""); setModal("criar"); }}
+            onClick={() => { setForm({ nome: "", slug: "", admin_password: "", colaborador_password: "", plano: "basico", google_email: "" }); setErroForm(""); setModal("criar"); }}
             className="flex items-center gap-1.5 px-4 py-2 bg-violet-600 rounded-xl text-sm font-bold hover:bg-violet-700 transition-colors"
           >
             <span className="material-symbols-outlined text-lg">add</span>
@@ -199,12 +232,11 @@ export default function SuperAdminPage({ onExit }: { onExit: () => void }) {
         </div>
       )}
 
-      {/* Stats */}
       <div className="px-6 py-4 grid grid-cols-3 gap-3">
         {[
           { icon: "store", label: "Total de Lojas", value: lojas.length },
           { icon: "check_circle", label: "Ativas", value: lojas.filter(l => l.status === "ativo").length },
-          { icon: "block", label: "Inativas", value: lojas.filter(l => l.status !== "ativo").length },
+          { icon: "table_chart", label: "Com Planilha", value: lojas.filter(l => !!l.sheets_id).length },
         ].map(s => (
           <div key={s.label} className="bg-slate-800 rounded-xl p-4 border border-slate-700">
             <span className="material-symbols-outlined text-violet-400 text-xl mb-2 block">{s.icon}</span>
@@ -214,7 +246,6 @@ export default function SuperAdminPage({ onExit }: { onExit: () => void }) {
         ))}
       </div>
 
-      {/* Lojas List */}
       <div className="px-6 pb-10">
         <div className="flex items-center justify-between mb-3">
           <h2 className="font-bold text-base text-slate-200">Lojas Cadastradas</h2>
@@ -248,18 +279,69 @@ export default function SuperAdminPage({ onExit }: { onExit: () => void }) {
                       </span>
                     </div>
                     <p className="text-slate-400 text-sm mt-0.5 font-mono">@{loja.slug}</p>
-                    <div className="flex items-center gap-4 mt-2 text-xs text-slate-500">
+
+                    <div className="flex items-center gap-4 mt-2 text-xs text-slate-500 flex-wrap">
                       <span><span className="material-symbols-outlined text-sm align-middle mr-0.5">group</span>{loja.total_clientes} clientes</span>
                       <span><span className="material-symbols-outlined text-sm align-middle mr-0.5">shopping_bag</span>{loja.total_vendas} vendas</span>
-                      <span>Criada em {fmtDate(loja.created_at)}</span>
+                      <span>Criada {fmtDate(loja.created_at)}</span>
                     </div>
+
+                    {loja.google_email && (
+                      <p className="text-xs text-slate-500 mt-1.5 flex items-center gap-1">
+                        <span className="material-symbols-outlined text-sm">mail</span>
+                        {loja.google_email}
+                      </p>
+                    )}
+
+                    <div className="mt-2 flex items-center gap-2 flex-wrap">
+                      {loja.sheets_id ? (
+                        <a
+                          href={`https://docs.google.com/spreadsheets/d/${loja.sheets_id}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="flex items-center gap-1 text-xs text-emerald-400 hover:text-emerald-300"
+                        >
+                          <span className="material-symbols-outlined text-sm">table_chart</span>
+                          Planilha conectada
+                          <span className="material-symbols-outlined text-xs">open_in_new</span>
+                        </a>
+                      ) : (
+                        <span className="text-xs text-slate-600 flex items-center gap-1">
+                          <span className="material-symbols-outlined text-sm">table_chart</span>
+                          Sem planilha
+                        </span>
+                      )}
+                    </div>
+
+                    {planilhaMsgs[loja.id] && (
+                      <div className={`mt-2 text-xs rounded-lg px-3 py-2 ${planilhaMsgs[loja.id].ok ? "bg-emerald-900/40 text-emerald-300" : "bg-red-900/40 text-red-400"}`}>
+                        {planilhaMsgs[loja.id].texto}
+                        {planilhaMsgs[loja.id].url && (
+                          <a href={planilhaMsgs[loja.id].url} target="_blank" rel="noreferrer" className="ml-2 underline">
+                            Abrir planilha
+                          </a>
+                        )}
+                      </div>
+                    )}
                   </div>
+
                   <div className="flex flex-col gap-1.5 shrink-0">
                     <button
                       onClick={() => openEditar(loja)}
                       className="flex items-center gap-1 px-3 py-1.5 bg-slate-700 rounded-lg text-xs font-medium hover:bg-slate-600 transition-colors"
                     >
                       <span className="material-symbols-outlined text-sm">edit</span>Editar
+                    </button>
+                    <button
+                      onClick={() => handleCriarPlanilha(loja)}
+                      disabled={criandoPlanilha === loja.id}
+                      className="flex items-center gap-1 px-3 py-1.5 bg-emerald-900/50 text-emerald-400 rounded-lg text-xs font-medium hover:bg-emerald-900/80 transition-colors disabled:opacity-50"
+                    >
+                      {criandoPlanilha === loja.id
+                        ? <span className="material-symbols-outlined text-sm animate-spin">refresh</span>
+                        : <span className="material-symbols-outlined text-sm">table_chart</span>
+                      }
+                      {loja.sheets_id ? "Recriar" : "Criar"} Planilha
                     </button>
                     <button
                       onClick={() => handleToggleStatus(loja)}
@@ -280,10 +362,9 @@ export default function SuperAdminPage({ onExit }: { onExit: () => void }) {
         )}
       </div>
 
-      {/* Modal Criar/Editar */}
       {modal && (
         <div className="fixed inset-0 z-50 bg-black/70 flex items-end sm:items-center justify-center p-4">
-          <div className="bg-slate-800 rounded-2xl w-full max-w-md border border-slate-700 p-6">
+          <div className="bg-slate-800 rounded-2xl w-full max-w-md border border-slate-700 p-6 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-5">
               <h2 className="font-bold text-lg">{modal === "criar" ? "Nova Loja" : "Editar Loja"}</h2>
               <button onClick={() => { setModal(null); setEditLoja(null); }} className="text-slate-400 hover:text-white">
@@ -347,6 +428,21 @@ export default function SuperAdminPage({ onExit }: { onExit: () => void }) {
                   />
                 </div>
               )}
+
+              <div>
+                <label className="text-sm font-medium text-slate-300 block mb-1">
+                  <span className="material-symbols-outlined text-sm align-middle mr-1 text-emerald-400">table_chart</span>
+                  E-mail Google (para criar/compartilhar planilha)
+                </label>
+                <input
+                  type="email" placeholder="donadaloja@gmail.com"
+                  className="w-full h-11 px-4 bg-slate-700 border border-slate-600 rounded-xl text-white text-sm outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500"
+                  value={form.google_email} onChange={e => setForm(f => ({ ...f, google_email: e.target.value }))}
+                />
+                <p className="text-xs text-slate-500 mt-1">
+                  A planilha será criada e compartilhada com este e-mail. Pode alterar depois.
+                </p>
+              </div>
 
               {erroForm && <p className="text-red-400 text-sm bg-red-900/30 rounded-lg px-3 py-2">{erroForm}</p>}
 

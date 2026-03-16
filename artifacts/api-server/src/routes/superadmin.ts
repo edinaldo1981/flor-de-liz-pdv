@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { pool } from "@workspace/db";
 import { signSuperAdminToken, signToken, superAdminMiddleware } from "../middleware/auth";
+import { getUncachableGoogleSheetClient, getUncachableGoogleDriveClient } from "../google-sheets";
 
 const router = Router();
 
@@ -20,7 +21,9 @@ router.get("/superadmin/lojas", superAdminMiddleware, async (_req, res) => {
       SELECT l.*,
         (SELECT COUNT(*) FROM clientes WHERE loja_id = l.id) AS total_clientes,
         (SELECT COUNT(*) FROM vendas WHERE loja_id = l.id) AS total_vendas,
-        (SELECT value FROM config WHERE loja_id = l.id AND key = 'auth_config') AS auth_config_raw
+        (SELECT value FROM config WHERE loja_id = l.id AND key = 'auth_config') AS auth_config_raw,
+        (SELECT value FROM config WHERE loja_id = l.id AND key = 'google_email') AS google_email,
+        (SELECT value FROM config WHERE loja_id = l.id AND key = 'sheets_id') AS sheets_id
       FROM lojas l ORDER BY l.created_at DESC
     `);
     const lojas = r.rows.map(row => ({
@@ -36,7 +39,7 @@ router.get("/superadmin/lojas", superAdminMiddleware, async (_req, res) => {
 });
 
 router.post("/superadmin/lojas", superAdminMiddleware, async (req, res) => {
-  const { nome, slug, admin_password, colaborador_password, plano = "basico" } = req.body;
+  const { nome, slug, admin_password, colaborador_password, plano = "basico", google_email } = req.body;
   if (!nome || !slug || !admin_password) {
     return res.status(400).json({ error: "Nome, slug e senha do admin são obrigatórios" });
   }
@@ -70,6 +73,14 @@ router.post("/superadmin/lojas", superAdminMiddleware, async (req, res) => {
       [authConfig, loja.id]
     );
 
+    if (google_email && google_email.trim()) {
+      await pool.query(
+        `INSERT INTO config (key, value, loja_id) VALUES ('google_email', $1, $2)
+         ON CONFLICT (key, loja_id) DO UPDATE SET value = $1`,
+        [google_email.trim().toLowerCase(), loja.id]
+      );
+    }
+
     res.json({ ok: true, loja });
   } catch (err) {
     console.error("[SuperAdmin] Erro ao criar loja:", err);
@@ -79,7 +90,7 @@ router.post("/superadmin/lojas", superAdminMiddleware, async (req, res) => {
 
 router.patch("/superadmin/lojas/:id", superAdminMiddleware, async (req, res) => {
   const { id } = req.params;
-  const { status, plano, nome, admin_password } = req.body;
+  const { status, plano, nome, admin_password, google_email } = req.body;
   try {
     if (status || plano || nome) {
       const fields: string[] = [];
@@ -103,10 +114,107 @@ router.patch("/superadmin/lojas/:id", superAdminMiddleware, async (req, res) => 
       );
     }
 
+    if (google_email !== undefined) {
+      const emailVal = google_email.trim().toLowerCase();
+      if (emailVal) {
+        await pool.query(
+          `INSERT INTO config (key, value, loja_id) VALUES ('google_email', $1, $2)
+           ON CONFLICT (key, loja_id) DO UPDATE SET value = $1`,
+          [emailVal, Number(id)]
+        );
+      } else {
+        await pool.query("DELETE FROM config WHERE key='google_email' AND loja_id=$1", [Number(id)]);
+      }
+    }
+
     res.json({ ok: true });
   } catch (err) {
     console.error("[SuperAdmin] Erro ao atualizar loja:", err);
     res.status(500).json({ error: "Erro ao atualizar" });
+  }
+});
+
+router.post("/superadmin/lojas/:id/criar-planilha", superAdminMiddleware, async (req, res) => {
+  const { id } = req.params;
+  try {
+    const lojaRes = await pool.query("SELECT nome FROM lojas WHERE id = $1", [id]);
+    if (lojaRes.rows.length === 0) return res.status(404).json({ error: "Loja não encontrada" });
+    const lojaNome = lojaRes.rows[0].nome;
+
+    const emailRes = await pool.query("SELECT value FROM config WHERE key = 'google_email' AND loja_id = $1", [id]);
+    const googleEmail = emailRes.rows[0]?.value || null;
+
+    const sheets = await getUncachableGoogleSheetClient();
+
+    const spreadsheet = await sheets.spreadsheets.create({
+      requestBody: {
+        properties: { title: `Anota Fácil — ${lojaNome}` },
+        sheets: [
+          { properties: { title: "Resumo", index: 0 } },
+          { properties: { title: "Clientes", index: 1 } },
+          { properties: { title: "Vendas", index: 2 } },
+          { properties: { title: "Fiados em Aberto", index: 3 } },
+          { properties: { title: "Catálogo de Produtos", index: 4 } },
+        ],
+      },
+    });
+
+    const spreadsheetId = spreadsheet.data.spreadsheetId!;
+    const sheetUrl = `https://docs.google.com/spreadsheets/d/${spreadsheetId}`;
+
+    await sheets.spreadsheets.values.batchUpdate({
+      spreadsheetId,
+      requestBody: {
+        valueInputOption: "RAW",
+        data: [
+          { range: "Resumo!A1", values: [["Planilha criada pelo Anota Fácil"], [`Loja: ${lojaNome}`], [`Data: ${new Date().toLocaleDateString("pt-BR")}`]] },
+          { range: "Clientes!A1", values: [["ID", "Nome", "CPF", "Telefone", "E-mail", "Endereço", "Observações"]] },
+          { range: "Vendas!A1", values: [["ID", "Cliente", "Data", "Total (R$)", "Forma Pagamento", "Status", "Valor Pago (R$)"]] },
+          { range: "Fiados em Aberto!A1", values: [["ID Venda", "Cliente", "Data", "Total (R$)", "Valor Pago (R$)", "Em Aberto (R$)"]] },
+          { range: "Catálogo de Produtos!A1", values: [["ID", "Marca", "Nome", "Preço (R$)", "Estoque", "Imagem URL"]] },
+        ],
+      },
+    });
+
+    await pool.query(
+      `INSERT INTO config (key, value, loja_id, updated_at) VALUES ('sheets_id', $1, $2, now())
+       ON CONFLICT (key, loja_id) DO UPDATE SET value = $1, updated_at = now()`,
+      [spreadsheetId, id]
+    );
+
+    let compartilhado = false;
+    let erroCompartilhamento: string | null = null;
+
+    if (googleEmail) {
+      try {
+        const drive = await getUncachableGoogleDriveClient();
+        await drive.permissions.create({
+          fileId: spreadsheetId,
+          sendNotificationEmail: true,
+          requestBody: {
+            type: "user",
+            role: "writer",
+            emailAddress: googleEmail,
+          },
+        });
+        compartilhado = true;
+      } catch (err: any) {
+        console.error("[SuperAdmin] Erro ao compartilhar planilha:", err.message);
+        erroCompartilhamento = err.message;
+      }
+    }
+
+    res.json({
+      ok: true,
+      spreadsheetId,
+      sheetUrl,
+      compartilhado,
+      googleEmail,
+      erroCompartilhamento,
+    });
+  } catch (err: any) {
+    console.error("[SuperAdmin] Erro ao criar planilha:", err.message);
+    res.status(500).json({ error: "Erro ao criar planilha: " + (err.message || "desconhecido") });
   }
 });
 
