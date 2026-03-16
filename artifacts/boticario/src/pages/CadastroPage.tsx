@@ -74,12 +74,6 @@ export default function CadastroPage({ onNavigate }: CadastroPageProps) {
 
   const handleSalvar = async () => {
     if (!form.nome.trim()) { setErro("Nome é obrigatório."); return; }
-    if (!form.cpf.trim() || form.cpf.replace(/\D/g, "").length < 11) {
-      setErro("CPF é obrigatório e deve ter 11 dígitos."); return;
-    }
-    if (!form.telefone.trim() || form.telefone.replace(/\D/g, "").length < 10) {
-      setErro("Celular é obrigatório. Informe com DDD."); return;
-    }
     setSaving(true);
     setErro("");
     try {
@@ -146,7 +140,7 @@ export default function CadastroPage({ onNavigate }: CadastroPageProps) {
             {/* CPF */}
             <label className="flex flex-col w-full">
               <p className="text-slate-700 text-sm font-medium pb-1.5">
-                CPF <span className="text-red-500">*</span>
+                CPF
               </p>
               <div className="relative flex items-center">
                 <span className="material-symbols-outlined absolute left-3 text-[#4d8063] text-xl">badge</span>
@@ -187,7 +181,7 @@ export default function CadastroPage({ onNavigate }: CadastroPageProps) {
             {/* Celular */}
             <label className="flex flex-col w-full">
               <p className="text-slate-700 text-sm font-medium pb-1.5">
-                Celular / WhatsApp <span className="text-red-500">*</span>
+                Celular / WhatsApp
               </p>
               <div className="relative flex items-center">
                 <span className="material-symbols-outlined absolute left-3 text-[#4d8063] text-xl">phone</span>
