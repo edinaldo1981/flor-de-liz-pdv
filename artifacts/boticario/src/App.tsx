@@ -53,12 +53,19 @@ function Sidebar({ current, onNavigate, role, permissions, onLogout, lojaNome }:
 }) {
   const activePage = pageParentMap[current] ?? current;
   const [vendasHoje, setVendasHoje] = useState<number | null>(null);
+  const [logo, setLogo] = useState<string | null>(() => localStorage.getItem("loja_logo") || null);
 
   useEffect(() => {
     apiFetch("/dashboard")
       .then(r => r.ok ? r.json() : null)
       .then(d => { if (d) setVendasHoje(parseFloat(d.vendasHoje?.soma ?? d.vendasHoje ?? 0)); })
       .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    const onLogoUpdate = () => setLogo(localStorage.getItem("loja_logo") || null);
+    window.addEventListener("logo_atualizado", onLogoUpdate);
+    return () => window.removeEventListener("logo_atualizado", onLogoUpdate);
   }, []);
 
   const allTabs: { icon: string; label: string; page: Page; permKey?: string }[] = [
@@ -76,8 +83,12 @@ function Sidebar({ current, onNavigate, role, permissions, onLogout, lojaNome }:
     <aside className="hidden lg:flex flex-col w-60 shrink-0 bg-white border-r border-slate-200 min-h-screen sticky top-0 h-screen">
       <div className="px-5 py-6 border-b border-slate-100">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#4d8063] flex items-center justify-center">
-            <span className="material-symbols-outlined text-white text-xl">spa</span>
+          <div className="w-10 h-10 rounded-xl bg-[#4d8063] flex items-center justify-center overflow-hidden shrink-0">
+            {logo ? (
+              <img src={logo} alt="Logo" className="w-full h-full object-cover" />
+            ) : (
+              <span className="material-symbols-outlined text-white text-xl">spa</span>
+            )}
           </div>
           <div>
             <h1 className="text-base font-bold text-slate-800 leading-tight">{lojaNome}</h1>

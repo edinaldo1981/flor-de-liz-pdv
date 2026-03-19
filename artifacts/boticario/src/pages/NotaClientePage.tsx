@@ -81,6 +81,12 @@ export default function NotaClientePage({ onNavigate }: NotaClientePageProps) {
   const [excluindoId, setExcluindoId] = useState<number | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<number | null>(null);
 
+  const [editHaverId, setEditHaverId] = useState<number | null>(null);
+  const [editHaverForm, setEditHaverForm] = useState({ descricao: "", saldo_restante: "" });
+  const [salvandoHaverEdit, setSalvandoHaverEdit] = useState(false);
+  const [confirmDeleteHaver, setConfirmDeleteHaver] = useState<number | null>(null);
+  const [deletandoHaver, setDeletandoHaver] = useState(false);
+
   const [erro, setErro] = useState("");
 
   useEffect(() => {
@@ -111,6 +117,43 @@ export default function NotaClientePage({ onNavigate }: NotaClientePageProps) {
   };
 
   const totalAberto = vendas.reduce((a, v) => a + saldoVenda(v), 0);
+
+  const handleEditHaver = async () => {
+    if (!editHaverId || !cliente) return;
+    setSalvandoHaverEdit(true);
+    try {
+      const r = await apiFetch(`/clientes/${cliente.id}/haveres/${editHaverId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          descricao: editHaverForm.descricao,
+          saldo_restante: parseFloat(editHaverForm.saldo_restante),
+        }),
+      });
+      if (!r.ok) throw new Error();
+      setEditHaverId(null);
+      fetchHaveres(cliente.id);
+    } catch {
+      setErro("Erro ao editar haver.");
+    } finally {
+      setSalvandoHaverEdit(false);
+    }
+  };
+
+  const handleDeleteHaver = async () => {
+    if (!confirmDeleteHaver || !cliente) return;
+    setDeletandoHaver(true);
+    try {
+      const r = await apiFetch(`/clientes/${cliente.id}/haveres/${confirmDeleteHaver}`, { method: "DELETE" });
+      if (!r.ok) throw new Error();
+      setConfirmDeleteHaver(null);
+      fetchHaveres(cliente.id);
+    } catch {
+      setErro("Erro ao excluir haver.");
+    } finally {
+      setDeletandoHaver(false);
+    }
+  };
 
   const handlePagar = async (v: Venda) => {
     const valor = parseFloat((pagValor[v.id] || "0").replace(",", "."));
@@ -295,11 +338,23 @@ export default function NotaClientePage({ onNavigate }: NotaClientePageProps) {
               </button>
             </div>
             {totalHaver > 0 && (
-              <div className="mt-2 pt-2 border-t border-amber-200 space-y-1">
+              <div className="mt-2 pt-2 border-t border-amber-200 space-y-1.5">
                 {haveres.map(h => (
-                  <div key={h.id} className="flex justify-between text-xs text-amber-700">
-                    <span className="truncate">{h.descricao}</span>
-                    <span className="font-bold ml-2 shrink-0">R$ {fmtBRL(parseFloat(h.saldo_restante))}</span>
+                  <div key={h.id} className="flex items-center gap-2 text-xs text-amber-700">
+                    <span className="flex-1 truncate">{h.descricao}</span>
+                    <span className="font-bold shrink-0">R$ {fmtBRL(parseFloat(h.saldo_restante))}</span>
+                    <button
+                      onClick={() => { setEditHaverId(h.id); setEditHaverForm({ descricao: h.descricao, saldo_restante: parseFloat(h.saldo_restante).toFixed(2) }); }}
+                      className="p-1 rounded bg-amber-100 hover:bg-amber-200 text-amber-600 shrink-0"
+                    >
+                      <Pencil className="w-3 h-3" />
+                    </button>
+                    <button
+                      onClick={() => setConfirmDeleteHaver(h.id)}
+                      className="p-1 rounded bg-red-50 hover:bg-red-100 text-red-400 shrink-0"
+                    >
+                      <Trash2 className="w-3 h-3" />
+                    </button>
                   </div>
                 ))}
               </div>
@@ -578,6 +633,68 @@ export default function NotaClientePage({ onNavigate }: NotaClientePageProps) {
                 className="flex-1 py-3 rounded-xl bg-amber-500 text-white font-bold text-sm disabled:opacity-60"
               >
                 {salvandoHaver ? "Salvando..." : "Registrar Haver"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Editar Haver */}
+      {editHaverId && (
+        <div className="fixed inset-0 bg-black/40 z-50 flex items-end justify-center">
+          <div className="bg-white rounded-t-2xl w-full max-w-md p-6 pb-8">
+            <h3 className="font-bold text-base mb-4">Editar Haver</h3>
+            <div className="flex flex-col gap-3">
+              <div>
+                <label className="text-sm font-medium text-slate-700 mb-1 block">Motivo</label>
+                <input
+                  className="w-full border border-slate-200 rounded-xl h-11 px-4 text-sm outline-none focus:ring-2 focus:ring-amber-300"
+                  value={editHaverForm.descricao}
+                  onChange={e => setEditHaverForm(f => ({ ...f, descricao: e.target.value }))}
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-slate-700 mb-1 block">Saldo Disponível (R$)</label>
+                <input
+                  type="number"
+                  className="w-full border border-slate-200 rounded-xl h-11 px-4 text-sm outline-none focus:ring-2 focus:ring-amber-300"
+                  value={editHaverForm.saldo_restante}
+                  onChange={e => setEditHaverForm(f => ({ ...f, saldo_restante: e.target.value }))}
+                />
+              </div>
+              <div className="flex gap-3 mt-2">
+                <button onClick={() => setEditHaverId(null)} className="flex-1 py-3 rounded-xl border border-slate-200 text-slate-600 text-sm font-semibold">
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleEditHaver}
+                  disabled={salvandoHaverEdit}
+                  className="flex-1 py-3 rounded-xl bg-amber-500 text-white font-bold text-sm disabled:opacity-60"
+                >
+                  {salvandoHaverEdit ? "Salvando..." : "Salvar"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Confirmar Excluir Haver */}
+      {confirmDeleteHaver && (
+        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center px-4">
+          <div className="bg-white rounded-2xl w-full max-w-sm p-6">
+            <h3 className="font-bold text-base mb-2 text-slate-800">Excluir Haver?</h3>
+            <p className="text-sm text-slate-500 mb-5">Essa ação não pode ser desfeita.</p>
+            <div className="flex gap-3">
+              <button onClick={() => setConfirmDeleteHaver(null)} className="flex-1 py-3 rounded-xl border border-slate-200 text-slate-600 text-sm font-semibold">
+                Cancelar
+              </button>
+              <button
+                onClick={handleDeleteHaver}
+                disabled={deletandoHaver}
+                className="flex-1 py-3 rounded-xl bg-red-500 text-white font-bold text-sm disabled:opacity-60"
+              >
+                {deletandoHaver ? "Excluindo..." : "Excluir"}
               </button>
             </div>
           </div>

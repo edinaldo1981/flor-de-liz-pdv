@@ -1,13 +1,12 @@
-import { ArrowLeft, ChevronRight, Pencil, Check, X, RefreshCw, ExternalLink, LogOut } from "lucide-react";
+import { ArrowLeft, ChevronRight, Pencil, Check, X, LogOut, ImagePlus, Trash2 } from "lucide-react";
 import { apiFetch } from "@/lib/api";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 interface ProfilePageProps {
   onNavigate: (page: string) => void;
   role?: "admin" | "colaborador";
   onLogout?: () => void;
 }
-
 
 const fmtBRL = (v: number) =>
   v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -22,20 +21,33 @@ export default function ProfilePage({ onNavigate, role = "admin", onLogout }: Pr
   const [stats, setStats] = useState({ vendas: 0, clientes: 0, fiados: 0, recebidoMes: 0 });
   const [loadingStats, setLoadingStats] = useState(true);
 
-  const [sheetUrl, setSheetUrl] = useState<string | null>(null);
-  const [syncing, setSyncing] = useState(false);
-  const [syncMsg, setSyncMsg] = useState<{ ok: boolean; text: string } | null>(null);
-
   const [pixKey, setPixKey] = useState("");
   const [pixTemp, setPixTemp] = useState("");
   const [editandoPix, setEditandoPix] = useState(false);
   const [savingPix, setSavingPix] = useState(false);
   const [pixMsg, setPixMsg] = useState<{ ok: boolean; text: string } | null>(null);
 
+  const [logo, setLogo] = useState<string | null>(() => localStorage.getItem("loja_logo") || null);
+  const [savingLogo, setSavingLogo] = useState(false);
+  const [logoMsg, setLogoMsg] = useState<{ ok: boolean; text: string } | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   useEffect(() => {
     apiFetch(`/config/pix`)
       .then(r => r.ok ? r.json() : null)
       .then(d => { if (d?.pixKey) { setPixKey(d.pixKey); setPixTemp(d.pixKey); } })
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    apiFetch(`/config/logo`)
+      .then(r => r.ok ? r.json() : null)
+      .then(d => {
+        if (d?.logo) {
+          setLogo(d.logo);
+          localStorage.setItem("loja_logo", d.logo);
+        }
+      })
       .catch(() => {});
   }, []);
 
@@ -62,29 +74,56 @@ export default function ProfilePage({ onNavigate, role = "admin", onLogout }: Pr
     }
   };
 
-  useEffect(() => {
-    apiFetch(`/sheets/status`)
-      .then(r => r.ok ? r.json() : null)
-      .then(d => { if (d?.spreadsheetId) setSheetUrl(`https://docs.google.com/spreadsheets/d/${d.spreadsheetId}`); })
-      .catch(() => {});
-  }, []);
+  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) {
+      setLogoMsg({ ok: false, text: "Imagem muito grande. Use até 2MB." });
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = async () => {
+      const base64 = reader.result as string;
+      setSavingLogo(true);
+      setLogoMsg(null);
+      try {
+        const r = await apiFetch(`/config/logo`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ logo: base64 }),
+        });
+        if (r.ok) {
+          setLogo(base64);
+          localStorage.setItem("loja_logo", base64);
+          setLogoMsg({ ok: true, text: "Logo salvo com sucesso!" });
+          window.dispatchEvent(new Event("logo_atualizado"));
+        } else {
+          setLogoMsg({ ok: false, text: "Erro ao salvar logo." });
+        }
+      } catch {
+        setLogoMsg({ ok: false, text: "Erro de conexão." });
+      } finally {
+        setSavingLogo(false);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
 
-  const sincronizarSheets = async () => {
-    setSyncing(true);
-    setSyncMsg(null);
+  const handleRemoverLogo = async () => {
+    setSavingLogo(true);
+    setLogoMsg(null);
     try {
-      const r = await apiFetch(`/sheets/sync`, { method: "POST" });
-      const d = await r.json();
-      if (r.ok && d.ok) {
-        setSheetUrl(d.sheetUrl);
-        setSyncMsg({ ok: true, text: "Sincronizado com sucesso!" });
-      } else {
-        setSyncMsg({ ok: false, text: d.error || "Erro ao sincronizar." });
+      const r = await apiFetch(`/config/logo`, { method: "DELETE" });
+      if (r.ok) {
+        setLogo(null);
+        localStorage.removeItem("loja_logo");
+        setLogoMsg({ ok: true, text: "Logo removido." });
+        window.dispatchEvent(new Event("logo_atualizado"));
       }
     } catch {
-      setSyncMsg({ ok: false, text: "Erro de conexão." });
+      setLogoMsg({ ok: false, text: "Erro ao remover logo." });
     } finally {
-      setSyncing(false);
+      setSavingLogo(false);
     }
   };
 
@@ -139,8 +178,10 @@ export default function ProfilePage({ onNavigate, role = "admin", onLogout }: Pr
 
       {/* Hero */}
       <div className="bg-[#4d8063] text-white px-6 py-8 flex flex-col items-center gap-3">
-        <div className="w-20 h-20 rounded-full bg-white/20 flex items-center justify-center border-4 border-white/40">
-          {nome === "Minha Loja" ? (
+        <div className="w-20 h-20 rounded-full bg-white/20 flex items-center justify-center border-4 border-white/40 overflow-hidden">
+          {logo ? (
+            <img src={logo} alt="Logo" className="w-full h-full object-cover" />
+          ) : nome === "Minha Loja" ? (
             <span className="material-symbols-outlined text-5xl">spa</span>
           ) : (
             <span className="text-3xl font-bold">{initials}</span>
@@ -220,7 +261,6 @@ export default function ProfilePage({ onNavigate, role = "admin", onLogout }: Pr
         </button>
       </div>
 
-      {/* Recebido no mês */}
       {!loadingStats && stats.recebidoMes > 0 && (
         <div className="mx-4 mb-4 bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3 flex items-center justify-between">
           <div>
@@ -231,7 +271,6 @@ export default function ProfilePage({ onNavigate, role = "admin", onLogout }: Pr
         </div>
       )}
 
-      {/* Menu de Navegação */}
       <div className="px-4 space-y-2">
         {[
           { icon: "add_shopping_cart", label: "Nova Venda", sub: "Registrar uma venda", page: "carrinho" },
@@ -258,7 +297,6 @@ export default function ProfilePage({ onNavigate, role = "admin", onLogout }: Pr
           </button>
         ))}
 
-        {/* Controle de Acesso — apenas admin */}
         {role === "admin" && (
           <button
             onClick={() => onNavigate("config_acesso")}
@@ -275,6 +313,63 @@ export default function ProfilePage({ onNavigate, role = "admin", onLogout }: Pr
           </button>
         )}
 
+        {/* Logo da Loja — apenas admin */}
+        {role === "admin" && (
+          <div className="bg-white rounded-2xl border border-purple-100 shadow-sm overflow-hidden">
+            <div className="flex items-center gap-3 px-4 py-3 bg-purple-50 border-b border-purple-100">
+              <div className="w-9 h-9 rounded-xl bg-white flex items-center justify-center shadow-sm shrink-0">
+                <ImagePlus className="w-5 h-5 text-purple-500" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-bold text-purple-800">Logo da Loja</p>
+                <p className="text-[11px] text-purple-600">Aparece na sidebar e no perfil</p>
+              </div>
+            </div>
+            <div className="px-4 py-3 space-y-3">
+              {logoMsg && (
+                <div className={`flex items-center gap-2 text-xs font-medium px-3 py-2 rounded-lg ${logoMsg.ok ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-red-600"}`}>
+                  <span className="material-symbols-outlined text-base">{logoMsg.ok ? "check_circle" : "error"}</span>
+                  {logoMsg.text}
+                </div>
+              )}
+              {logo && (
+                <div className="flex items-center gap-3">
+                  <div className="w-16 h-16 rounded-xl overflow-hidden border border-purple-100 shrink-0">
+                    <img src={logo} alt="Logo atual" className="w-full h-full object-cover" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-xs text-slate-500 mb-2">Logo atual</p>
+                    <button
+                      onClick={handleRemoverLogo}
+                      disabled={savingLogo}
+                      className="flex items-center gap-1.5 text-xs text-red-500 font-semibold px-3 py-1.5 rounded-lg border border-red-200 bg-red-50 hover:bg-red-100"
+                    >
+                      <Trash2 className="w-3 h-3" />
+                      Remover logo
+                    </button>
+                  </div>
+                </div>
+              )}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleLogoUpload}
+              />
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                disabled={savingLogo}
+                className="w-full flex items-center justify-center gap-2 border-2 border-dashed border-purple-200 text-purple-600 font-bold py-3 rounded-xl text-sm hover:bg-purple-50 disabled:opacity-60 transition-colors"
+              >
+                <ImagePlus className="w-4 h-4" />
+                {savingLogo ? "Salvando..." : logo ? "Trocar imagem" : "Enviar logo"}
+              </button>
+              <p className="text-[10px] text-slate-400 text-center">PNG, JPG ou WEBP até 2MB</p>
+            </div>
+          </div>
+        )}
+
         {/* Chave PIX — apenas admin */}
         {role === "admin" && (
           <div className="bg-white rounded-2xl border border-blue-100 shadow-sm overflow-hidden">
@@ -284,7 +379,7 @@ export default function ProfilePage({ onNavigate, role = "admin", onLogout }: Pr
               </div>
               <div className="flex-1">
                 <p className="text-sm font-bold text-blue-800">Chave PIX para Pagamento</p>
-                <p className="text-[11px] text-blue-600">Exibida no portal do cliente</p>
+                <p className="text-[11px] text-blue-600">Exibida no portal do cliente e no checkout</p>
               </div>
             </div>
             <div className="px-4 py-3 space-y-2.5">
@@ -339,55 +434,6 @@ export default function ProfilePage({ onNavigate, role = "admin", onLogout }: Pr
           </div>
         )}
 
-        {/* Google Sheets Backup */}
-        <div className="mt-2 bg-white rounded-2xl border border-emerald-100 shadow-sm overflow-hidden">
-          <div className="flex items-center gap-3 px-4 py-3 bg-emerald-50 border-b border-emerald-100">
-            <div className="w-9 h-9 rounded-xl bg-white flex items-center justify-center shadow-sm shrink-0">
-              <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none">
-                <rect width="24" height="24" rx="4" fill="#0F9D58"/>
-                <rect x="5" y="4" width="14" height="16" rx="1" fill="white"/>
-                <rect x="7" y="7" width="10" height="1.5" rx="0.5" fill="#0F9D58"/>
-                <rect x="7" y="10" width="10" height="1.5" rx="0.5" fill="#0F9D58"/>
-                <rect x="7" y="13" width="7" height="1.5" rx="0.5" fill="#0F9D58"/>
-              </svg>
-            </div>
-            <div className="flex-1">
-              <p className="text-sm font-bold text-emerald-800">Backup Google Sheets</p>
-              <p className="text-[11px] text-emerald-600">Clientes, vendas e fiados na sua planilha</p>
-            </div>
-          </div>
-
-          <div className="px-4 py-3 space-y-2.5">
-            {syncMsg && (
-              <div className={`flex items-center gap-2 text-xs font-medium px-3 py-2 rounded-lg ${syncMsg.ok ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-red-600"}`}>
-                <span className="material-symbols-outlined text-base">{syncMsg.ok ? "check_circle" : "error"}</span>
-                {syncMsg.text}
-              </div>
-            )}
-
-            <button
-              onClick={sincronizarSheets}
-              disabled={syncing}
-              className="w-full flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl text-sm disabled:opacity-60 transition-colors"
-            >
-              <RefreshCw className={`w-4 h-4 ${syncing ? "animate-spin" : ""}`} />
-              {syncing ? "Sincronizando..." : sheetUrl ? "Sincronizar Agora" : "Criar Planilha e Sincronizar"}
-            </button>
-
-            {sheetUrl && (
-              <a
-                href={sheetUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full flex items-center justify-center gap-2 border border-emerald-200 text-emerald-700 font-semibold py-2.5 rounded-xl text-sm bg-emerald-50"
-              >
-                <ExternalLink className="w-4 h-4" />
-                Abrir Planilha no Google Sheets
-              </a>
-            )}
-          </div>
-        </div>
-        {/* Botão Sair */}
         {onLogout && (
           <button
             onClick={onLogout}

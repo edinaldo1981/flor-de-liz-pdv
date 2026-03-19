@@ -1,6 +1,7 @@
-import { ArrowLeft, Trash2, Plus, Minus, Search, AlertCircle, Package, ShoppingCart } from "lucide-react";
+import { ArrowLeft, Trash2, Plus, Minus, Search, AlertCircle, Package, ShoppingCart, Copy, Check } from "lucide-react";
 import { apiFetch } from "@/lib/api";
 import { useState, useEffect, useRef } from "react";
+import { QRCodeSVG } from "qrcode.react";
 
 interface CarrinhoPageProps {
   onNavigate: (page: string) => void;
@@ -37,6 +38,37 @@ const formasPagamento = [
   { key: "a_prazo", icon: "receipt_long", label: "A Prazo" },
 ];
 
+function crc16(data: string): string {
+  let crc = 0xFFFF;
+  for (let i = 0; i < data.length; i++) {
+    crc ^= data.charCodeAt(i) << 8;
+    for (let j = 0; j < 8; j++) {
+      crc = crc & 0x8000 ? (crc << 1) ^ 0x1021 : crc << 1;
+      crc &= 0xFFFF;
+    }
+  }
+  return crc.toString(16).toUpperCase().padStart(4, "0");
+}
+
+function buildPixPayload(pixKey: string, amount: number, merchantName: string): string {
+  const f = (id: string, value: string) => `${id}${value.length.toString().padStart(2, "0")}${value}`;
+  const gui = f("00", "br.gov.bcb.pix") + f("01", pixKey);
+  const merchantAccountInfo = f("26", gui);
+  const name = merchantName.replace(/[^a-zA-Z0-9 ]/g, "").substring(0, 25).toUpperCase() || "LOJA";
+  const txid = f("05", "***");
+  const additionalData = f("62", txid);
+  const payload =
+    f("00", "01") +
+    merchantAccountInfo +
+    f("52", "0000") +
+    f("53", "986") +
+    f("54", amount.toFixed(2)) +
+    f("58", "BR") +
+    f("59", name) +
+    f("60", "BRASIL") +
+    additionalData;
+  return payload + f("63", crc16(payload + "6304"));
+}
 
 function loadCartFromStorage(): CartItem[] {
   try {
@@ -45,7 +77,7 @@ function loadCartFromStorage(): CartItem[] {
       const parsed = JSON.parse(raw);
       if (Array.isArray(parsed) && parsed.length > 0) return parsed;
     }
-  } catch { /* ignore */ }
+  } catch { }
   return [];
 }
 
@@ -62,11 +94,16 @@ export default function CarrinhoPage({ onNavigate }: CarrinhoPageProps) {
   const [desconto, setDesconto] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [erro, setErro] = useState("");
+  const [pixKey, setPixKey] = useState("");
+  const [showPixModal, setShowPixModal] = useState(false);
+  const [copiado, setCopiado] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+  const lojaNome = localStorage.getItem("auth_loja_nome") || "Loja";
   const total = items.reduce((sum, i) => sum + i.price * i.qty, 0);
   const totalFinal = Math.max(0, total - desconto);
   const isAPrazo = pagamento === "a_prazo";
+  const isPix = pagamento === "pix";
   const canFinalize = clienteSelecionado !== null && items.length > 0;
   const totalQty = items.reduce((s, i) => s + i.qty, 0);
 
@@ -78,6 +115,10 @@ export default function CarrinhoPage({ onNavigate }: CarrinhoPageProps) {
   useEffect(() => {
     fetchProdutos();
     fetchClientes("");
+    apiFetch("/config/pix")
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d?.pixKey) setPixKey(d.pixKey); })
+      .catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -93,7 +134,7 @@ export default function CarrinhoPage({ onNavigate }: CarrinhoPageProps) {
     try {
       const r = await apiFetch(`/produtos`);
       if (r.ok) setProdutos(await r.json());
-    } catch { /* ignore */ }
+    } catch { }
   };
 
   const fetchClientes = async (q: string) => {
@@ -102,7 +143,7 @@ export default function CarrinhoPage({ onNavigate }: CarrinhoPageProps) {
       const url = q ? `/clientes?q=${encodeURIComponent(q)}` : `/clientes`;
       const r = await apiFetch(url);
       if (r.ok) setClientes(await r.json());
-    } catch { /* ignore */ } finally { setLoadingClientes(false); }
+    } catch { } finally { setLoadingClientes(false); }
   };
 
   const addToCart = (p: Produto) => {
@@ -138,16 +179,37 @@ export default function CarrinhoPage({ onNavigate }: CarrinhoPageProps) {
       localStorage.setItem("ultima_venda", JSON.stringify({ venda, cliente: clienteSelecionado, items, total: totalFinal, pagamento }));
       localStorage.removeItem("carrinho_items");
       setItems([]);
+      setShowPixModal(false);
       onNavigate("confirmacao");
     } catch {
       setErro("Não foi possível registrar a venda. Tente novamente.");
+      setShowPixModal(false);
     } finally { setSubmitting(false); }
+  };
+
+  const handleClickConfirmar = () => {
+    if (!canFinalize) { setErro("Selecione um cliente antes de finalizar."); return; }
+    if (isPix && pixKey) {
+      setShowPixModal(true);
+    } else {
+      handleConfirmar();
+    }
+  };
+
+  const pixPayload = pixKey ? buildPixPayload(pixKey, totalFinal, lojaNome) : "";
+
+  const copiarPix = () => {
+    if (pixPayload) {
+      navigator.clipboard.writeText(pixPayload).then(() => {
+        setCopiado(true);
+        setTimeout(() => setCopiado(false), 2000);
+      });
+    }
   };
 
   return (
     <div className="bg-[#f6f7f7] min-h-screen flex flex-col">
 
-      {/* ── Cabeçalho ── */}
       <header className="sticky top-0 z-20 bg-white border-b border-[#4d8063]/10 px-4 py-3 flex items-center gap-3">
         <button onClick={() => onNavigate("home")} className="p-1">
           <ArrowLeft className="w-5 h-5" />
@@ -160,10 +222,7 @@ export default function CarrinhoPage({ onNavigate }: CarrinhoPageProps) {
         )}
       </header>
 
-      {/* ── Painel dividido: Catálogo | Carrinho ── */}
       <div className="flex gap-0 border-b border-slate-200" style={{ height: 300 }}>
-
-        {/* ── Lado esquerdo: Catálogo ── */}
         <div className="flex flex-col w-1/2 border-r border-slate-200 bg-white">
           <div className="flex items-center gap-1.5 px-2 py-2 border-b border-slate-100">
             <Search className="w-3.5 h-3.5 text-slate-400 shrink-0" />
@@ -211,9 +270,7 @@ export default function CarrinhoPage({ onNavigate }: CarrinhoPageProps) {
           </div>
         </div>
 
-        {/* ── Lado direito: Carrinho ── */}
         <div className="flex flex-col w-1/2 bg-white">
-          {/* Total no topo */}
           <div className="px-3 py-2 border-b border-slate-100 bg-[#4d8063]/5">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1.5">
@@ -225,12 +282,11 @@ export default function CarrinhoPage({ onNavigate }: CarrinhoPageProps) {
             <p className="text-base font-bold text-[#4d8063] mt-0.5">R$ {totalFinal.toFixed(2).replace(".", ",")}</p>
           </div>
 
-          {/* Itens — apenas 4 primeiros visíveis, resto rola */}
           <div className="flex-1 overflow-y-auto" style={{ maxHeight: 214 }}>
             {items.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full gap-1.5 text-slate-300 py-4">
                 <ShoppingCart className="w-7 h-7" />
-                <p className="text-[10px] text-center leading-tight">Clique nos produtos<br/>para adicionar</p>
+                <p className="text-[10px] text-center leading-tight">Clique nos produtos<br />para adicionar</p>
               </div>
             ) : (
               items.map(item => (
@@ -259,10 +315,7 @@ export default function CarrinhoPage({ onNavigate }: CarrinhoPageProps) {
         </div>
       </div>
 
-      {/* ── Seção inferior: Cliente + Pagamento + Confirmar ── */}
       <div className="flex-1 overflow-y-auto pb-4">
-
-        {/* Cliente */}
         <div className="px-4 pt-4 pb-2">
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider">
@@ -332,7 +385,6 @@ export default function CarrinhoPage({ onNavigate }: CarrinhoPageProps) {
           )}
         </div>
 
-        {/* Desconto */}
         <div className="px-4 pt-2">
           <div className="bg-white rounded-xl border border-slate-200 flex items-center px-3 gap-2">
             <span className="material-symbols-outlined text-[#4d8063] text-lg">local_offer</span>
@@ -348,7 +400,6 @@ export default function CarrinhoPage({ onNavigate }: CarrinhoPageProps) {
           </div>
         </div>
 
-        {/* Pagamento */}
         <div className="px-4 pt-3">
           <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Forma de Pagamento</h3>
           <div className="grid grid-cols-4 gap-2">
@@ -356,9 +407,8 @@ export default function CarrinhoPage({ onNavigate }: CarrinhoPageProps) {
               <button
                 key={f.key}
                 onClick={() => setPagamento(f.key)}
-                className={`flex flex-col items-center gap-1 py-2.5 rounded-xl border text-[10px] font-bold transition-colors ${
-                  pagamento === f.key ? "bg-[#4d8063] text-white border-[#4d8063]" : "bg-white text-slate-600 border-slate-200"
-                }`}
+                className={`flex flex-col items-center gap-1 py-2.5 rounded-xl border text-[10px] font-bold transition-colors ${pagamento === f.key ? "bg-[#4d8063] text-white border-[#4d8063]" : "bg-white text-slate-600 border-slate-200"
+                  }`}
               >
                 <span className="material-symbols-outlined text-base">{f.icon}</span>
                 {f.label}
@@ -380,16 +430,14 @@ export default function CarrinhoPage({ onNavigate }: CarrinhoPageProps) {
           </div>
         )}
 
-        {/* Botão Confirmar — dentro do fluxo, sempre visível */}
         <div className="px-4 pt-4">
           <button
-            onClick={handleConfirmar}
+            onClick={handleClickConfirmar}
             disabled={!canFinalize || submitting}
-            className={`w-full font-bold py-4 rounded-xl flex items-center justify-center gap-2 shadow-lg transition-all ${
-              canFinalize && !submitting
-                ? "bg-[#4d8063] text-white"
-                : "bg-slate-200 text-slate-400 cursor-not-allowed"
-            }`}
+            className={`w-full font-bold py-4 rounded-xl flex items-center justify-center gap-2 shadow-lg transition-all ${canFinalize && !submitting
+              ? "bg-[#4d8063] text-white"
+              : "bg-slate-200 text-slate-400 cursor-not-allowed"
+              }`}
           >
             {submitting ? (
               <><span className="material-symbols-outlined animate-spin">refresh</span> Registrando...</>
@@ -398,12 +446,73 @@ export default function CarrinhoPage({ onNavigate }: CarrinhoPageProps) {
             ) : !clienteSelecionado ? (
               <><AlertCircle className="w-5 h-5" /> Selecione um cliente</>
             ) : (
-              <><span className="material-symbols-outlined">{isAPrazo ? "receipt_long" : "check_circle"}</span>
-                {isAPrazo ? "Registrar como Fiado" : `Confirmar Venda • R$ ${totalFinal.toFixed(2).replace(".", ",")}`}</>
+              <><span className="material-symbols-outlined">{isAPrazo ? "receipt_long" : isPix ? "qr_code" : "check_circle"}</span>
+                {isAPrazo ? "Registrar como Fiado" : isPix ? `Gerar QR Code PIX • R$ ${totalFinal.toFixed(2).replace(".", ",")}` : `Confirmar Venda • R$ ${totalFinal.toFixed(2).replace(".", ",")}`}</>
             )}
           </button>
         </div>
       </div>
+
+      {/* Modal PIX QR Code */}
+      {showPixModal && (
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-end justify-center sm:items-center">
+          <div className="bg-white w-full max-w-sm rounded-t-3xl sm:rounded-3xl p-6 flex flex-col items-center gap-4">
+            <div className="w-10 h-1 bg-slate-200 rounded-full mb-1 sm:hidden" />
+            <div className="flex items-center gap-2">
+              <span className="material-symbols-outlined text-[#4d8063] text-2xl">qr_code</span>
+              <h2 className="text-lg font-bold text-slate-800">Pagamento PIX</h2>
+            </div>
+
+            <div className="text-center">
+              <p className="text-3xl font-bold text-[#4d8063]">R$ {totalFinal.toFixed(2).replace(".", ",")}</p>
+              <p className="text-sm text-slate-500 mt-1">para {clienteSelecionado?.nome}</p>
+            </div>
+
+            {pixPayload ? (
+              <div className="bg-white border-4 border-[#4d8063]/20 rounded-2xl p-3">
+                <QRCodeSVG value={pixPayload} size={200} level="M" />
+              </div>
+            ) : (
+              <div className="bg-slate-100 rounded-2xl p-8 text-center">
+                <span className="material-symbols-outlined text-4xl text-slate-400">qr_code</span>
+                <p className="text-xs text-slate-400 mt-2">Chave PIX não configurada</p>
+              </div>
+            )}
+
+            <div className="w-full bg-slate-50 rounded-xl px-4 py-3 flex items-center gap-2">
+              <div className="flex-1 min-w-0">
+                <p className="text-[10px] text-slate-400 font-medium">Chave PIX</p>
+                <p className="text-sm font-mono text-slate-700 truncate">{pixKey || "Não configurada"}</p>
+              </div>
+              {pixKey && (
+                <button onClick={copiarPix} className="shrink-0 p-2 rounded-lg bg-[#4d8063]/10 text-[#4d8063]">
+                  {copiado ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                </button>
+              )}
+            </div>
+
+            <p className="text-xs text-slate-400 text-center">Peça ao cliente para escanear o QR Code ou usar o Pix Copia e Cola</p>
+
+            <button
+              onClick={handleConfirmar}
+              disabled={submitting}
+              className="w-full bg-[#4d8063] text-white font-bold py-4 rounded-xl flex items-center justify-center gap-2 text-base"
+            >
+              {submitting
+                ? <><span className="material-symbols-outlined animate-spin">refresh</span> Registrando...</>
+                : <><span className="material-symbols-outlined">check_circle</span> Pagamento Recebido — Finalizar</>
+              }
+            </button>
+
+            <button
+              onClick={() => setShowPixModal(false)}
+              className="w-full py-3 text-slate-400 text-sm font-medium"
+            >
+              Cancelar
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

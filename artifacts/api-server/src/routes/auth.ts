@@ -110,4 +110,40 @@ router.post("/config/pix", authMiddleware, async (req, res) => {
   }
 });
 
+router.get("/config/logo", authMiddleware, async (req, res) => {
+  const lojaId = req.auth!.lojaId;
+  try {
+    const r = await pool.query("SELECT value FROM config WHERE key = 'logo' AND loja_id = $1", [lojaId]);
+    res.json({ logo: r.rows.length > 0 ? r.rows[0].value : null });
+  } catch {
+    res.status(500).json({ error: "Erro ao buscar logo" });
+  }
+});
+
+router.post("/config/logo", authMiddleware, async (req, res) => {
+  const { logo } = req.body;
+  const lojaId = req.auth!.lojaId;
+  if (!logo) return res.status(400).json({ error: "Informe logo" });
+  try {
+    await pool.query(
+      `INSERT INTO config (key, value, loja_id) VALUES ('logo', $1, $2)
+       ON CONFLICT (key, loja_id) DO UPDATE SET value = $1`,
+      [String(logo), lojaId]
+    );
+    res.json({ ok: true });
+  } catch {
+    res.status(500).json({ error: "Erro ao salvar logo" });
+  }
+});
+
+router.delete("/config/logo", authMiddleware, async (req, res) => {
+  const lojaId = req.auth!.lojaId;
+  try {
+    await pool.query("DELETE FROM config WHERE key = 'logo' AND loja_id = $1", [lojaId]);
+    res.json({ ok: true });
+  } catch {
+    res.status(500).json({ error: "Erro ao remover logo" });
+  }
+});
+
 export default router;
