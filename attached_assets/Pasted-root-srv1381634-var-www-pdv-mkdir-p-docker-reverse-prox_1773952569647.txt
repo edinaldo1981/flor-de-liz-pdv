@@ -1,0 +1,71 @@
+root@srv1381634:/var/www/pdv# mkdir -p /docker/reverse-proxy
+cat > /docker/reverse-proxy/Caddyfile << 'EOF'
+pdvanotafacil.com {
+    reverse_proxy localhost:8080
+}
+
+*.pdvanotafacil.com {
+    reverse_proxy localhost:3002
+}
+
+api.pdvanotafacil.com {
+    reverse_proxy localhost:3001
+}
+EOF
+root@srv1381634:/var/www/pdv# cat > /docker/reverse-proxy/docker-compose.yml << 'EOF'
+services:
+  caddy:
+    image: caddy:latest
+    container_name: caddy-proxy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    network_mode: host
+
+volumes:
+  caddy_data:
+  caddy_config:
+EOF
+root@srv1381634:/var/www/pdv# cd /docker/reverse-proxy && docker compose up -d
+[+] up 4/4
+ ✔ Image caddy:latest    Pulled                                                                                                                                                             1.2s
+ ✔ Container caddy       Recreated                                                                                                                                                          0.4s
+ ! caddy                 Published ports are discarded when using host network mode                                                                                                         0.0s
+ ✔ Container caddy-proxy Started                                                                                                                                                            0.2s
+root@srv1381634:/docker/reverse-proxy# docker logs caddy-proxy --tail 30
+{"level":"info","ts":1773952193.9744542,"logger":"http","msg":"using ACME account","account_id":"https://acme-v02.api.letsencrypt.org/acme/acct/3161268381","account_contact":[]}
+{"level":"info","ts":1773952194.6362689,"msg":"trying to solve challenge","identifier":"pdvanotafacil.com","challenge_type":"tls-alpn-01","ca":"https://acme-v02.api.letsencrypt.org/directory"}
+{"level":"info","ts":1773952195.1183298,"logger":"tls","msg":"served key authentication certificate","server_name":"pdvanotafacil.com","challenge":"tls-alpn-01","remote":"23.178.112.106:54861","distributed":false}
+{"level":"info","ts":1773952195.5010018,"logger":"tls","msg":"served key authentication certificate","server_name":"pdvanotafacil.com","challenge":"tls-alpn-01","remote":"3.18.106.76:10054","distributed":false}
+{"level":"info","ts":1773952195.5658588,"logger":"tls","msg":"served key authentication certificate","server_name":"pdvanotafacil.com","challenge":"tls-alpn-01","remote":"34.215.92.92:43528","distributed":false}
+{"level":"info","ts":1773952195.6660469,"logger":"tls","msg":"served key authentication certificate","server_name":"pdvanotafacil.com","challenge":"tls-alpn-01","remote":"16.16.199.50:54226","distributed":false}
+{"level":"info","ts":1773952195.8165615,"logger":"tls","msg":"served key authentication certificate","server_name":"pdvanotafacil.com","challenge":"tls-alpn-01","remote":"54.254.44.40:57342","distributed":false}
+{"level":"info","ts":1773952197.018502,"msg":"authorization finalized","identifier":"pdvanotafacil.com","authz_status":"valid"}
+{"level":"info","ts":1773952197.0185437,"msg":"validations succeeded; finalizing order","order":"https://acme-v02.api.letsencrypt.org/acme/order/3161268381/492259255221"}
+{"level":"info","ts":1773952199.7521555,"msg":"got renewal info","names":["pdvanotafacil.com"],"window_start":1779056131,"window_end":1779211580,"selected_time":1779161369,"recheck_after":1773976067.7521398,"explanation_url":""}
+{"level":"info","ts":1773952200.101974,"msg":"got renewal info","names":["pdvanotafacil.com"],"window_start":1779056131,"window_end":1779211580,"selected_time":1779147476,"recheck_after":1773977440.101962,"explanation_url":""}
+{"level":"info","ts":1773952200.1026125,"msg":"successfully downloaded available certificate chains","count":2,"first_url":"https://acme-v02.api.letsencrypt.org/acme/cert/05a98f9e0f8759403c399b085aad7f45fafe"}
+{"level":"info","ts":1773952200.1212204,"logger":"tls.obtain","msg":"certificate obtained successfully","identifier":"pdvanotafacil.com","issuer":"acme-v02.api.letsencrypt.org-directory"}
+{"level":"info","ts":1773952200.1222699,"logger":"tls.obtain","msg":"releasing lock","identifier":"pdvanotafacil.com"}
+{"level":"info","ts":1773952253.7433827,"logger":"tls.obtain","msg":"obtaining certificate","identifier":"*.pdvanotafacil.com"}
+{"level":"info","ts":1773952253.74511,"logger":"http","msg":"creating new account because no account for configured email is known to us","email":"","ca":"https://acme-staging-v02.api.letsencrypt.org/directory","error":"open /data/caddy/acme/acme-staging-v02.api.letsencrypt.org-directory/users/default/default.json: no such file or directory"}
+{"level":"info","ts":1773952253.74531,"logger":"http","msg":"ACME account has empty status; registering account with ACME server","contact":[],"location":""}
+{"level":"info","ts":1773952253.747682,"logger":"http","msg":"creating new account because no account for configured email is known to us","email":"","ca":"https://acme-staging-v02.api.letsencrypt.org/directory","error":"open /data/caddy/acme/acme-staging-v02.api.letsencrypt.org-directory/users/default/default.json: no such file or directory"}
+{"level":"info","ts":1773952254.659916,"logger":"http","msg":"new ACME account registered","contact":[],"status":"valid"}
+{"level":"info","ts":1773952254.6656723,"logger":"http","msg":"using ACME account","account_id":"https://acme-staging-v02.api.letsencrypt.org/acme/acct/275790893","account_contact":[]}
+{"level":"error","ts":1773952255.1980171,"logger":"tls.obtain","msg":"could not get certificate from issuer","identifier":"*.pdvanotafacil.com","issuer":"acme-v02.api.letsencrypt.org-directory","error":"[*.pdvanotafacil.com] solving challenges: *.pdvanotafacil.com: no solvers available for remaining challenges (configured=[http-01 tls-alpn-01] offered=[dns-01] remaining=[dns-01]) (order=https://acme-staging-v02.api.letsencrypt.org/acme/order/275790893/34731781243) (ca=https://acme-staging-v02.api.letsencrypt.org/directory)"}
+{"level":"error","ts":1773952255.1980865,"logger":"tls.obtain","msg":"will retry","error":"[*.pdvanotafacil.com] Obtain: [*.pdvanotafacil.com] solving challenges: *.pdvanotafacil.com: no solvers available for remaining challenges (configured=[http-01 tls-alpn-01] offered=[dns-01] remaining=[dns-01]) (order=https://acme-staging-v02.api.letsencrypt.org/acme/order/275790893/34731781243) (ca=https://acme-staging-v02.api.letsencrypt.org/directory)","attempt":2,"retrying_in":120,"elapsed":63.231177684,"max_duration":2592000}
+{"level":"info","ts":1773952375.1994693,"logger":"tls.obtain","msg":"obtaining certificate","identifier":"*.pdvanotafacil.com"}
+{"level":"info","ts":1773952375.2021208,"logger":"http","msg":"using ACME account","account_id":"https://acme-staging-v02.api.letsencrypt.org/acme/acct/275790893","account_contact":[]}
+{"level":"error","ts":1773952375.8924067,"logger":"tls.obtain","msg":"could not get certificate from issuer","identifier":"*.pdvanotafacil.com","issuer":"acme-v02.api.letsencrypt.org-directory","error":"[*.pdvanotafacil.com] solving challenges: *.pdvanotafacil.com: no solvers available for remaining challenges (configured=[http-01 tls-alpn-01] offered=[dns-01] remaining=[dns-01]) (order=https://acme-staging-v02.api.letsencrypt.org/acme/order/275790893/34731868233) (ca=https://acme-staging-v02.api.letsencrypt.org/directory)"}
+{"level":"error","ts":1773952375.8924642,"logger":"tls.obtain","msg":"will retry","error":"[*.pdvanotafacil.com] Obtain: [*.pdvanotafacil.com] solving challenges: *.pdvanotafacil.com: no solvers available for remaining challenges (configured=[http-01 tls-alpn-01] offered=[dns-01] remaining=[dns-01]) (order=https://acme-staging-v02.api.letsencrypt.org/acme/order/275790893/34731868233) (ca=https://acme-staging-v02.api.letsencrypt.org/directory)","attempt":3,"retrying_in":120,"elapsed":183.925555409,"max_duration":2592000}
+{"level":"info","ts":1773952495.8927672,"logger":"tls.obtain","msg":"obtaining certificate","identifier":"*.pdvanotafacil.com"}
+{"level":"info","ts":1773952495.893623,"logger":"http","msg":"using ACME account","account_id":"https://acme-staging-v02.api.letsencrypt.org/acme/acct/275790893","account_contact":[]}
+{"level":"error","ts":1773952496.7477486,"logger":"tls.obtain","msg":"could not get certificate from issuer","identifier":"*.pdvanotafacil.com","issuer":"acme-v02.api.letsencrypt.org-directory","error":"[*.pdvanotafacil.com] solving challenges: *.pdvanotafacil.com: no solvers available for remaining challenges (configured=[tls-alpn-01 http-01] offered=[dns-01] remaining=[dns-01]) (order=https://acme-staging-v02.api.letsencrypt.org/acme/order/275790893/34731965573) (ca=https://acme-staging-v02.api.letsencrypt.org/directory)"}
+{"level":"error","ts":1773952496.7478085,"logger":"tls.obtain","msg":"will retry","error":"[*.pdvanotafacil.com] Obtain: [*.pdvanotafacil.com] solving challenges: *.pdvanotafacil.com: no solvers available for remaining challenges (configured=[tls-alpn-01 http-01] offered=[dns-01] remaining=[dns-01]) (order=https://acme-staging-v02.api.letsencrypt.org/acme/order/275790893/34731965573) (ca=https://acme-staging-v02.api.letsencrypt.org/directory)","attempt":4,"retrying_in":300,"elapsed":304.780900203,"max_duration":2592000}
+root@srv1381634:/docker/reverse-proxy# 
