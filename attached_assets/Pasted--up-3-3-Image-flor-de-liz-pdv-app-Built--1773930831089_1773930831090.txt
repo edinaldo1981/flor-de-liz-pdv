@@ -1,0 +1,36 @@
+[+] up 3/3
+ ✔ Image flor-de-liz-pdv-app Built                                                                                                                                                        126.8s
+ ✔ Container anotafacil_db   Healthy                                                                                                                                                      25.7s
+ ✔ Container anotafacil_app  Started                                                                                                                                                      24.8s
+root@srv1381634:~/flor-de-liz-pdv# docker logs anotafacil_app --tail 30
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async X8 (/app/artifacts/api-server/dist/index.cjs:164:1904)
+[DB] Falha ao inicializar banco de dados: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+    at /app/artifacts/api-server/dist/index.cjs:59:15227
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async X8 (/app/artifacts/api-server/dist/index.cjs:164:1904)
+[DB] Falha ao inicializar banco de dados: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+    at /app/artifacts/api-server/dist/index.cjs:59:15227
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async X8 (/app/artifacts/api-server/dist/index.cjs:164:1904)
+[DB] Falha ao inicializar banco de dados: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+    at /app/artifacts/api-server/dist/index.cjs:59:15227
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async X8 (/app/artifacts/api-server/dist/index.cjs:164:1904)
+[DB] Falha ao inicializar banco de dados: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+    at /app/artifacts/api-server/dist/index.cjs:59:15227
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async X8 (/app/artifacts/api-server/dist/index.cjs:164:1904)
+[DB] Falha ao inicializar banco de dados: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+    at /app/artifacts/api-server/dist/index.cjs:59:15227
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async X8 (/app/artifacts/api-server/dist/index.cjs:164:1904)
+[DB] Falha ao inicializar banco de dados: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+    at /app/artifacts/api-server/dist/index.cjs:59:15227
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async X8 (/app/artifacts/api-server/dist/index.cjs:164:1904)
+[DB] Falha ao inicializar banco de dados: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+    at /app/artifacts/api-server/dist/index.cjs:59:15227
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async X8 (/app/artifacts/api-server/dist/index.cjs:164:1904)
+root@srv1381634:~/flor-de-liz-pdv# 
