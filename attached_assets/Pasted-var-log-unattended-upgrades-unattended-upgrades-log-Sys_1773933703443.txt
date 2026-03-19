@@ -1,0 +1,33 @@
+var/log/unattended-upgrades/unattended-upgrades.log
+
+*** System restart required ***
+Last login: Thu Mar 19 15:07:39 2026 from 169.254.0.1
+root@srv1381634:~# find / -name "docker-compose.yml" 2>/dev/null | grep -v "proc\|sys"
+/opt/wificontrol/docker-compose.yml
+/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/689/fs/app/docker-compose.yml
+/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/57/fs/docker-compose.yml
+/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/329/fs/app/docker-compose.yml
+/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/109/fs/app/docker-compose.yml
+/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/775/fs/app/docker-compose.yml
+/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/635/fs/app/docker-compose.yml
+/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/699/fs/docker-compose.yml
+/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/610/fs/app/docker-compose.yml
+/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/622/fs/app/docker-compose.yml
+/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/720/fs/app/docker-compose.yml
+/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/95/fs/app/docker-compose.yml
+/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/583/fs/app/docker-compose.yml
+/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/340/fs/app/docker-compose.yml
+/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/246/fs/docker-compose.yml
+/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/134/fs/app/docker-compose.yml
+/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/665/fs/app/docker-compose.yml
+/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/326/fs/docker-compose.yml
+/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/597/fs/app/docker-compose.yml
+/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/344/fs/app/docker-compose.yml
+/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/681/fs/app/docker-compose.yml
+/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/650/fs/app/docker-compose.yml
+/var/www/pdv/docker-compose.yml
+/root/wificonect-criado-com-antgravity-para-vps/app/docker-compose.yml
+/root/wificonect-criado-com-antgravity-para-vps/docker-compose.yml
+/root/html-helper/docker-compose.yml
+/root/flor-de-liz-pdv/docker-compose.yml
+/root/Anotafacil.v1.0/docker-co
