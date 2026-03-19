@@ -1,0 +1,17 @@
+ => [builder 14/14] RUN BASE_PATH=/portal-cliente/ PORT=3000 pnpm --filter @workspace/portal-cliente build &&     BASE_PATH=/ PORT=3000 pnpm --filter @workspace/boticario build &&       32.8s 
+ => [production 10/12] COPY --from=builder /app/artifacts/api-server/dist ./artifacts/api-server/dist                                                                                      1.0s 
+ => [production 11/12] COPY --from=builder /app/artifacts/boticario/dist ./artifacts/boticario/dist                                                                                        0.1s 
+ => [production 12/12] COPY --from=builder /app/artifacts/portal-cliente/dist ./artifacts/portal-cliente/dist                                                                              0.1s 
+ => exporting to image                                                                                                                                                                    33.8s 
+ => => exporting layers                                                                                                                                                                   21.3s 
+ => => exporting manifest sha256:089d14fb84c1c321b6bfa3a9f23d2fb8c41b263eb51906e24a7f23fdc3c8c6b9                                                                                          0.0s 
+ => => exporting config sha256:8f55657ddc46202fbdeee81a1c2102cffdc02053e4a84751ecfe34c53e799a77                                                                                            0.0s 
+ => => exporting attestation manifest sha256:2d833abdcecd3efcb06a57bd67dddca7c3c879ef482f776166435171ee0e1c42                                                                              0.0s 
+ => => exporting manifest list sha256:c09998a898767e1ad460bfb17e8690389deac63bab705db7c2c5d61a4bae7276                                                                                     0.0s 
+ => => naming to docker.io/library/flor-de-liz-pdv-app:latest                                                                                                                              0.0s 
+ => => unpacking to docker.io/library/flor-de-liz-pdv-app:latest                                                                                                                          12.4s
+ => resolving provenance for metadata file                                                                                                                                                 0.0s
+[+] up 3/3
+ ✔ Image flor-de-liz-pdv-app Built                                                                                                                                                        126.8s
+ ✔ Container anotafacil_db   Healthy                                                                                                                                                      25.7s
+ ✔ Container anotafacil_app  Started     
