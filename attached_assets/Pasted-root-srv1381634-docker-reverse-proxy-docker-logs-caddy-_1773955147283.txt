@@ -1,0 +1,17 @@
+root@srv1381634:/docker/reverse-proxy# docker logs caddy-proxy --tail 15
+{"level":"info","ts":1773954971.7591941,"logger":"admin","msg":"admin endpoint started","address":"localhost:2019","enforce_origin":false,"origins":["//localhost:2019","//[::1]:2019","//127.0.0.1:2019"]}
+{"level":"info","ts":1773954971.759697,"logger":"http.auto_https","msg":"server is listening only on the HTTPS port but has no TLS connection policies; adding one to enable TLS","server_name":"srv0","https_port":443}
+{"level":"info","ts":1773954971.7598464,"logger":"http.auto_https","msg":"enabling automatic HTTP->HTTPS redirects","server_name":"srv0"}
+{"level":"warn","ts":1773954971.7604837,"logger":"http","msg":"HTTP/2 skipped because it requires TLS","network":"tcp","addr":":80"}
+{"level":"warn","ts":1773954971.760586,"logger":"http","msg":"HTTP/3 skipped because it requires TLS","network":"tcp","addr":":80"}
+{"level":"info","ts":1773954971.7605934,"logger":"http.log","msg":"server running","name":"remaining_auto_https_redirects","protocols":["h1","h2","h3"]}
+{"level":"info","ts":1773954971.7607188,"logger":"http","msg":"enabling HTTP/3 listener","addr":":443"}
+{"level":"info","ts":1773954971.7608438,"msg":"failed to sufficiently increase receive buffer size (was: 208 kiB, wanted: 7168 kiB, got: 416 kiB). See https://github.com/quic-go/quic-go/wiki/UDP-Buffer-Sizes for details."}
+{"level":"info","ts":1773954971.7611713,"logger":"http.log","msg":"server running","name":"srv0","protocols":["h1","h2","h3"]}
+{"level":"info","ts":1773954971.7612526,"logger":"http","msg":"enabling automatic TLS certificate management","domains":["*.pdvanotafacil.com","pdvanotafacil.com","www.pdvanotafacil.com","api.pdvanotafacil.com"]}
+{"level":"info","ts":1773954971.7622669,"msg":"autosaved config (load with --resume flag)","file":"/config/caddy/autosave.json"}
+{"level":"info","ts":1773954971.7623491,"msg":"serving initial configuration"}
+{"level":"info","ts":1773954971.7648501,"logger":"tls","msg":"storage cleaning happened too recently; skipping for now","storage":"FileStorage:/data/caddy","instance":"fb8e0187-a5f4-4d19-a2f6-cb5a04922390","try_again":1774041371.764849,"try_again_in":86399.999999529}
+{"level":"info","ts":1773954971.7651403,"logger":"tls","msg":"finished cleaning storage units"}
+{"level":"info","ts":1773954971.765577,"logger":"tls.cache.maintenance","msg":"started background certificate maintenance","cache":"0x398fd345c600"}
+root@srv1381634:/docker/reverse-proxy# 
