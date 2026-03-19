@@ -1,0 +1,22 @@
+root@srv1381634:~# docker logs caddy-proxy --tail 20
+{"level":"info","ts":1773952705.6757908,"msg":"maxprocs: Leaving GOMAXPROCS=1: CPU quota undefined"}
+{"level":"info","ts":1773952705.6761744,"msg":"GOMEMLIMIT is updated","GOMEMLIMIT":3695826124,"previous":9223372036854775807}
+{"level":"info","ts":1773952705.6762795,"msg":"using config from file","file":"/etc/caddy/Caddyfile"}
+Error: adapting config using caddyfile: parsing caddyfile tokens for 'on_demand_tls': the on_demand_tls 'interval' option is no longer supported, remove it from your config, at /etc/caddy/Caddyfile:3
+{"level":"info","ts":1773952731.6392887,"msg":"maxprocs: Leaving GOMAXPROCS=1: CPU quota undefined"}
+{"level":"info","ts":1773952731.63959,"msg":"GOMEMLIMIT is updated","GOMEMLIMIT":3695826124,"previous":9223372036854775807}
+{"level":"info","ts":1773952731.639695,"msg":"using config from file","file":"/etc/caddy/Caddyfile"}
+Error: adapting config using caddyfile: parsing caddyfile tokens for 'on_demand_tls': the on_demand_tls 'interval' option is no longer supported, remove it from your config, at /etc/caddy/Caddyfile:3
+{"level":"info","ts":1773952783.1180377,"msg":"maxprocs: Leaving GOMAXPROCS=1: CPU quota undefined"}
+{"level":"info","ts":1773952783.1183062,"msg":"GOMEMLIMIT is updated","GOMEMLIMIT":3695826124,"previous":9223372036854775807}
+{"level":"info","ts":1773952783.1184087,"msg":"using config from file","file":"/etc/caddy/Caddyfile"}
+Error: adapting config using caddyfile: parsing caddyfile tokens for 'on_demand_tls': the on_demand_tls 'interval' option is no longer supported, remove it from your config, at /etc/caddy/Caddyfile:3
+{"level":"info","ts":1773952843.4332938,"msg":"maxprocs: Leaving GOMAXPROCS=1: CPU quota undefined"}
+{"level":"info","ts":1773952843.433625,"msg":"GOMEMLIMIT is updated","GOMEMLIMIT":3695826124,"previous":9223372036854775807}
+{"level":"info","ts":1773952843.4337928,"msg":"using config from file","file":"/etc/caddy/Caddyfile"}
+Error: adapting config using caddyfile: parsing caddyfile tokens for 'on_demand_tls': the on_demand_tls 'interval' option is no longer supported, remove it from your config, at /etc/caddy/Caddyfile:3
+{"level":"info","ts":1773952903.755948,"msg":"maxprocs: Leaving GOMAXPROCS=1: CPU quota undefined"}
+{"level":"info","ts":1773952903.7562497,"msg":"GOMEMLIMIT is updated","GOMEMLIMIT":3695826124,"previous":9223372036854775807}
+{"level":"info","ts":1773952903.7562969,"msg":"using config from file","file":"/etc/caddy/Caddyfile"}
+Error: adapting config using caddyfile: parsing caddyfile tokens for 'on_demand_tls': the on_demand_tls 'interval' option is no longer supported, remove it from your config, at /etc/caddy/Caddyfile:3
+root@srv1381634:~# 
