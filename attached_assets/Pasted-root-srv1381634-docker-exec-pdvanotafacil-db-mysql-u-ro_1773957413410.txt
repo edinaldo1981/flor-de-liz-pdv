@@ -1,0 +1,35 @@
+root@srv1381634:~# docker exec pdvanotafacil-db mysql -u root -prootpassword pdv_db -e "ALTER TABLE categories ADD COLUMN icon VARCHAR(50);"
+mysql: [Warning] Using a password on the command line interface can be insecure.
+root@srv1381634:~# sed -i "s/ALTER TABLE categories ADD COLUMN IF NOT EXISTS icon VARCHAR(50)/ALTER TABLE categories ADD COLUMN icon VARCHAR(50)/g" /var/www/pdv/api/server.js
+root@srv1381634:~# cd /var/www/pdv && docker compose up -d --build pdv-api
+WARN[0000] /var/www/pdv/docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion 
+[+] Building 2.4s (12/12) FINISHED                                                                                                                                                              
+ => [internal] load local bake definitions                                                                                                                                                 0.0s
+ => => reading from stdin 480B                                                                                                                                                             0.0s
+ => [internal] load build definition from Dockerfile                                                                                                                                       0.0s
+ => => transferring dockerfile: 160B                                                                                                                                                       0.0s
+ => [internal] load metadata for docker.io/library/node:20-alpine                                                                                                                          1.0s
+ => [internal] load .dockerignore                                                                                                                                                          0.0s
+ => => transferring context: 2B                                                                                                                                                            0.0s
+ => [1/5] FROM docker.io/library/node:20-alpine@sha256:b88333c42c23fbd91596ebd7fd10de239cedab9617de04142dde7315e3bc0afa                                                                    0.1s
+ => => resolve docker.io/library/node:20-alpine@sha256:b88333c42c23fbd91596ebd7fd10de239cedab9617de04142dde7315e3bc0afa                                                                    0.0s
+ => [internal] load build context                                                                                                                                                          0.0s
+ => => transferring context: 10.87kB                                                                                                                                                       0.0s
+ => CACHED [2/5] WORKDIR /app                                                                                                                                                              0.0s
+ => CACHED [3/5] COPY package*.json ./                                                                                                                                                     0.0s
+ => CACHED [4/5] RUN npm install                                                                                                                                                           0.0s
+ => [5/5] COPY . .                                                                                                                                                                         0.1s
+ => exporting to image                                                                                                                                                                     0.3s
+ => => exporting layers                                                                                                                                                                    0.1s
+ => => exporting manifest sha256:aa8ca1dfb1dc1355f6bd04b70251c88f16a889ade42ade5a876688596d7ee246                                                                                          0.0s
+ => => exporting config sha256:96346df335ba6bc507b927824ea5309c445bfcfd5dca706fe2f6b358e5d74fb3                                                                                            0.0s
+ => => exporting attestation manifest sha256:c49dfbab7039c0249a9de2906fbc010eec6037148757ef2cb67e4a748fbf2ba3                                                                              0.0s
+ => => exporting manifest list sha256:6452fd5a33da9173d46e5b21e6ed24dcb59b7688027fc85d6a7714cdd1b977ea                                                                                     0.0s
+ => => naming to docker.io/library/pdv-pdv-api:latest                                                                                                                                      0.0s
+ => => unpacking to docker.io/library/pdv-pdv-api:latest                                                                                                                                   0.0s
+ => resolving provenance for metadata file                                                                                                                                                 0.0s
+[+] up 3/3
+ ✔ Image pdv-pdv-api           Built                                                                                                                                                       2.6ss
+ ✔ Container pdvanotafacil-db  Healthy                                                                                                                                                     11.0s
+ ✔ Container pdvanotafacil-api Started                                                                                                                                                     11.3s
+root@srv1381634:/var/www/pdv# 
