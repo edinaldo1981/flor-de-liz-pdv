@@ -208,6 +208,12 @@ export default function App() {
     setAuthChecking(false);
   }, []);
 
+  useEffect(() => {
+    if (lojaNome && lojaNome !== "Minha Loja") {
+      document.title = lojaNome;
+    }
+  }, [lojaNome]);
+
   const handleLogin = (r: Role, p: Permissions | null, nome: string) => {
     setRole(r);
     setPermissions(p);
