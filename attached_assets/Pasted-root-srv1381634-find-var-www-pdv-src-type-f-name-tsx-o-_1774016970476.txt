@@ -1,0 +1,43 @@
+root@srv1381634:~# find /var/www/pdv/src -type f -name "*.tsx" -o -name "*.jsx" | head -20
+/var/www/pdv/src/contexts/CartContext.tsx
+/var/www/pdv/src/contexts/StoreContext.tsx
+/var/www/pdv/src/contexts/CustomerContext.tsx
+/var/www/pdv/src/contexts/ProductContext.tsx
+/var/www/pdv/src/contexts/SysAdminContext.tsx
+/var/www/pdv/src/contexts/AuthContext.tsx
+/var/www/pdv/src/contexts/SaleContext.tsx
+/var/www/pdv/src/pages/SalesHome.tsx
+/var/www/pdv/src/pages/CheckoutPage.tsx
+/var/www/pdv/src/pages/DashboardPage.tsx
+/var/www/pdv/src/pages/StockPage.tsx
+/var/www/pdv/src/pages/LoginPin.tsx
+/var/www/pdv/src/pages/ReceiptPage.tsx
+/var/www/pdv/src/pages/NotFound.tsx
+/var/www/pdv/src/pages/ReportsPage.tsx
+/var/www/pdv/src/pages/AdminPage.tsx
+/var/www/pdv/src/pages/ContasReceberPage.tsx
+/var/www/pdv/src/pages/sysadmin/SuperAdminPanel.tsx
+/var/www/pdv/src/pages/FiadoPage.tsx
+/var/www/pdv/src/pages/CartPage.tsx
+root@srv1381634:~# grep -rn "categories\|categorias\|categoria" /var/www/pdv/src/ | grep -v "node_modules" | head -20
+/var/www/pdv/src/contexts/ProductContext.tsx:35:  categories: Category[];
+/var/www/pdv/src/contexts/ProductContext.tsx:53:  const [categories, setCategories] = useState<Category[]>([]);
+/var/www/pdv/src/contexts/ProductContext.tsx:60:      api.get('/categories').catch(() => [])
+/var/www/pdv/src/contexts/ProductContext.tsx:119:        await api.post('/categories', category);
+/var/www/pdv/src/contexts/ProductContext.tsx:128:        const cat = categories.find(c => c.id === id);
+/var/www/pdv/src/contexts/ProductContext.tsx:130:            await api.post('/categories', { ...cat, ...data });
+/var/www/pdv/src/contexts/ProductContext.tsx:135:  }, [categories]);
+/var/www/pdv/src/contexts/ProductContext.tsx:140:        await api.delete(`/categories/${id}`);
+/var/www/pdv/src/contexts/ProductContext.tsx:165:      value={{ products, categories, units, addProduct, updateProduct, deleteProduct, addCategory, updateCategory, deleteCategory, addUnit, deleteUnit, getUnitShort, isLoading }}
+/var/www/pdv/src/pages/StockPage.tsx:18:  const { products, categories, units, updateProduct, deleteProduct, addProduct, addUnit, getUnitShort } = useProducts();
+/var/www/pdv/src/pages/StockPage.tsx:93:      toast.error("Selecione uma categoria para o produto.");
+/var/www/pdv/src/pages/StockPage.tsx:137:  const categoryOptions = categories.filter((c) => c.id !== "todos");
+/var/www/pdv/src/pages/StockPage.tsx:176:            const cat = categories.find((c) => c.id === product.category);
+/var/www/pdv/src/pages/StockPage.tsx:313:                    <span className="text-2xl">{categories.find((c) => c.id === editCategory)?.icon || "📦"}</span>
+/var/www/pdv/src/pages/AdminPage.tsx:90:    { id: "categorias", icon: Tag, label: "Categorias", description: "Gerenciar categorias de produtos" },
+/var/www/pdv/src/pages/AdminPage.tsx:341:      {activeSection === "categorias" && (
+/var/www/pdv/src/components/pdv/ProductCard.tsx:11:  const { categories, getUnitShort } = useProducts();
+/var/www/pdv/src/components/pdv/ProductCard.tsx:13:  const category = categories.find((c) => c.id === product.category);
+/var/www/pdv/src/components/pdv/CategoryManagerModal.tsx:20:  const { categories, addCategory, updateCategory, deleteCategory, products } = useProducts();
+/var/www/pdv/src/components/pdv/CategoryManagerModal.tsx:27:  const editableCategories = categories.filter((c) => c.id !== "todos");
+root@srv1381634:~# 
