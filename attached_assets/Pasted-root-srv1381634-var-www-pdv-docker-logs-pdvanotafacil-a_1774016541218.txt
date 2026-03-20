@@ -1,0 +1,42 @@
+root@srv1381634:/var/www/pdv# docker logs pdvanotafacil-api --tail 20
+  sqlState: '23000',
+  sqlMessage: "Column 'name' cannot be null"
+}
+Error saving product: Error: Cannot add or update a child row: a foreign key constraint fails (`pdv_db`.`products`, CONSTRAINT `products_ibfk_1` FOREIGN KEY (`category`) REFERENCES `categories` (`id`) ON DELETE SET NULL)
+    at PromisePool.query (/app/node_modules/mysql2/lib/promise/pool.js:36:22)
+    at /app/server.js:72:20
+    at Layer.handleRequest (/app/node_modules/router/lib/layer.js:152:17)
+    at next (/app/node_modules/router/lib/route.js:157:13)
+    at Route.dispatch (/app/node_modules/router/lib/route.js:117:3)
+    at handle (/app/node_modules/router/index.js:435:11)
+    at Layer.handleRequest (/app/node_modules/router/lib/layer.js:152:17)
+    at /app/node_modules/router/index.js:295:15
+    at processParams (/app/node_modules/router/index.js:582:12)
+    at next (/app/node_modules/router/index.js:291:5) {
+  code: 'ER_NO_REFERENCED_ROW_2',
+  errno: 1452,
+  sql: "INSERT INTO products (id, name, price, image, category, stock, unit, codigo_barras) VALUES ('p1774016318872', 'Laranja', 1, NULL, 'sucos', 10, 'un', NULL) ON DUPLICATE KEY UPDATE name=VALUES(name), price=VALUES(price), image=VALUES(image), category=VALUES(category), stock=VALUES(stock), unit=VALUES(unit), codigo_barras=VALUES(codigo_barras)",
+  sqlState: '23000',
+  sqlMessage: 'Cannot add or update a child row: a foreign key constraint fails (`pdv_db`.`products`, CONSTRAINT `products_ibfk_1` FOREIGN KEY (`category`) REFERENCES `categories` (`id`) ON DELETE SET NULL)'
+}
+root@srv1381634:/var/www/pdv# docker inspect pdvanotafacil-db --format '{{json .Mounts}}' | python3 -m json.tool
+[
+    {
+        "Type": "volume",
+        "Name": "pdv_pdv_data",
+        "Source": "/var/lib/docker/volumes/pdv_pdv_data/_data",
+        "Destination": "/var/lib/mysql",
+        "Driver": "local",
+        "Mode": "rw",
+        "RW": true,
+        "Propagation": ""
+    },
+    {
+        "Type": "bind",
+        "Source": "/var/www/pdv/db/init.sql",
+        "Destination": "/docker-entrypoint-initdb.d/init.sql",
+        "Mode": "rw",
+        "RW": true,
+        "Propagation": "rprivate"
+    }
+]
