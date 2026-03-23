@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { apiFetch } from "@/lib/api";
 import { ArrowLeft, Search, Plus, Pencil, Trash2, X, Save, Package } from "lucide-react";
 
@@ -15,11 +15,15 @@ interface Produto {
   img_url?: string;
 }
 
+const PAGE_SIZE = 24;
 
 export default function PerfumariaPage({ onNavigate }: PerfumariaPageProps) {
   const [search, setSearch] = useState("");
   const [produtos, setProdutos] = useState<Produto[]>([]);
+  const [total, setTotal] = useState(0);
+  const [offset, setOffset] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [selecionados, setSelecionados] = useState<number[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [editando, setEditando] = useState<Produto | null>(null);
@@ -28,16 +32,13 @@ export default function PerfumariaPage({ onNavigate }: PerfumariaPageProps) {
   const [saving, setSaving] = useState(false);
   const [erro, setErro] = useState("");
   const [imgPreview, setImgPreview] = useState<string>("");
-
   const [comprimindo, setComprimindo] = useState(false);
 
   const compressImage = (file: File): Promise<string> =>
     new Promise((resolve, reject) => {
       const img = new Image();
       const url = URL.createObjectURL(file);
-
       const cleanup = () => URL.revokeObjectURL(url);
-
       img.onload = () => {
         try {
           const MAX = 1200;
@@ -51,23 +52,14 @@ export default function PerfumariaPage({ onNavigate }: PerfumariaPageProps) {
           if (!ctx) { cleanup(); reject(new Error("Canvas não disponível")); return; }
           ctx.drawImage(img, 0, 0, w, h);
           cleanup();
-
           const supportsWebP = canvas.toDataURL("image/webp").startsWith("data:image/webp");
           const result = supportsWebP
             ? canvas.toDataURL("image/webp", 0.88)
             : canvas.toDataURL("image/jpeg", 0.88);
           resolve(result);
-        } catch (e) {
-          cleanup();
-          reject(e);
-        }
+        } catch (e) { cleanup(); reject(e); }
       };
-
-      img.onerror = () => {
-        cleanup();
-        reject(new Error("Não foi possível carregar a imagem. Tente converter para JPG ou PNG."));
-      };
-
+      img.onerror = () => { cleanup(); reject(new Error("Não foi possível carregar a imagem. Tente converter para JPG ou PNG.")); };
       img.src = url;
     });
 
@@ -81,15 +73,34 @@ export default function PerfumariaPage({ onNavigate }: PerfumariaPageProps) {
       setImgPreview(compressed);
       setForm(prev => ({ ...prev, img_url: compressed }));
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Erro ao processar imagem.";
-      setErro(msg);
+      setErro(err instanceof Error ? err.message : "Erro ao processar imagem.");
     } finally {
       setComprimindo(false);
     }
   };
 
+  const fetchProdutos = useCallback(async (searchTerm: string, off: number, append = false) => {
+    if (off === 0) setLoading(true); else setLoadingMore(true);
+    try {
+      const qs = new URLSearchParams({ limit: String(PAGE_SIZE), offset: String(off) });
+      if (searchTerm.trim()) qs.set("q", searchTerm.trim());
+      const resp = await apiFetch(`/produtos?${qs}`);
+      if (resp.ok) {
+        const data = await resp.json();
+        const rows: Produto[] = data.rows ?? data;
+        const tot: number = data.total ?? rows.length;
+        setTotal(tot);
+        setProdutos(prev => append ? [...prev, ...rows] : rows);
+        setOffset(off + rows.length);
+      }
+    } catch { /* ignore */ } finally {
+      setLoading(false);
+      setLoadingMore(false);
+    }
+  }, []);
+
   useEffect(() => {
-    fetchProdutos();
+    fetchProdutos("", 0, false);
     try {
       const raw = localStorage.getItem("produto_editar");
       if (raw) {
@@ -98,20 +109,20 @@ export default function PerfumariaPage({ onNavigate }: PerfumariaPageProps) {
         openForm(p);
       }
     } catch { /* ignore */ }
-  }, []);
+  }, [fetchProdutos]);
 
-  const fetchProdutos = async () => {
-    setLoading(true);
-    try {
-      const resp = await apiFetch(`/produtos`);
-      if (resp.ok) setProdutos(await resp.json());
-    } catch { /* silently fail */ } finally { setLoading(false); }
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      fetchProdutos(search, 0, false);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [search, fetchProdutos]);
+
+  const handleVerMais = () => {
+    fetchProdutos(search, offset, true);
   };
 
-  const filtered = produtos.filter(p =>
-    p.nome.toLowerCase().includes(search.toLowerCase()) ||
-    p.marca.toLowerCase().includes(search.toLowerCase())
-  );
+  const temMais = produtos.length < total;
 
   const toggleSelecionado = (id: number) => {
     setSelecionados(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
@@ -120,14 +131,7 @@ export default function PerfumariaPage({ onNavigate }: PerfumariaPageProps) {
   const irParaVenda = () => {
     const novos = produtos
       .filter(p => selecionados.includes(p.id))
-      .map(p => ({
-        id: p.id,
-        brand: p.marca,
-        name: p.nome,
-        price: p.preco,
-        qty: 1,
-        img: p.img_url || "",
-      }));
+      .map(p => ({ id: p.id, brand: p.marca, name: p.nome, price: p.preco, qty: 1, img: p.img_url || "" }));
     let cart: typeof novos = [];
     try {
       const raw = localStorage.getItem("carrinho_items");
@@ -135,11 +139,8 @@ export default function PerfumariaPage({ onNavigate }: PerfumariaPageProps) {
     } catch { /* ignore */ }
     for (const novo of novos) {
       const idx = cart.findIndex(c => c.id === novo.id);
-      if (idx >= 0) {
-        cart[idx].qty += 1;
-      } else {
-        cart.push(novo);
-      }
+      if (idx >= 0) cart[idx].qty += 1;
+      else cart.push(novo);
     }
     localStorage.setItem("carrinho_items", JSON.stringify(cart));
     onNavigate("carrinho");
@@ -156,13 +157,7 @@ export default function PerfumariaPage({ onNavigate }: PerfumariaPageProps) {
   const openForm = (produto?: Produto) => {
     if (produto) {
       setEditando(produto);
-      setForm({
-        marca: produto.marca,
-        nome: produto.nome,
-        preco: produto.preco.toString(),
-        estoque: produto.estoque.toString(),
-        img_url: produto.img_url || "",
-      });
+      setForm({ marca: produto.marca, nome: produto.nome, preco: produto.preco.toString(), estoque: produto.estoque.toString(), img_url: produto.img_url || "" });
       setImgPreview(produto.img_url || "");
     } else {
       setEditando(null);
@@ -181,26 +176,16 @@ export default function PerfumariaPage({ onNavigate }: PerfumariaPageProps) {
     setSaving(true);
     setErro("");
     try {
-      const body = {
-        marca: form.marca,
-        nome: form.nome,
-        preco: parseFloat(form.preco),
-        estoque: parseInt(form.estoque) || 0,
-        img_url: form.img_url || null,
-      };
+      const body = { marca: form.marca, nome: form.nome, preco: parseFloat(form.preco), estoque: parseInt(form.estoque) || 0, img_url: form.img_url || null };
       const url = editando ? `/produtos/${editando.id}` : `/produtos`;
       const method = editando ? "PUT" : "POST";
-      const resp = await apiFetch(url, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
+      const resp = await apiFetch(url, { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
       if (!resp.ok) {
         const data = await resp.json().catch(() => ({}));
         throw new Error(data.error || "Erro ao salvar produto.");
       }
       closeForm();
-      fetchProdutos();
+      fetchProdutos(search, 0, false);
     } catch (err: unknown) {
       setErro(err instanceof Error ? err.message : "Erro ao salvar. Tente novamente.");
     } finally {
@@ -214,7 +199,7 @@ export default function PerfumariaPage({ onNavigate }: PerfumariaPageProps) {
       if (!resp.ok) throw new Error();
       setConfirmDelete(null);
       setSelecionados(prev => prev.filter(id => id !== produto.id));
-      fetchProdutos();
+      fetchProdutos(search, 0, false);
     } catch {
       setErro("Erro ao excluir produto.");
     }
@@ -241,16 +226,21 @@ export default function PerfumariaPage({ onNavigate }: PerfumariaPageProps) {
               value={search}
               onChange={e => setSearch(e.target.value)}
             />
+            {search && (
+              <button onClick={() => setSearch("")} className="text-slate-400">
+                <X className="w-4 h-4" />
+              </button>
+            )}
           </div>
         </div>
       </header>
 
       <main className="flex-1 px-4 py-3 pb-24">
         <p className="text-xs text-slate-500 mb-3 font-medium">
-          {loading ? "Carregando..." : `${filtered.length} produto${filtered.length !== 1 ? "s" : ""} encontrado${filtered.length !== 1 ? "s" : ""}`}
+          {loading ? "Carregando..." : `${total} produto${total !== 1 ? "s" : ""} encontrado${total !== 1 ? "s" : ""}`}
         </p>
 
-        {!loading && filtered.length === 0 && (
+        {!loading && produtos.length === 0 && (
           <div className="bg-white rounded-xl border-2 border-dashed border-[#4d8063]/20 py-10 flex flex-col items-center gap-3 text-[#4d8063]">
             <Package className="w-10 h-10 opacity-40" />
             <p className="text-sm font-medium text-slate-500">Nenhum produto cadastrado</p>
@@ -260,66 +250,95 @@ export default function PerfumariaPage({ onNavigate }: PerfumariaPageProps) {
           </div>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3">
-          {filtered.map(p => {
-            const selected = selecionados.includes(p.id);
-            return (
-              <div key={p.id} className={`bg-white rounded-xl border ${selected ? "border-[#4d8063] ring-1 ring-[#4d8063]/30" : "border-[#4d8063]/5"} p-3 shadow-sm`}>
-                <button
-                  onClick={() => {
-                    localStorage.setItem("produto_detalhe", JSON.stringify(p));
-                    onNavigate("produto");
-                  }}
-                  className="flex items-center gap-3 w-full text-left"
-                >
-                  <div className="w-14 h-14 rounded-xl overflow-hidden shrink-0 bg-slate-100 flex items-center justify-center">
-                    {p.img_url ? (
-                      <img src={p.img_url} alt={p.nome} className="w-full h-full object-cover" />
-                    ) : (
-                      <Package className="w-6 h-6 text-slate-300" />
-                    )}
+        {loading ? (
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div key={i} className="bg-white rounded-xl border border-slate-100 p-3 shadow-sm animate-pulse">
+                <div className="flex items-center gap-3">
+                  <div className="w-14 h-14 rounded-xl bg-slate-100 shrink-0" />
+                  <div className="flex-1 space-y-2">
+                    <div className="h-3 bg-slate-100 rounded w-1/3" />
+                    <div className="h-4 bg-slate-100 rounded w-2/3" />
+                    <div className="h-3 bg-slate-100 rounded w-1/4" />
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[10px] font-bold text-[#4d8063] uppercase tracking-wider">{p.marca}</p>
-                    <p className="text-sm font-semibold leading-tight mt-0.5 truncate">{p.nome}</p>
-                    <div className="flex items-center gap-2 mt-1">
-                      <p className="text-[#4d8063] font-bold text-sm">R$ {Number(p.preco).toFixed(2).replace(".", ",")}</p>
-                      <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded ${p.estoque <= 3 ? "bg-orange-100 text-orange-600" : "bg-emerald-100 text-emerald-700"}`}>
-                        {p.estoque} un.
-                      </span>
-                    </div>
-                  </div>
-                </button>
-                <div className="flex items-center gap-2 mt-3 pt-2 border-t border-slate-100">
-                  <button
-                    onClick={() => toggleSelecionado(p.id)}
-                    className={`flex-1 py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition-colors ${
-                      selected ? "bg-[#4d8063] text-white" : "bg-[#4d8063]/10 text-[#4d8063]"
-                    }`}
-                  >
-                    {selected ? (
-                      <><span className="material-symbols-outlined text-sm">check</span> Selecionado</>
-                    ) : (
-                      <><Plus className="w-3.5 h-3.5" /> Adicionar à Venda</>
-                    )}
-                  </button>
-                  <button
-                    onClick={() => openForm(p)}
-                    className="p-2 rounded-lg bg-slate-100 text-slate-500 hover:bg-slate-200"
-                  >
-                    <Pencil className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => setConfirmDelete(p)}
-                    className="p-2 rounded-lg bg-red-50 text-red-400 hover:bg-red-100"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
                 </div>
               </div>
-            );
-          })}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3">
+              {produtos.map(p => {
+                const selected = selecionados.includes(p.id);
+                return (
+                  <div key={p.id} className={`bg-white rounded-xl border ${selected ? "border-[#4d8063] ring-1 ring-[#4d8063]/30" : "border-[#4d8063]/5"} p-3 shadow-sm`}>
+                    <button
+                      onClick={() => {
+                        localStorage.setItem("produto_detalhe", JSON.stringify(p));
+                        onNavigate("produto");
+                      }}
+                      className="flex items-center gap-3 w-full text-left"
+                    >
+                      <div className="w-14 h-14 rounded-xl overflow-hidden shrink-0 bg-slate-100 flex items-center justify-center">
+                        {p.img_url ? (
+                          <img src={p.img_url} alt={p.nome} className="w-full h-full object-cover" loading="lazy" />
+                        ) : (
+                          <Package className="w-6 h-6 text-slate-300" />
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[10px] font-bold text-[#4d8063] uppercase tracking-wider">{p.marca}</p>
+                        <p className="text-sm font-semibold leading-tight mt-0.5 truncate">{p.nome}</p>
+                        <div className="flex items-center gap-2 mt-1">
+                          <p className="text-[#4d8063] font-bold text-sm">R$ {Number(p.preco).toFixed(2).replace(".", ",")}</p>
+                          <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded ${p.estoque <= 3 ? "bg-orange-100 text-orange-600" : "bg-emerald-100 text-emerald-700"}`}>
+                            {p.estoque} un.
+                          </span>
+                        </div>
+                      </div>
+                    </button>
+                    <div className="flex items-center gap-2 mt-3 pt-2 border-t border-slate-100">
+                      <button
+                        onClick={() => toggleSelecionado(p.id)}
+                        className={`flex-1 py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition-colors ${
+                          selected ? "bg-[#4d8063] text-white" : "bg-[#4d8063]/10 text-[#4d8063]"
+                        }`}
+                      >
+                        {selected ? (
+                          <><span className="material-symbols-outlined text-sm">check</span> Selecionado</>
+                        ) : (
+                          <><Plus className="w-3.5 h-3.5" /> Adicionar à Venda</>
+                        )}
+                      </button>
+                      <button onClick={() => openForm(p)} className="p-2 rounded-lg bg-slate-100 text-slate-500 hover:bg-slate-200">
+                        <Pencil className="w-4 h-4" />
+                      </button>
+                      <button onClick={() => setConfirmDelete(p)} className="p-2 rounded-lg bg-red-50 text-red-400 hover:bg-red-100">
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {temMais && (
+              <div className="mt-6 flex justify-center">
+                <button
+                  onClick={handleVerMais}
+                  disabled={loadingMore}
+                  className="bg-white border border-[#4d8063]/30 text-[#4d8063] font-bold px-6 py-3 rounded-xl text-sm flex items-center gap-2 disabled:opacity-60"
+                >
+                  {loadingMore ? (
+                    <><span className="material-symbols-outlined animate-spin text-base">refresh</span> Carregando...</>
+                  ) : (
+                    <>Ver mais {Math.min(PAGE_SIZE, total - produtos.length)} produtos</>
+                  )}
+                </button>
+              </div>
+            )}
+          </>
+        )}
       </main>
 
       {selecionados.length > 0 && (
@@ -334,12 +353,8 @@ export default function PerfumariaPage({ onNavigate }: PerfumariaPageProps) {
         </div>
       )}
 
-      {/* ── Modal Criar/Editar ── */}
       {showForm && (
-        <div
-          className="fixed inset-0 z-50 bg-black/40 flex items-end justify-center"
-          onClick={e => { if (e.target === e.currentTarget) closeForm(); }}
-        >
+        <div className="fixed inset-0 z-50 bg-black/40 flex items-end justify-center" onClick={e => { if (e.target === e.currentTarget) closeForm(); }}>
           <div className="bg-white w-full max-w-md rounded-t-2xl p-5 pb-8 space-y-4 animate-slide-up">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-bold">{editando ? "Editar Produto" : "Novo Produto"}</h2>
@@ -364,16 +379,10 @@ export default function PerfumariaPage({ onNavigate }: PerfumariaPageProps) {
               </label>
             ))}
 
-            {/* Foto — galeria do dispositivo */}
             <div className="flex flex-col gap-1">
               <span className="text-sm font-medium text-slate-700">Foto do Produto (opcional)</span>
               <label className="cursor-pointer">
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={handleImgChange}
-                />
+                <input type="file" accept="image/*" className="hidden" onChange={handleImgChange} />
                 {comprimindo ? (
                   <div className="w-full h-24 rounded-xl border border-[#4d8063]/20 bg-[#4d8063]/5 flex flex-col items-center justify-center gap-2">
                     <span className="material-symbols-outlined animate-spin text-[#4d8063]">refresh</span>
@@ -395,11 +404,7 @@ export default function PerfumariaPage({ onNavigate }: PerfumariaPageProps) {
                 )}
               </label>
               {imgPreview && (
-                <button
-                  type="button"
-                  onClick={() => { setImgPreview(""); setForm(prev => ({ ...prev, img_url: "" })); }}
-                  className="text-xs text-red-400 text-center mt-1"
-                >
+                <button type="button" onClick={() => { setImgPreview(""); setForm(prev => ({ ...prev, img_url: "" })); }} className="text-xs text-red-400 text-center mt-1">
                   Remover foto
                 </button>
               )}
@@ -422,7 +427,6 @@ export default function PerfumariaPage({ onNavigate }: PerfumariaPageProps) {
         </div>
       )}
 
-      {/* ── Modal Confirmar Exclusão ── */}
       {confirmDelete && (
         <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center px-6">
           <div className="bg-white rounded-2xl p-6 w-full max-w-sm space-y-4">
@@ -436,12 +440,8 @@ export default function PerfumariaPage({ onNavigate }: PerfumariaPageProps) {
               </p>
             </div>
             <div className="flex gap-3">
-              <button onClick={() => setConfirmDelete(null)} className="flex-1 py-3 rounded-xl border border-slate-200 font-bold text-sm">
-                Cancelar
-              </button>
-              <button onClick={() => handleDelete(confirmDelete)} className="flex-1 py-3 rounded-xl bg-red-500 text-white font-bold text-sm">
-                Excluir
-              </button>
+              <button onClick={() => setConfirmDelete(null)} className="flex-1 py-3 rounded-xl border border-slate-200 font-bold text-sm">Cancelar</button>
+              <button onClick={() => handleDelete(confirmDelete)} className="flex-1 py-3 rounded-xl bg-red-500 text-white font-bold text-sm">Excluir</button>
             </div>
           </div>
         </div>

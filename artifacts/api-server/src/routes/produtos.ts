@@ -5,20 +5,30 @@ import { authMiddleware } from "../middleware/auth";
 const router = Router();
 
 router.get("/produtos", authMiddleware, async (req, res) => {
-  const { q } = req.query;
+  const { q, limit, offset } = req.query;
   const lojaId = req.auth!.lojaId;
+  const lim = Math.min(parseInt(limit as string) || 24, 100);
+  const off = parseInt(offset as string) || 0;
   try {
-    let query: string;
+    let baseWhere: string;
     let params: unknown[];
     if (q && typeof q === "string" && q.trim()) {
-      query = "SELECT * FROM produtos WHERE loja_id = $1 AND (nome ILIKE $2 OR marca ILIKE $2) ORDER BY marca, nome";
+      baseWhere = "loja_id = $1 AND (nome ILIKE $2 OR marca ILIKE $2)";
       params = [lojaId, `%${q.trim()}%`];
     } else {
-      query = "SELECT * FROM produtos WHERE loja_id = $1 ORDER BY marca, nome";
+      baseWhere = "loja_id = $1";
       params = [lojaId];
     }
-    const result = await pool.query(query, params);
-    res.json(result.rows);
+    const countResult = await pool.query(
+      `SELECT COUNT(*) FROM produtos WHERE ${baseWhere}`,
+      params
+    );
+    const total = parseInt(countResult.rows[0].count);
+    const dataResult = await pool.query(
+      `SELECT * FROM produtos WHERE ${baseWhere} ORDER BY marca, nome LIMIT $${params.length + 1} OFFSET $${params.length + 2}`,
+      [...params, lim, off]
+    );
+    res.json({ rows: dataResult.rows, total, limit: lim, offset: off });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Erro ao buscar produtos" });
