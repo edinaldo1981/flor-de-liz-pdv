@@ -7,9 +7,11 @@ const router = Router();
 router.get("/dashboard", authMiddleware, async (req, res) => {
   const lojaId = req.auth!.lojaId;
   try {
-    const hoje = new Date();
-    const inicioDia = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
-    const inicioMes = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+    const agora = new Date();
+    const offsetBR = -3 * 60;
+    const agoraBR = new Date(agora.getTime() + (offsetBR - agora.getTimezoneOffset()) * 60000);
+    const inicioDia = new Date(Date.UTC(agoraBR.getFullYear(), agoraBR.getMonth(), agoraBR.getDate()));
+    const inicioMes = new Date(Date.UTC(agoraBR.getFullYear(), agoraBR.getMonth(), 1));
 
     const [vendasHoje, fiadosAbertos, recebidoMes, totalClientes, ultimasVendas, topFiados] = await Promise.all([
       pool.query(

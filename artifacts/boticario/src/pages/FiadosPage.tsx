@@ -40,6 +40,15 @@ function diasAtras(dateStr: string) {
   return `${d} dias`;
 }
 
+function isAtrasado(v: Venda): boolean {
+  if (v.status === "fiado_atrasado") return true;
+  if (v.status === "fiado") {
+    const dias = Math.floor((Date.now() - new Date(v.created_at).getTime()) / 86400000);
+    return dias > 30;
+  }
+  return false;
+}
+
 export default function FiadosPage({ onNavigate }: FiadosPageProps) {
   const [busca, setBusca] = useState("");
   const [fiados, setFiados] = useState<Venda[]>([]);
@@ -133,7 +142,7 @@ export default function FiadosPage({ onNavigate }: FiadosPageProps) {
           ) : (
             filtrados.map(g => {
               const isExp = expandido === g.cliente_id;
-              const temAtrasado = g.fiados.some(v => v.status === "fiado_atrasado");
+              const temAtrasado = g.fiados.some(v => isAtrasado(v));
               return (
                 <div key={g.cliente_id} className="bg-white rounded-2xl border border-[#4d8063]/10 shadow-sm overflow-hidden">
                   {/* Cabeçalho do cliente */}

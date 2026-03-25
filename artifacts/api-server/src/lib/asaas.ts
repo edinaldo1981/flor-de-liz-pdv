@@ -66,7 +66,7 @@ export async function findOrCreateAsaasCustomer(cliente: {
   return created.id as string;
 }
 
-function nextBusinessDay(days = 3): string {
+function nextBusinessDay(days = 30): string {
   const d = new Date();
   d.setDate(d.getDate() + days);
   return d.toISOString().split("T")[0];
