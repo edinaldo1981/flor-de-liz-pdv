@@ -249,18 +249,14 @@ export default function CarrinhoPage({ onNavigate }: CarrinhoPageProps) {
 
       <div className="flex gap-0 border-b border-slate-200" style={{ height: 300 }}>
         <div className="flex flex-col w-1/2 border-r border-slate-200 bg-white">
-          <div className="flex items-center gap-1.5 px-2 py-2 border-b border-slate-100">
-            {marcaSelecionada && !searchProd && (
-              <button onClick={() => setMarcaSelecionada(null)} className="shrink-0">
-                <ArrowLeft className="w-3.5 h-3.5 text-[#4d8063]" />
-              </button>
-            )}
+          {/* Busca */}
+          <div className="flex items-center gap-1.5 px-2 py-2 border-b border-slate-100 shrink-0">
             <Search className="w-3.5 h-3.5 text-slate-400 shrink-0" />
             <input
               className="flex-1 text-xs outline-none placeholder-slate-400 bg-transparent"
-              placeholder={marcaSelecionada && !searchProd ? marcaSelecionada : "Buscar produto..."}
+              placeholder="Buscar produto..."
               value={searchProd}
-              onChange={e => { setSearchProd(e.target.value); if (e.target.value) setMarcaSelecionada(null); }}
+              onChange={e => { setSearchProd(e.target.value); }}
             />
             {loadingSearch && <span className="material-symbols-outlined text-slate-300 text-sm animate-spin shrink-0">refresh</span>}
             {searchProd && !loadingSearch && (
@@ -269,38 +265,45 @@ export default function CarrinhoPage({ onNavigate }: CarrinhoPageProps) {
               </button>
             )}
           </div>
+
+          {/* Marcas em chips horizontais */}
+          {!searchProd && marcas.length > 0 && (
+            <div className="flex gap-1.5 px-2 py-1.5 overflow-x-auto shrink-0 border-b border-slate-100 scrollbar-hide">
+              {marcas.map(marca => {
+                const temNoCarrinho = items.some(i => i.brand === marca);
+                const ativa = marcaSelecionada === marca;
+                return (
+                  <button
+                    key={marca}
+                    onClick={() => setMarcaSelecionada(ativa ? null : marca)}
+                    className={`flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-bold whitespace-nowrap shrink-0 transition-colors ${
+                      ativa
+                        ? "bg-[#4d8063] text-white"
+                        : "bg-slate-100 text-slate-600 hover:bg-[#4d8063]/10"
+                    }`}
+                  >
+                    {temNoCarrinho && <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${ativa ? "bg-white/70" : "bg-[#4d8063]"}`} />}
+                    {marca}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Lista de produtos */}
           <div className="flex-1 overflow-y-auto">
             {!searchProd && !marcaSelecionada ? (
-              marcas.length === 0 ? (
-                <div className="flex flex-col items-center justify-center h-full gap-2 text-slate-300">
-                  <Package className="w-8 h-8" />
-                  <p className="text-xs">Sem produtos</p>
-                </div>
-              ) : (
-                marcas.map(marca => {
-                  const qtdMarca = produtos.filter(p => p.marca === marca).length;
-                  const temNoCarrinho = items.some(i => i.brand === marca);
-                  return (
-                    <button
-                      key={marca}
-                      onClick={() => setMarcaSelecionada(marca)}
-                      className="w-full flex items-center justify-between px-3 py-2.5 border-b border-slate-50 hover:bg-[#4d8063]/5 active:bg-[#4d8063]/10 text-left"
-                    >
-                      <div className="flex-1 min-w-0">
-                        <p className="text-[11px] font-bold text-slate-700 truncate">{marca}</p>
-                        <p className="text-[9px] text-slate-400">{qtdMarca} produto{qtdMarca !== 1 ? "s" : ""}</p>
-                      </div>
-                      <div className="flex items-center gap-1.5 shrink-0">
-                        {temNoCarrinho && <span className="w-1.5 h-1.5 rounded-full bg-[#4d8063]" />}
-                        <span className="material-symbols-outlined text-slate-300 text-sm">chevron_right</span>
-                      </div>
-                    </button>
-                  );
-                })
-              )
+              <div className="flex flex-col items-center justify-center h-full gap-2 text-slate-300 px-3">
+                <Package className="w-7 h-7" />
+                <p className="text-[10px] text-center leading-tight">Selecione uma marca<br />ou busque um produto</p>
+              </div>
+            ) : loadingSearch ? (
+              <div className="flex items-center justify-center h-full">
+                <span className="material-symbols-outlined text-slate-300 animate-spin">refresh</span>
+              </div>
             ) : filteredProd.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full gap-2 text-slate-300">
-                <Package className="w-8 h-8" />
+                <Package className="w-7 h-7" />
                 <p className="text-xs">Sem produtos</p>
               </div>
             ) : (
