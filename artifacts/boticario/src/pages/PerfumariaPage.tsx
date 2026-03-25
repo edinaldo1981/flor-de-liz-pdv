@@ -24,7 +24,7 @@ export default function PerfumariaPage({ onNavigate }: PerfumariaPageProps) {
   const [offset, setOffset] = useState(0);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
-  const [selecionados, setSelecionados] = useState<number[]>([]);
+  const [selecionados, setSelecionados] = useState<Record<number, Produto>>({});
   const [showForm, setShowForm] = useState(false);
   const [editando, setEditando] = useState<Produto | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<Produto | null>(null);
@@ -124,14 +124,20 @@ export default function PerfumariaPage({ onNavigate }: PerfumariaPageProps) {
 
   const temMais = produtos.length < total;
 
-  const toggleSelecionado = (id: number) => {
-    setSelecionados(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
+  const toggleSelecionado = (produto: Produto) => {
+    setSelecionados(prev => {
+      if (prev[produto.id]) {
+        const { [produto.id]: _, ...rest } = prev;
+        return rest;
+      }
+      return { ...prev, [produto.id]: produto };
+    });
   };
 
   const irParaVenda = () => {
-    const novos = produtos
-      .filter(p => selecionados.includes(p.id))
-      .map(p => ({ id: p.id, brand: p.marca, name: p.nome, price: p.preco, qty: 1, img: p.img_url || "" }));
+    const novos = Object.values(selecionados).map(p => ({
+      id: p.id, brand: p.marca, name: p.nome, price: p.preco, qty: 1, img: p.img_url || ""
+    }));
     let cart: typeof novos = [];
     try {
       const raw = localStorage.getItem("carrinho_items");
@@ -269,7 +275,7 @@ export default function PerfumariaPage({ onNavigate }: PerfumariaPageProps) {
           <>
             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3">
               {produtos.map(p => {
-                const selected = selecionados.includes(p.id);
+                const selected = !!selecionados[p.id];
                 return (
                   <div key={p.id} className={`bg-white rounded-xl border ${selected ? "border-[#4d8063] ring-1 ring-[#4d8063]/30" : "border-[#4d8063]/5"} p-3 shadow-sm`}>
                     <button
@@ -299,7 +305,7 @@ export default function PerfumariaPage({ onNavigate }: PerfumariaPageProps) {
                     </button>
                     <div className="flex items-center gap-2 mt-3 pt-2 border-t border-slate-100">
                       <button
-                        onClick={() => toggleSelecionado(p.id)}
+                        onClick={() => toggleSelecionado(p)}
                         className={`flex-1 py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition-colors ${
                           selected ? "bg-[#4d8063] text-white" : "bg-[#4d8063]/10 text-[#4d8063]"
                         }`}
@@ -341,14 +347,14 @@ export default function PerfumariaPage({ onNavigate }: PerfumariaPageProps) {
         )}
       </main>
 
-      {selecionados.length > 0 && (
+      {Object.keys(selecionados).length > 0 && (
         <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-[#4d8063]/10 z-10 max-w-md mx-auto lg:max-w-none lg:left-60 lg:mx-0">
           <button
             onClick={irParaVenda}
             className="w-full bg-[#4d8063] text-white font-bold py-4 rounded-xl flex items-center justify-center gap-2"
           >
             <span className="material-symbols-outlined">shopping_cart</span>
-            Ir para Venda ({selecionados.length} {selecionados.length === 1 ? "item" : "itens"})
+            {(() => { const n = Object.keys(selecionados).length; return `Ir para Venda (${n} ${n === 1 ? "item" : "itens"})`; })()}
           </button>
         </div>
       )}
