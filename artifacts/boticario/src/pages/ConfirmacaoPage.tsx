@@ -33,46 +33,46 @@ export default function ConfirmacaoPage({ onNavigate }: ConfirmacaoPageProps) {
   const handlePrint = () => {
     if (!dados) return;
 
+    const lojaNome = localStorage.getItem("auth_loja_nome") || "LOJA";
+
     const linhas = [
-      "============================",
-      "       FLOR DE LIZ          ",
-      "============================",
+      "================================",
+      `   ${lojaNome.toUpperCase().substring(0, 28)}`,
+      "================================",
       `Pedido #${dados.venda?.id || "---"}`,
       `Data: ${new Date().toLocaleString("pt-BR")}`,
-      "----------------------------",
+      "--------------------------------",
       `Cliente: ${dados.cliente.nome}`,
-      "----------------------------",
+      "--------------------------------",
       "ITENS:",
-      ...dados.items.map(i => `${i.qty}x ${i.brand} ${i.name}  R$ ${(i.price * i.qty).toFixed(2).replace(".", ",")}`),
-      "----------------------------",
+      ...dados.items.map(i => `${i.qty}x ${i.brand} ${i.name}\n   R$ ${(i.price * i.qty).toFixed(2).replace(".", ",")}`),
+      "--------------------------------",
       `TOTAL: R$ ${dados.total.toFixed(2).replace(".", ",")}`,
       `Pagamento: ${pagamentoLabel[dados.pagamento] || dados.pagamento}`,
-      "============================",
-      "    Obrigada pela compra!   ",
-      "============================",
+      "================================",
+      "     Obrigada pela compra!      ",
+      "================================",
     ].join("\n");
 
-    const styleEl = document.createElement("style");
-    styleEl.id = "flor-print-style";
-    styleEl.textContent = `
-      @media print {
-        body > *:not(#flor-print-area) { display: none !important; }
-        #flor-print-area { display: block !important; }
-      }
-    `;
-
-    const printEl = document.createElement("div");
-    printEl.id = "flor-print-area";
-    printEl.style.cssText = "display:none; font-family:monospace; font-size:14px; white-space:pre; padding:20px;";
-    printEl.textContent = linhas;
-
-    document.head.appendChild(styleEl);
-    document.body.appendChild(printEl);
-
-    window.print();
-
-    document.head.removeChild(styleEl);
-    document.body.removeChild(printEl);
+    const win = window.open("", "_blank", "width=420,height=700");
+    if (!win) { alert("Permita pop-ups neste site para imprimir o recibo."); return; }
+    win.document.write(`<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Recibo #${dados.venda?.id || ""}</title>
+  <style>
+    body { font-family: monospace; font-size: 13px; padding: 20px; margin: 0; background: #fff; }
+    pre { white-space: pre-wrap; word-break: break-word; margin: 0; }
+    @media print { body { padding: 8px; } }
+  </style>
+</head>
+<body>
+  <pre>${linhas}</pre>
+  <script>window.onload = function() { window.print(); window.onafterprint = function() { window.close(); }; }<\/script>
+</body>
+</html>`);
+    win.document.close();
   };
 
   return (

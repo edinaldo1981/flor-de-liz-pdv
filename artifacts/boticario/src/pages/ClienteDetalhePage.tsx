@@ -68,7 +68,6 @@ export default function ClienteDetalhePage({ onNavigate }: Props) {
   const [data, setData] = useState<{ cliente: Cliente; vendas: Venda[]; stats: Stats } | null>(null);
   const [loading, setLoading] = useState(true);
   const [expandedVenda, setExpandedVenda] = useState<number | null>(null);
-  const [printingVenda, setPrintingVenda] = useState<Venda | null>(null);
   const [haveres, setHaveres] = useState<Haver[]>([]);
   const [saldoHaver, setSaldoHaver] = useState<number>(0);
   const [clienteId, setClienteId] = useState<string | null>(null);
@@ -107,14 +106,88 @@ export default function ClienteDetalhePage({ onNavigate }: Props) {
       .finally(() => setLoading(false));
   }, []);
 
+  const abrirJanelaImpressao = (html: string, titulo: string) => {
+    const win = window.open("", "_blank", "width=420,height=700");
+    if (!win) { alert("Permita pop-ups neste site para imprimir."); return; }
+    win.document.write(`<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>${titulo}</title>
+  <style>
+    body { font-family: monospace; font-size: 12px; padding: 16px; margin: 0; background: #fff; }
+    p { margin: 2px 0; }
+    .right { text-align: right; }
+    .center { text-align: center; }
+    .bold { font-weight: bold; }
+    .small { font-size: 10px; }
+    .sep { border: none; border-top: 1px dashed #000; margin: 6px 0; }
+    @media print { body { padding: 4px; } }
+  </style>
+</head>
+<body>
+  ${html}
+  <script>window.onload = function() { window.print(); window.onafterprint = function() { window.close(); }; }<\/script>
+</body>
+</html>`);
+    win.document.close();
+  };
+
   const printRecibo = (venda: Venda) => {
-    setPrintingVenda(venda);
-    setTimeout(() => { window.print(); setPrintingVenda(null); }, 300);
+    const lojaNome = localStorage.getItem("auth_loja_nome") || "LOJA";
+    const itensHtml = (venda.itens || []).filter(i => i.nome_produto).map(item =>
+      `<div>
+        <p>${item.quantidade}x ${item.nome_produto}</p>
+        <p class="right">${item.marca} — ${fmtBRL(item.quantidade * parseFloat(String(item.preco_unit)))}</p>
+      </div>`
+    ).join("");
+
+    const html = `
+      <p class="center bold" style="font-size:14px">${lojaNome.toUpperCase()}</p>
+      <p class="center">Nota de Venda #${venda.id}</p>
+      <p class="center">${fmtDate(venda.created_at)}</p>
+      <hr class="sep"/>
+      <p><span class="bold">Cliente:</span> ${cliente.nome}</p>
+      ${cliente.cpf ? `<p><span class="bold">CPF:</span> ${cliente.cpf}</p>` : ""}
+      <hr class="sep"/>
+      ${itensHtml}
+      <hr class="sep"/>
+      <p class="right bold" style="font-size:14px">TOTAL: ${fmtBRL(parseFloat(venda.total))}</p>
+      <p class="right">${pagLabel[venda.forma_pagamento] ?? venda.forma_pagamento} — ${statusLabel[venda.status]?.label ?? venda.status}</p>
+      <p class="center small" style="margin-top:12px">Obrigada pela preferência! ♥</p>
+    `;
+    abrirJanelaImpressao(html, `Recibo #${venda.id}`);
   };
 
   const printHistorico = () => {
-    setPrintingVenda(null);
-    setTimeout(() => window.print(), 100);
+    const lojaNome = localStorage.getItem("auth_loja_nome") || "LOJA";
+    const vendasHtml = vendas.map(v =>
+      `<div style="margin-bottom:8px">
+        <p><span class="bold">#${v.id}</span> ${fmtDate(v.created_at)}</p>
+        ${(v.itens || []).filter(i => i.nome_produto).map(item =>
+          `<p style="padding-left:8px">${item.quantidade}x ${item.nome_produto} ${fmtBRL(item.quantidade * parseFloat(String(item.preco_unit)))}</p>`
+        ).join("")}
+        <p class="right">${fmtBRL(parseFloat(v.total))} — ${statusLabel[v.status]?.label ?? v.status}</p>
+        <hr class="sep"/>
+      </div>`
+    ).join("");
+
+    const html = `
+      <p class="center bold" style="font-size:14px">${lojaNome.toUpperCase()}</p>
+      <p class="center bold">Histórico — ${cliente.nome}</p>
+      ${cliente.cpf ? `<p class="center">CPF: ${cliente.cpf}</p>` : ""}
+      ${(cliente.whatsapp || cliente.telefone) ? `<p class="center">Tel: ${cliente.whatsapp || cliente.telefone}</p>` : ""}
+      <p class="center">${new Date().toLocaleDateString("pt-BR")}</p>
+      <hr class="sep"/>
+      <p>Total de compras: ${stats.totalVendas}</p>
+      <p>Total pago: ${fmtBRL(stats.totalGasto)}</p>
+      ${stats.totalEmAberto > 0 ? `<p class="bold">Em aberto: ${fmtBRL(stats.totalEmAberto)}</p>` : ""}
+      ${saldoHaver > 0 ? `<p>Haver disponível: ${fmtBRL(saldoHaver)}</p>` : ""}
+      <hr class="sep"/>
+      ${vendasHtml}
+      <p class="center small" style="margin-top:8px">Obrigada pela preferência! ♥</p>
+    `;
+    abrirJanelaImpressao(html, `Histórico — ${cliente.nome}`);
   };
 
   const openEdit = (haver: Haver) => {
@@ -167,16 +240,7 @@ export default function ClienteDetalhePage({ onNavigate }: Props) {
 
   return (
     <>
-      <style>{`
-        @media print {
-          body * { visibility: hidden !important; }
-          .print-area, .print-area * { visibility: visible !important; }
-          .print-area { position: fixed !important; top: 0; left: 0; width: 80mm; }
-          .no-print { display: none !important; }
-        }
-      `}</style>
-
-      <div className="bg-[#f6f7f7] min-h-screen flex flex-col max-w-md mx-auto lg:max-w-2xl no-print">
+      <div className="bg-[#f6f7f7] min-h-screen flex flex-col max-w-md mx-auto lg:max-w-2xl">
         {/* Header */}
         <header className="sticky top-0 z-20 bg-white border-b border-[#4d8063]/10 no-print">
           <div className="flex items-center gap-3 px-4 py-4">
@@ -491,69 +555,6 @@ export default function ClienteDetalhePage({ onNavigate }: Props) {
         </div>
       )}
 
-      {/* Área de Impressão */}
-      <div className="print-area" style={{ display: "none" }}>
-        {printingVenda ? (
-          <div style={{ fontFamily: "monospace", fontSize: 12, padding: 8, width: "80mm" }}>
-            <div style={{ textAlign: "center", marginBottom: 8 }}>
-              <p style={{ fontWeight: "bold", fontSize: 14 }}>{localStorage.getItem("auth_loja_nome") || "LOJA"}</p>
-              <p>Nota de Venda #{printingVenda.id}</p>
-              <p>{fmtDate(printingVenda.created_at)}</p>
-              <p>{"─".repeat(32)}</p>
-            </div>
-            <p><b>Cliente:</b> {cliente.nome}</p>
-            {cliente.cpf && <p><b>CPF:</b> {cliente.cpf}</p>}
-            <p>{"─".repeat(32)}</p>
-            {printingVenda.itens?.filter(i => i.nome_produto).map((item, idx) => (
-              <div key={idx} style={{ marginBottom: 4 }}>
-                <p>{item.quantidade}x {item.nome_produto}</p>
-                <p style={{ textAlign: "right" }}>{item.marca} — {fmtBRL(item.quantidade * parseFloat(String(item.preco_unit)))}</p>
-              </div>
-            ))}
-            <p>{"─".repeat(32)}</p>
-            <p style={{ textAlign: "right", fontWeight: "bold", fontSize: 14 }}>
-              TOTAL: {fmtBRL(parseFloat(printingVenda.total))}
-            </p>
-            <p style={{ textAlign: "right" }}>
-              {pagLabel[printingVenda.forma_pagamento] ?? printingVenda.forma_pagamento} — {statusLabel[printingVenda.status]?.label ?? printingVenda.status}
-            </p>
-            <p style={{ textAlign: "center", marginTop: 12, fontSize: 10 }}>Obrigada pela preferência! ♥</p>
-          </div>
-        ) : (
-          <div style={{ fontFamily: "monospace", fontSize: 11, padding: 8, width: "80mm" }}>
-            <div style={{ textAlign: "center", marginBottom: 8 }}>
-              <p style={{ fontWeight: "bold", fontSize: 14 }}>{localStorage.getItem("auth_loja_nome") || "LOJA"}</p>
-              <p style={{ fontWeight: "bold" }}>Histórico — {cliente.nome}</p>
-              {cliente.cpf && <p>CPF: {cliente.cpf}</p>}
-              {(cliente.whatsapp || cliente.telefone) && <p>Tel: {cliente.whatsapp || cliente.telefone}</p>}
-              <p>{new Date().toLocaleDateString("pt-BR")}</p>
-              <p>{"─".repeat(32)}</p>
-            </div>
-            <div style={{ marginBottom: 8 }}>
-              <p>Total de compras: {stats.totalVendas}</p>
-              <p>Total pago: {fmtBRL(stats.totalGasto)}</p>
-              {stats.totalEmAberto > 0 && <p><b>Em aberto: {fmtBRL(stats.totalEmAberto)}</b></p>}
-              {saldoHaver > 0 && <p>Haver disponível: {fmtBRL(saldoHaver)}</p>}
-            </div>
-            <p>{"─".repeat(32)}</p>
-            {vendas.map(v => (
-              <div key={v.id} style={{ marginBottom: 6 }}>
-                <p><b>#{v.id}</b> {fmtDate(v.created_at)}</p>
-                {v.itens?.filter(i => i.nome_produto).map((item, idx) => (
-                  <p key={idx} style={{ paddingLeft: 8 }}>
-                    {item.quantidade}x {item.nome_produto} {fmtBRL(item.quantidade * parseFloat(String(item.preco_unit)))}
-                  </p>
-                ))}
-                <p style={{ textAlign: "right" }}>
-                  {fmtBRL(parseFloat(v.total))} — {statusLabel[v.status]?.label ?? v.status}
-                </p>
-                <p>{"- ".repeat(16)}</p>
-              </div>
-            ))}
-            <p style={{ textAlign: "center", marginTop: 8, fontSize: 10 }}>Obrigada pela preferência! ♥</p>
-          </div>
-        )}
-      </div>
     </>
   );
 }
