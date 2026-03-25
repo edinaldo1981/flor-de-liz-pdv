@@ -139,7 +139,7 @@ export default function CarrinhoPage({ onNavigate }: CarrinhoPageProps) {
 
   const fetchProdutos = async () => {
     try {
-      const r = await apiFetch(`/produtos?limit=100`);
+      const r = await apiFetch(`/produtos?limit=9999`);
       if (r.ok) {
         const data = await r.json();
         setProdutos(data.rows ?? data);
