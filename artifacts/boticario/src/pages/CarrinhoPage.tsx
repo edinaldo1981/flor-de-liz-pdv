@@ -85,6 +85,8 @@ export default function CarrinhoPage({ onNavigate }: CarrinhoPageProps) {
   const [items, setItems] = useState<CartItem[]>(loadCartFromStorage);
   const [produtos, setProdutos] = useState<Produto[]>([]);
   const [searchProd, setSearchProd] = useState("");
+  const [searchResults, setSearchResults] = useState<Produto[]>([]);
+  const [loadingSearch, setLoadingSearch] = useState(false);
   const [marcaSelecionada, setMarcaSelecionada] = useState<string | null>(null);
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const [clienteSelecionado, setClienteSelecionado] = useState<Cliente | null>(null);
@@ -111,10 +113,7 @@ export default function CarrinhoPage({ onNavigate }: CarrinhoPageProps) {
   const marcas = Array.from(new Set(produtos.map(p => p.marca))).sort();
 
   const filteredProd = searchProd.trim()
-    ? produtos.filter(p =>
-        p.nome.toLowerCase().includes(searchProd.toLowerCase()) ||
-        p.marca.toLowerCase().includes(searchProd.toLowerCase())
-      )
+    ? searchResults
     : marcaSelecionada
       ? produtos.filter(p => p.marca === marcaSelecionada)
       : [];
@@ -132,6 +131,22 @@ export default function CarrinhoPage({ onNavigate }: CarrinhoPageProps) {
     const timer = setTimeout(() => fetchClientes(busca), 300);
     return () => clearTimeout(timer);
   }, [busca]);
+
+  useEffect(() => {
+    if (!searchProd.trim()) { setSearchResults([]); setLoadingSearch(false); return; }
+    setLoadingSearch(true);
+    const timer = setTimeout(async () => {
+      try {
+        const r = await apiFetch(`/produtos?q=${encodeURIComponent(searchProd.trim())}&limit=50`);
+        if (r.ok) {
+          const data = await r.json();
+          setSearchResults(data.rows ?? data);
+        }
+      } catch { }
+      finally { setLoadingSearch(false); }
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchProd]);
 
   useEffect(() => {
     localStorage.setItem("carrinho_items", JSON.stringify(items));
@@ -247,7 +262,8 @@ export default function CarrinhoPage({ onNavigate }: CarrinhoPageProps) {
               value={searchProd}
               onChange={e => { setSearchProd(e.target.value); if (e.target.value) setMarcaSelecionada(null); }}
             />
-            {searchProd && (
+            {loadingSearch && <span className="material-symbols-outlined text-slate-300 text-sm animate-spin shrink-0">refresh</span>}
+            {searchProd && !loadingSearch && (
               <button onClick={() => setSearchProd("")} className="shrink-0 text-slate-300">
                 <span className="text-xs">✕</span>
               </button>

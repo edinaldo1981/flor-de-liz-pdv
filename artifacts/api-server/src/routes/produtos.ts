@@ -7,7 +7,7 @@ const router = Router();
 router.get("/produtos", authMiddleware, async (req, res) => {
   const { q, limit, offset } = req.query;
   const lojaId = req.auth!.lojaId;
-  const lim = Math.min(parseInt(limit as string) || 24, 100);
+  const lim = Math.min(parseInt(limit as string) || 24, 5000);
   const off = parseInt(offset as string) || 0;
   try {
     let baseWhere: string;
