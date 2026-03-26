@@ -56,11 +56,9 @@ export default function FiadosPage({ onNavigate }: FiadosPageProps) {
   const [expandido, setExpandido] = useState<number | null>(null);
 
   useEffect(() => {
-    apiFetch(`/vendas`)
+    apiFetch(`/vendas?status=fiado,fiado_atrasado`)
       .then(r => r.json())
-      .then((data: Venda[]) => {
-        setFiados(data.filter(v => v.status === "fiado" || v.status === "fiado_atrasado"));
-      })
+      .then((data: Venda[]) => setFiados(data))
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);

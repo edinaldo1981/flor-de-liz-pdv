@@ -62,12 +62,22 @@ router.post("/vendas", authMiddleware, async (req, res) => {
 
 router.get("/vendas", authMiddleware, async (req, res) => {
   const lojaId = req.auth!.lojaId;
+  const { status } = req.query;
   try {
-    const result = await pool.query(
-      `SELECT v.*, c.nome as cliente_nome FROM vendas v LEFT JOIN clientes c ON c.id = v.cliente_id
-       WHERE v.loja_id = $1 ORDER BY v.created_at DESC LIMIT 50`,
-      [lojaId]
-    );
+    let query: string;
+    let params: unknown[];
+    if (status) {
+      const statuses = (status as string).split(",").map(s => s.trim());
+      const placeholders = statuses.map((_, i) => `$${i + 2}`).join(", ");
+      query = `SELECT v.*, c.nome as cliente_nome FROM vendas v LEFT JOIN clientes c ON c.id = v.cliente_id
+               WHERE v.loja_id = $1 AND v.status IN (${placeholders}) ORDER BY v.created_at DESC`;
+      params = [lojaId, ...statuses];
+    } else {
+      query = `SELECT v.*, c.nome as cliente_nome FROM vendas v LEFT JOIN clientes c ON c.id = v.cliente_id
+               WHERE v.loja_id = $1 ORDER BY v.created_at DESC LIMIT 50`;
+      params = [lojaId];
+    }
+    const result = await pool.query(query, params);
     res.json(result.rows);
   } catch {
     res.status(500).json({ error: "Erro ao buscar vendas" });
